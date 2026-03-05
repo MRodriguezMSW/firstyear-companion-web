@@ -1,4 +1,5 @@
 import "./globals.css";
+import ThemeInitializer from "./ThemeInitializer";
 
 export default function RootLayout({
   children,
@@ -8,6 +9,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content"
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
@@ -15,7 +20,8 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 text-slate-50">
+      <body>
+        <ThemeInitializer />
         {children}
       </body>
     </html>

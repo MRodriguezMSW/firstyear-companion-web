@@ -1,1 +1,44 @@
 @import "tailwindcss";
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  height: -webkit-fill-available;
+}
+
+body {
+  height: 100vh;
+  height: -webkit-fill-available;
+  overflow: hidden;
+  overscroll-behavior: none;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  font-family: 'DM Sans', sans-serif;
+  color: #f5ede0;
+  background: var(--bg, #0e1f1b);
+}
+
+#__next {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* ── Theme CSS variables ── */
+:root,
+[data-theme="forest"] {
+  --bg:   #0e1f1b;
+  --orb1: rgba(74,124,111,.15);
+  --orb2: rgba(180,140,90,.10);
+}
+[data-theme="ocean"]    { --bg: #0a1a2e; --orb1: rgba(30,100,160,.15);  --orb2: rgba(80,180,170,.08);  }
+[data-theme="dusk"]     { --bg: #1e1018; --orb1: rgba(190,110,150,.15); --orb2: rgba(200,160,70,.10);  }
+[data-theme="midnight"] { --bg: #0d0e1f; --orb1: rgba(100,100,190,.15); --orb2: rgba(160,160,210,.08); }
+[data-theme="ember"]    { --bg: #1a100a; --orb1: rgba(190,90,40,.15);   --orb2: rgba(160,120,70,.10);  }
+[data-theme="bloom"]    { --bg: #1a1015; --orb1: rgba(200,110,150,.15); --orb2: rgba(220,195,175,.08); }

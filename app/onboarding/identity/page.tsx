@@ -11,6 +11,16 @@ function dotState(i: number, screen = 1) {
   return i < screen ? "done" : i === screen ? "active" : "pending";
 }
 
+const SCREEN: React.CSSProperties = {
+  position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+  display: "flex", flexDirection: "column",
+  alignItems: "center", justifyContent: "center",
+  overflow: "hidden", padding: "16px",
+};
+const CONTENT: React.CSSProperties = {
+  width: "100%", maxWidth: 480, position: "relative", zIndex: 1,
+};
+
 export default function IdentityPage() {
   const router = useRouter();
   const [name, setName] = useState("");
@@ -23,12 +33,12 @@ export default function IdentityPage() {
   };
 
   return (
-    <div className={styles.fycRoot}>
+    <div className={styles.fycRoot} style={SCREEN}>
       <div className={`${styles.bgOrb} ${styles.bgOrb1}`} />
       <div className={`${styles.bgOrb} ${styles.bgOrb2}`} />
       <div className={`${styles.bgOrb} ${styles.bgOrb3}`} />
 
-      <div className={styles.card}>
+      <div style={CONTENT}>
         <div className={styles.stepDots}>
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className={clsx(styles.dot, styles[dotState(i)])} />

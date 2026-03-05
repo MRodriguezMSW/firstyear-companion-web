@@ -196,6 +196,8 @@ export interface OnboardingContext {
   onMedication: string | null;
   hasProvider: string | null;
   needsProviderHelp: boolean;
+  wantsMedsIntro: boolean;
+  theme?: string;
   emotionalIntensity: number;
   emotions: string[];
   note: string | null;
