@@ -1,7 +1,12 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// Lazy init — avoids crash when env var is absent at build time
+let _openai: OpenAI | null = null;
+function getOpenAI() {
+  if (!_openai) _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  return _openai;
+}
 
 type ChatMessage = { role: "system" | "user" | "assistant"; content: string };
 
@@ -200,7 +205,7 @@ stage=${state.stage}
 - Your chips MUST be plausible answers to your ONE final question.`,
     };
 
-    const resp = await openai.chat.completions.create({
+    const resp = await getOpenAI().chat.completions.create({
       model: "gpt-4.1-mini",
       temperature: 0.5,
       response_format: { type: "json_object" },
