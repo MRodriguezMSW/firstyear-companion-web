@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import clsx from "clsx";
 import styles from "../styles/Onboarding.module.css";
+import CrisisButton from "../../components/CrisisButton";
 
 const PRONOUNS = ["She/her", "He/him", "They/them", "Use my name only", "Prefer not to say"];
 
@@ -74,6 +75,8 @@ export default function IdentityPage() {
           <button className={styles.btnNext} onClick={handleNext}>Continue</button>
         </div>
       </div>
+
+      <CrisisButton />
     </div>
   );
 }

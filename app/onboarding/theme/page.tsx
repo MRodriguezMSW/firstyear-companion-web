@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import clsx from "clsx";
 import styles from "../styles/Onboarding.module.css";
+import CrisisButton from "../../components/CrisisButton";
 
 function dotState(i: number, screen = 5) {
   return i < screen ? "done" : i === screen ? "active" : "pending";
@@ -88,6 +89,8 @@ export default function ThemePage() {
           <button className={styles.btnNext} onClick={handleFinish}>Start your conversation</button>
         </div>
       </div>
+
+      <CrisisButton />
     </div>
   );
 }

@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import clsx from "clsx";
 import {
-  COMPANION_IDENTITIES,
   AVATAR_CATEGORIES,
   daysSince,
   type CompanionId,
@@ -12,14 +11,56 @@ import {
   type OnboardingContext,
 } from "../data";
 import styles from "../styles/Onboarding.module.css";
+import CrisisButton from "../../components/CrisisButton";
 
-const ALL_NAMES = Array.from(
-  new Set(COMPANION_IDENTITIES.flatMap((c) => c.names))
-) as string[];
+// ── Companion name rows (exactly 2 rows) ────────────────────────────────────
+const NAME_ROWS = [
+  ["Quinn", "Ember", "Sage", "River", "Lux"],
+  ["Alma",  "Sky",   "Iris", "Nova",  "✏️ My own"],
+];
+const ALL_NAMES = NAME_ROWS.flat();
 
-const ALL_COMP_AVATARS = COMPANION_IDENTITIES.flatMap((c) => [...c.avatars]).filter(
-  (a, i, arr) => arr.findIndex((x) => x.name === a.name) === i
-);
+// ── Per-name companion avatar icon sets ─────────────────────────────────────
+type AvaItem = { emoji: string; name: string };
+const NAME_AVATARS: Record<string, AvaItem[]> = {
+  Quinn: [
+    { emoji: "🌿", name: "Leaf" }, { emoji: "🌸", name: "Blossom" }, { emoji: "🍃", name: "Fern" },
+    { emoji: "🌺", name: "Hibiscus" }, { emoji: "🌻", name: "Sunflower" }, { emoji: "🌾", name: "Wheat" },
+  ],
+  Ember: [
+    { emoji: "🔥", name: "Ember" }, { emoji: "⭐", name: "Star" }, { emoji: "🌅", name: "Sunrise" },
+    { emoji: "🕯️", name: "Candle" }, { emoji: "🌙", name: "Crescent" }, { emoji: "✨", name: "Spark" },
+  ],
+  Sage: [
+    { emoji: "🌱", name: "Sprout" }, { emoji: "🍀", name: "Clover" }, { emoji: "🌿", name: "Herb" },
+    { emoji: "🪨", name: "Stone" }, { emoji: "🌲", name: "Tree" }, { emoji: "🍂", name: "Autumn" },
+  ],
+  River: [
+    { emoji: "🌊", name: "Wave" }, { emoji: "💧", name: "Drop" }, { emoji: "🐚", name: "Shell" },
+    { emoji: "🪸", name: "Coral" }, { emoji: "🐬", name: "Dolphin" }, { emoji: "🌀", name: "Spiral" },
+  ],
+  Lux: [
+    { emoji: "🌈", name: "Rainbow" }, { emoji: "💫", name: "Dizzy" }, { emoji: "🌟", name: "Star" },
+    { emoji: "🔮", name: "Orb" }, { emoji: "🪐", name: "Planet" }, { emoji: "☁️", name: "Cloud" },
+  ],
+  Alma: [
+    { emoji: "🦋", name: "Butterfly" }, { emoji: "🌷", name: "Tulip" }, { emoji: "🕊️", name: "Dove" },
+    { emoji: "🌸", name: "Cherry" }, { emoji: "🫧", name: "Bubble" }, { emoji: "🪷", name: "Lotus" },
+  ],
+  Sky: [
+    { emoji: "☁️", name: "Cloud" }, { emoji: "🌤️", name: "Sunny" }, { emoji: "🌬️", name: "Wind" },
+    { emoji: "🦅", name: "Eagle" }, { emoji: "🌙", name: "Moon" }, { emoji: "⚡", name: "Lightning" },
+  ],
+  Iris: [
+    { emoji: "🌈", name: "Rainbow" }, { emoji: "🎨", name: "Palette" }, { emoji: "🦚", name: "Peacock" },
+    { emoji: "🌺", name: "Iris" }, { emoji: "🦜", name: "Parrot" }, { emoji: "🫐", name: "Berry" },
+  ],
+  Nova: [
+    { emoji: "💥", name: "Nova" }, { emoji: "🌌", name: "Galaxy" }, { emoji: "⭐", name: "Star" },
+    { emoji: "🪐", name: "Saturn" }, { emoji: "☄️", name: "Comet" }, { emoji: "🌙", name: "Moon" },
+  ],
+};
+const DEFAULT_AVATARS: AvaItem[] = NAME_AVATARS["Nova"];
 
 function dotState(i: number, screen = 4) {
   return i < screen ? "done" : i === screen ? "active" : "pending";
@@ -45,20 +86,34 @@ export default function AvatarPage() {
   const [avatarCat, setAvatarCat] = useState("animals");
   const [userAvatarSel, setUserAvatarSel] = useState<{ catId: string; idx: number } | null>(null);
   const [companionName, setCompanionName] = useState("Nova");
-  const [companionAvaIdx, setCompanionAvaIdx] = useState(0);
   const [isCustomName, setIsCustomName] = useState(false);
   const [customName, setCustomName] = useState("");
+  const [companionAvaIdx, setCompanionAvaIdx] = useState(0);
 
-  const compAvatar = ALL_COMP_AVATARS[companionAvaIdx] ?? ALL_COMP_AVATARS[0];
   const currentCat = AVATAR_CATEGORIES.find((c) => c.id === avatarCat)!;
   const userAvatar = userAvatarSel
     ? AVATAR_CATEGORIES.find((c) => c.id === userAvatarSel.catId)?.avatars[userAvatarSel.idx]
     : null;
 
+  // Icons for the currently selected companion name
+  const compAvatars = isCustomName ? DEFAULT_AVATARS : (NAME_AVATARS[companionName] ?? DEFAULT_AVATARS);
+  const compAvatar = compAvatars[companionAvaIdx] ?? compAvatars[0];
+
+  const selectName = (n: string) => {
+    if (n === "✏️ My own") {
+      setIsCustomName(true);
+      setCompanionAvaIdx(0);
+    } else {
+      setIsCustomName(false);
+      setCompanionName(n);
+      setCompanionAvaIdx(0);
+    }
+  };
+
   const handleFinish = () => {
     if (!userAvatar) return;
 
-    const finalName = isCustomName ? (customName.trim() || companionName) : companionName;
+    const finalName = isCustomName ? (customName.trim() || "Nova") : companionName;
 
     const profile: FycProfile = {
       companion: {
@@ -176,23 +231,24 @@ export default function AvatarPage() {
             </div>
           </div>
 
-          <div className={styles.namePills}>
-            {ALL_NAMES.map((n) => (
-              <button
-                key={n}
-                className={clsx(styles.namePill, !isCustomName && companionName === n && styles.act)}
-                onClick={() => { setIsCustomName(false); setCompanionName(n); }}
-              >
-                {n}
-              </button>
-            ))}
-            <button
-              className={clsx(styles.namePill, isCustomName && styles.act)}
-              onClick={() => { setIsCustomName(true); setCompanionName(""); }}
-            >
-              ✏️ My own
-            </button>
-          </div>
+          {/* Name pills — exactly 2 rows */}
+          {NAME_ROWS.map((row, ri) => (
+            <div key={ri} className={styles.namePills} style={{ marginBottom: ri === 0 ? 4 : 8 }}>
+              {row.map((n) => {
+                const isMyOwn = n === "✏️ My own";
+                const isActive = isMyOwn ? isCustomName : (!isCustomName && companionName === n);
+                return (
+                  <button
+                    key={n}
+                    className={clsx(styles.namePill, isActive && styles.act)}
+                    onClick={() => selectName(n)}
+                  >
+                    {n}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
 
           {isCustomName && (
             <input
@@ -206,10 +262,11 @@ export default function AvatarPage() {
             />
           )}
 
+          {/* Companion avatar icons — change with name, exactly 6 icons in 2 rows of 3 */}
           <div className={styles.compAvaRow}>
-            {ALL_COMP_AVATARS.map((a, i) => (
+            {compAvatars.map((a, i) => (
               <div
-                key={a.name}
+                key={`${isCustomName ? "custom" : companionName}-${i}`}
                 className={clsx(styles.compAvaTile, companionAvaIdx === i && styles.act)}
                 onClick={() => setCompanionAvaIdx(i)}
               >
@@ -229,6 +286,8 @@ export default function AvatarPage() {
           </div>
         </div>
       </div>
+
+      <CrisisButton />
     </div>
   );
 }

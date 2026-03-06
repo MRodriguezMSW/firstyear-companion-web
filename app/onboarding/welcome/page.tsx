@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import styles from "../styles/Onboarding.module.css";
+import CrisisButton from "../../components/CrisisButton";
 
 const SCREEN: React.CSSProperties = {
   position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
@@ -55,18 +56,22 @@ export default function WelcomePage() {
       </div>
 
       <div style={CONTENT}>
-        <div className={styles.welcomeIcon}>🌱</div>
-        <p className={styles.eyebrow}>{t.eyebrow}</p>
-        <p style={{ fontSize: 15, lineHeight: 1.65, color: "rgba(245,237,224,.85)", margin: "14px 0 24px" }}>
-          {t.body}
-        </p>
-        <button
-          className={`${styles.btnNext} ${styles.btnNextFull}`}
-          onClick={() => router.push("/onboarding/consent")}
-        >
-          {t.btn}
-        </button>
+        <div className={styles.onboardingCard}>
+          <div className={styles.welcomeIcon}>🌱</div>
+          <p className={styles.eyebrow}>{t.eyebrow}</p>
+          <p style={{ fontSize: 15, lineHeight: 1.65, color: "rgba(245,237,224,.85)", margin: "14px 0 24px" }}>
+            {t.body}
+          </p>
+          <button
+            className={`${styles.btnNext} ${styles.btnNextFull}`}
+            onClick={() => router.push("/onboarding/consent")}
+          >
+            {t.btn}
+          </button>
+        </div>
       </div>
+
+      <CrisisButton />
     </div>
   );
 }

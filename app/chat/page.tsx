@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import clsx from "clsx";
 import styles from "./styles/Chat.module.css";
+import CrisisButton from "../components/CrisisButton";
 
 const FALLBACK_NAMES = ["Nova", "Sage", "River", "Luna"];
 
@@ -53,6 +54,17 @@ const GLOSSARY = [
   { term: "Opportunistic Infection", def: "An infection that takes advantage of a weakened immune system. These are rare with treatment. Staying on your medication keeps your immune system strong enough to prevent them." },
   { term: "Ryan White Program", def: "A federal program that helps people living with HIV access care and medication regardless of ability to pay. If you don't have insurance or can't afford care, this program can help." },
 ];
+
+// ── Crisis detection (visual pulse only — no voice) ──────────────────────────
+const CRISIS_PATTERNS = [
+  /\b(kill\s*myself|killing\s*myself|end\s*my\s*life|take\s*my\s*(own\s*)?life|want\s*to\s*die|wish\s*i\s*were\s*dead|no\s*reason\s*to\s*(live|be\s*here)|better\s*off\s*dead|better\s*off\s*without\s*me)\b/i,
+  /\b(suicide|suicidal|self[\s-]?harm|cut\s*(myself|me)|hurt\s*(myself|me)|overdose)\b/i,
+  /\b(hopeless|no hope|feeling hopeless|there('?s| is) no point|can'?t go on|can'?t do this anymore|don'?t want to be here|don'?t want to live)\b/i,
+  /\b(quiero\s*morir|quitarme\s*la\s*vida|hacerme\s*daño|mejor\s*muerto|ya\s*no\s*quiero\s*vivir|sin\s*esperanza|no\s*hay\s*salida)\b/i,
+];
+function detectCrisis(text: string): boolean {
+  return CRISIS_PATTERNS.some(p => p.test(text));
+}
 
 function chipsToMessage(chips: string[]): string {
   if (chips.length === 1) return chips[0];
@@ -194,6 +206,9 @@ export default function ChatPage() {
   const [providerCity, setProviderCity] = useState("");
   const [mobileSheet, setMobileSheet] = useState<"calm" | "relax" | "terms" | "provider" | null>(null);
 
+  // Crisis pulse
+  const [crisisDetected, setCrisisDetected] = useState(false);
+
   // Music
   const [musicTrack, setMusicTrack] = useState(0);
   const [musicPlaying, setMusicPlaying] = useState(false);
@@ -208,6 +223,8 @@ export default function ChatPage() {
   const audioCtxRef = useRef<AudioContext | null>(null);
   const masterGainRef = useRef<GainNode | null>(null);
   const ambientNodesRef = useRef<AudioNode[]>([]);
+  const providerInputRef = useRef<HTMLInputElement | null>(null);
+  const mobileProviderInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, sending, chips]);
   useEffect(() => { const t = setInterval(() => setAffirmationIdx(i => (i + 1) % AFFIRMATIONS.length), 8000); return () => clearInterval(t); }, []);
@@ -226,6 +243,57 @@ export default function ChatPage() {
       return prev;
     });
   }, [language, openingCtx]);
+
+  // ── Crisis pulse: activate when last user message contains crisis language ──
+  useEffect(() => {
+    const lastUser = [...messages].reverse().find(m => m.role === "user");
+    if (lastUser && detectCrisis(lastUser.content)) {
+      setCrisisDetected(true);
+    }
+  }, [messages]);
+
+  // ── Google Places Autocomplete ─────────────────────────────────────────────
+  useEffect(() => {
+    const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    if (!key) return;
+    if ((window as any).google?.maps?.places) {
+      initPlaces();
+      return;
+    }
+    const scriptId = "gmaps-places-script";
+    if (document.getElementById(scriptId)) return;
+    const script = document.createElement("script");
+    script.id = scriptId;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places`;
+    script.async = true;
+    script.onload = initPlaces;
+    document.head.appendChild(script);
+
+    function initPlaces() {
+      const opts = { types: ["geocode"], componentRestrictions: { country: "us" } };
+      if (providerInputRef.current) {
+        const ac = new (window as any).google.maps.places.Autocomplete(providerInputRef.current, opts);
+        ac.addListener("place_changed", () => {
+          const place = ac.getPlace();
+          if (place?.formatted_address) setProviderCity(place.formatted_address);
+        });
+      }
+    }
+  }, []);
+
+  // Re-init autocomplete for mobile sheet provider input when it opens
+  useEffect(() => {
+    if (mobileSheet !== "provider") return;
+    const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    if (!key || !(window as any).google?.maps?.places) return;
+    if (!mobileProviderInputRef.current) return;
+    const opts = { types: ["geocode"], componentRestrictions: { country: "us" } };
+    const ac = new (window as any).google.maps.places.Autocomplete(mobileProviderInputRef.current, opts);
+    ac.addListener("place_changed", () => {
+      const place = ac.getPlace();
+      if (place?.formatted_address) setProviderCity(place.formatted_address);
+    });
+  }, [mobileSheet]);
 
   // ── Load onboarding context ───────────────────────────────────────────────
   useEffect(() => {
@@ -480,7 +548,7 @@ export default function ChatPage() {
           <div className={styles.glossaryModal} onClick={e => e.stopPropagation()}>
             <div className={styles.glossaryModalTerm}>{glossaryTerm.term}</div>
             <div className={styles.glossaryModalDef}>{glossaryTerm.def}</div>
-            <button className={styles.glossaryModalClose} onClick={() => setGlossaryTerm(null)}>{language === "es" ? "Cerrar" : "Got it"}</button>
+            <button className={styles.glossaryModalClose} onClick={(e) => { e.stopPropagation(); setGlossaryTerm(null); }}>{language === "es" ? "Cerrar" : "Got it"}</button>
           </div>
         </div>
       )}
@@ -580,13 +648,13 @@ export default function ChatPage() {
           {/* Mobile wellness icon bar */}
           <div className={styles.mobileWellnessBar}>
             <button className={styles.mobileWellnessIconBtn} onClick={() => setMobileSheet("calm")}>
-              <span>🫁</span><span className={styles.mobileWellnessIconLbl}>{language === "es" ? "Calma" : "Calm"}</span>
+              <span>🧘</span><span className={styles.mobileWellnessIconLbl}>{language === "es" ? "Calma" : "Calm"}</span>
             </button>
             <button className={styles.mobileWellnessIconBtn} onClick={() => setMobileSheet("relax")}>
               <span>🌿</span><span className={styles.mobileWellnessIconLbl}>{language === "es" ? "Momento" : "Relax"}</span>
             </button>
             <button className={styles.mobileWellnessIconBtn} onClick={() => setMobileSheet("terms")}>
-              <span>📖</span><span className={styles.mobileWellnessIconLbl}>{language === "es" ? "Términos" : "Terms"}</span>
+              <span>📖</span><span className={styles.mobileWellnessIconLbl}>{language === "es" ? "Términos" : "HIV Terms"}</span>
             </button>
             <button className={styles.mobileWellnessIconBtn} onClick={() => setMobileSheet("provider")}>
               <span>📍</span><span className={styles.mobileWellnessIconLbl}>{language === "es" ? "Proveedor" : "Provider"}</span>
@@ -624,7 +692,7 @@ export default function ChatPage() {
         <div className={styles.wellnessSidebar}>
           <div className={styles.sidebarCardRow}>
             <div className={styles.sidebarCard}>
-              <div className={styles.sidebarCardTitle}>🫁 {language === "es" ? "Encuentra tu calma" : "Find your calm"}</div>
+              <div className={styles.sidebarCardTitle}>🧘 {language === "es" ? "Encuentra tu calma" : "Find your calm"}</div>
               <div className={styles.sidebarBtnGroup}>
                 <button className={styles.sidebarBtn} onClick={startBreathing} disabled={sending}>{language === "es" ? "Ejercicio de respiración" : "Breathing Exercise"}</button>
                 <button className={styles.sidebarBtn} onClick={() => triggerSend("Can you guide me through a 4-7-8 breathing exercise?")} disabled={sending}>{language === "es" ? "Respiración 4-7-8" : "4-7-8 Breathing"}</button>
@@ -663,6 +731,7 @@ export default function ChatPage() {
             </p>
             <div className={styles.providerSearchRow}>
               <input
+                ref={providerInputRef}
                 className={styles.providerInput}
                 placeholder={language === "es" ? "Ciudad o código postal..." : "City or zip code..."}
                 value={providerCity}
@@ -706,7 +775,7 @@ export default function ChatPage() {
 
             {mobileSheet === "calm" && (
               <>
-                <div className={styles.mobileSheetTitle}>🫁 {language === "es" ? "Encuentra tu calma" : "Find your calm"}</div>
+                <div className={styles.mobileSheetTitle}>🧘 {language === "es" ? "Encuentra tu calma" : "Find your calm"}</div>
                 <div className={styles.mobileSheetBtnGroup}>
                   <button className={styles.sidebarBtn} disabled={sending} onClick={() => { startBreathing(); setMobileSheet(null); }}>{language === "es" ? "Ejercicio de respiración" : "Breathing Exercise"}</button>
                   <button className={styles.sidebarBtn} disabled={sending} onClick={() => { triggerSend("Can you guide me through a 4-7-8 breathing exercise?"); setMobileSheet(null); }}>{language === "es" ? "Respiración 4-7-8" : "4-7-8 Breathing"}</button>
@@ -750,6 +819,7 @@ export default function ChatPage() {
                 </p>
                 <div className={styles.providerSearchRow}>
                   <input
+                    ref={mobileProviderInputRef}
                     className={styles.providerInput}
                     placeholder={language === "es" ? "Ciudad o código postal..." : "City or zip code..."}
                     value={providerCity}
@@ -769,6 +839,8 @@ export default function ChatPage() {
           </div>
         </div>
       )}
+
+      <CrisisButton pulsing={crisisDetected} />
     </div>
   );
 }

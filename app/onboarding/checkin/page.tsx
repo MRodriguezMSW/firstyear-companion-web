@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import clsx from "clsx";
 import { intensityLabel } from "../data";
 import styles from "../styles/Onboarding.module.css";
+import CrisisButton from "../../components/CrisisButton";
 
 const EMOTIONS = ["Anxious", "Sad", "Overwhelmed", "Numb", "Angry", "Lonely", "Tired", "Hopeful", "Okay"];
 
@@ -112,6 +113,8 @@ export default function CheckInPage() {
           </div>
         </div>
       </div>
+
+      <CrisisButton />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import clsx from "clsx";
 import { daysSince, diagnosisContext } from "../data";
 import styles from "../styles/Onboarding.module.css";
+import CrisisButton from "../../components/CrisisButton";
 
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const currentYear = new Date().getFullYear();
@@ -42,15 +43,19 @@ export default function TimelinePage() {
   const [diagnosisDate, setDiagnosisDate] = useState("");
   const [timeline, setTimeline] = useState("");
   const [onMeds, setOnMeds] = useState("");
-  const [medsCardDismissed, setMedsCardDismissed] = useState(false);
   const [hasProvider, setHasProvider] = useState("");
-  const days  = daysSince(diagnosisDate);
-  const dxCtx = diagnosisContext(days);
-
   const [narrowScreen, setNarrowScreen] = useState(false);
   const [ddMonth, setDdMonth] = useState("");
   const [ddDay,   setDdDay]   = useState("");
   const [ddYear,  setDdYear]  = useState("");
+
+  // Modal state
+  const [medsModal, setMedsModal]         = useState(false);
+  const [providerModal, setProviderModal] = useState(false);
+  const [medsAnswered, setMedsAnswered]   = useState(false);
+
+  const days  = daysSince(diagnosisDate);
+  const dxCtx = diagnosisContext(days);
 
   useEffect(() => {
     const check = () => setNarrowScreen(window.innerWidth <= 768);
@@ -72,14 +77,24 @@ export default function TimelinePage() {
     ? new Date(parseInt(ddYear), MONTHS.indexOf(ddMonth) + 1, 0).getDate()
     : 31;
 
-  const saveAndProceed = (opts: { providerHelp?: boolean; medsIntro?: boolean } = {}) => {
+  const saveAndProceed = () => {
     if (diagnosisDate) localStorage.setItem("companion_diagnosisDate", diagnosisDate);
     if (timeline)      localStorage.setItem("companion_timeline", timeline);
     if (onMeds)        localStorage.setItem("companion_onMeds", onMeds);
     if (hasProvider)   localStorage.setItem("companion_hasProvider", hasProvider);
-    localStorage.setItem("companion_needsProvider",  String(opts.providerHelp === true));
-    localStorage.setItem("companion_wantsMedsIntro", String(opts.medsIntro    === true));
+    localStorage.setItem("companion_needsProvider",  String(hasProvider === "No"));
+    localStorage.setItem("companion_wantsMedsIntro", String(onMeds === "No" && medsAnswered));
     router.push("/onboarding/checkin");
+  };
+
+  const handleMedsNo = () => {
+    setOnMeds("No");
+    setMedsModal(true);
+  };
+
+  const handleProviderNo = () => {
+    setHasProvider("No");
+    setProviderModal(true);
   };
 
   return (
@@ -87,6 +102,40 @@ export default function TimelinePage() {
       <div className={`${styles.bgOrb} ${styles.bgOrb1}`} />
       <div className={`${styles.bgOrb} ${styles.bgOrb2}`} />
       <div className={`${styles.bgOrb} ${styles.bgOrb3}`} />
+
+      {/* Meds No modal */}
+      {medsModal && (
+        <div className={styles.warmModalOverlay}>
+          <div className={styles.warmModal}>
+            <p className={styles.warmModalText}>
+              That is okay — starting medications is a big decision and there is no rush. When you are ready I will walk you through everything at your pace. No pressure, just support.
+            </p>
+            <button
+              className={styles.warmModalBtn}
+              onClick={() => { setMedsAnswered(true); setMedsModal(false); }}
+            >
+              Got it, let's continue
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Provider No modal */}
+      {providerModal && (
+        <div className={styles.warmModalOverlay}>
+          <div className={styles.warmModal}>
+            <p className={styles.warmModalText}>
+              You do not have to figure this out alone. When we get to the chat just say the word and we will find someone safe, private, and friendly near you. You have already taken a brave step just by being here.
+            </p>
+            <button
+              className={styles.warmModalBtn}
+              onClick={() => setProviderModal(false)}
+            >
+              I'm ready, let's go
+            </button>
+          </div>
+        </div>
+      )}
 
       <div style={SCROLL}>
         <div style={CONTENT}>
@@ -164,55 +213,45 @@ export default function TimelinePage() {
           </div>
 
           <div className={styles.sectionLabel} style={{ marginBottom: 8 }}>Are you currently on HIV medication?</div>
-          <div className={styles.yesnoRow} style={{ marginBottom: 8 }}>
-            {YN.map((v) => (
-              <button key={v} className={clsx(styles.ynChip, onMeds === v && styles.selected)} onClick={() => setOnMeds(v)}>
-                {v}
-              </button>
-            ))}
+          <div className={styles.yesnoRow} style={{ marginBottom: 16 }}>
+            <button
+              className={clsx(styles.ynChip, onMeds === "Yes" && styles.selected)}
+              onClick={() => setOnMeds("Yes")}
+            >
+              Yes
+            </button>
+            <button
+              className={clsx(styles.ynChip, onMeds === "No" && styles.selected)}
+              onClick={handleMedsNo}
+            >
+              No
+            </button>
           </div>
-
-          {onMeds === "No" && !medsCardDismissed && (
-            <div className={styles.warmCard}>
-              <p className={styles.warmCardText}>
-                That's okay — starting medications is a big decision and it's completely normal to not be there yet. There's no rush and no judgment here. What I can tell you is that when you're ready, today's medications are nothing like what people imagine. Most people take one pill, once a day, and go on to live full, healthy lives.
-              </p>
-              <div className={styles.warmCardBtns}>
-                <button className={styles.warmCardBtnPrimary} onClick={() => { localStorage.setItem("companion_wantsMedsIntro", "true"); setMedsCardDismissed(true); }}>
-                  Thank you, let's continue
-                </button>
-              </div>
-            </div>
-          )}
 
           <div className={styles.sectionLabel} style={{ marginBottom: 8 }}>Do you have an HIV provider right now?</div>
-          <div className={styles.yesnoRow} style={{ marginBottom: 8 }}>
-            {YN.map((v) => (
-              <button key={v} className={clsx(styles.ynChip, hasProvider === v && styles.selected)} onClick={() => setHasProvider(v)}>
-                {v}
-              </button>
-            ))}
+          <div className={styles.yesnoRow} style={{ marginBottom: 16 }}>
+            <button
+              className={clsx(styles.ynChip, hasProvider === "Yes" && styles.selected)}
+              onClick={() => setHasProvider("Yes")}
+            >
+              Yes
+            </button>
+            <button
+              className={clsx(styles.ynChip, hasProvider === "No" && styles.selected)}
+              onClick={handleProviderNo}
+            >
+              No
+            </button>
           </div>
-
-          {hasProvider === "No" && (
-            <div className={styles.warmCard}>
-              <p className={styles.warmCardText}>
-                You don't have to figure this out alone. Finding the right provider is one of the most important steps you can take, and I'll be right here to help you when you're ready. Just say the word in the chat and we'll find someone safe, private, and friendly near you.
-              </p>
-              <div className={styles.warmCardBtns}>
-                <button className={styles.warmCardBtnPrimary} onClick={() => saveAndProceed({ providerHelp: true })}>
-                  I'm ready, let's go
-                </button>
-              </div>
-            </div>
-          )}
 
           <div className={styles.btnRow}>
             <button className={styles.btnBack} onClick={() => router.back()}>Back</button>
-            <button className={styles.btnNext} onClick={() => saveAndProceed()}>Continue</button>
+            <button className={styles.btnNext} onClick={saveAndProceed}>Continue</button>
           </div>
         </div>
       </div>
+
+      <CrisisButton />
     </div>
   );
 }
