@@ -55,6 +55,15 @@ const GLOSSARY = [
   { term: "Ryan White Program", def: "A federal program that helps people living with HIV access care and medication regardless of ability to pay. If you don't have insurance or can't afford care, this program can help." },
 ];
 
+const PROVIDER_CATEGORIES = [
+  { id: "hiv",       icon: "🩺", label: "HIV Provider",               prompt: "HIV care providers" },
+  { id: "mental",    icon: "🧠", label: "Mental Health Therapist",    prompt: "mental health therapists who specialize in chronic illness" },
+  { id: "substance", icon: "💊", label: "Substance Use Counselor",    prompt: "substance use counselors" },
+  { id: "std",       icon: "🧪", label: "STD Testing",                prompt: "STD testing clinics" },
+  { id: "lgbtq",     icon: "🏳️‍🌈", label: "LGBTQ+ Affirming Care",  prompt: "LGBTQ+ affirming healthcare providers" },
+  { id: "prep",      icon: "💉", label: "PrEP Provider",              prompt: "PrEP providers" },
+] as const;
+
 // ── Crisis detection (visual pulse only — no voice) ──────────────────────────
 const CRISIS_PATTERNS = [
   /\b(kill\s*myself|killing\s*myself|end\s*my\s*life|take\s*my\s*(own\s*)?life|want\s*to\s*die|wish\s*i\s*were\s*dead|no\s*reason\s*to\s*(live|be\s*here)|better\s*off\s*dead|better\s*off\s*without\s*me)\b/i,
@@ -204,6 +213,7 @@ export default function ChatPage() {
   const [showThemePicker, setShowThemePicker] = useState(false);
   const [glossaryTerm, setGlossaryTerm] = useState<typeof GLOSSARY[number] | null>(null);
   const [providerCity, setProviderCity] = useState("");
+  const [providerCategory, setProviderCategory] = useState("");
   const [mobileSheet, setMobileSheet] = useState<"calm" | "relax" | "terms" | "provider" | null>(null);
 
   // Crisis pulse
@@ -725,27 +735,59 @@ export default function ChatPage() {
           </div>
 
           <div className={styles.sidebarCard}>
-            <div className={styles.sidebarCardTitle}>📍 {language === "es" ? "Encontrar un proveedor" : "Find an HIV Provider"}</div>
-            <p style={{ fontSize: 11, color: "rgba(245,237,224,.45)", marginBottom: 8, lineHeight: 1.5 }}>
-              {language === "es" ? "Ingresa tu ciudad o código postal" : "Enter your city or zip code"}
+            <div className={styles.sidebarCardTitle}>📍 {language === "es" ? "Encontrar un proveedor" : "Find a Provider"}</div>
+            <p style={{ fontSize: 11, color: "rgba(245,237,224,.45)", marginBottom: 10, lineHeight: 1.5 }}>
+              {language === "es" ? "Selecciona una categoría" : "Select a category first"}
             </p>
-            <div className={styles.providerSearchRow}>
-              <input
-                ref={providerInputRef}
-                className={styles.providerInput}
-                placeholder={language === "es" ? "Ciudad o código postal..." : "City or zip code..."}
-                value={providerCity}
-                onChange={e => setProviderCity(e.target.value)}
-                onKeyDown={e => { if (e.key === "Enter" && providerCity.trim()) { triggerSend(`Can you help me find an HIV provider near ${providerCity.trim()}?`); setProviderCity(""); } }}
-              />
-              <button
-                className={styles.providerSearchBtn}
-                disabled={sending || !providerCity.trim()}
-                onClick={() => { triggerSend(`Can you help me find an HIV provider near ${providerCity.trim()}?`); setProviderCity(""); }}
-              >
-                {language === "es" ? "Buscar" : "Search"}
-              </button>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 10 }}>
+              {PROVIDER_CATEGORIES.map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => setProviderCategory(cat.id)}
+                  style={{
+                    background: providerCategory === cat.id ? "rgba(74,124,111,0.2)" : "rgba(255,248,235,0.04)",
+                    border: `1px solid ${providerCategory === cat.id ? "rgba(74,124,111,0.6)" : "rgba(255,248,235,0.1)"}`,
+                    borderRadius: 10, padding: "9px 8px",
+                    color: providerCategory === cat.id ? "#8ecfbe" : "rgba(245,237,224,0.6)",
+                    fontSize: 11, fontWeight: 500,
+                    cursor: "pointer", textAlign: "center",
+                    fontFamily: "DM Sans, sans-serif",
+                    display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+                    transition: "all 0.15s ease",
+                  }}
+                >
+                  <span style={{ fontSize: 16 }}>{cat.icon}</span>
+                  <span style={{ lineHeight: 1.3 }}>{cat.label}</span>
+                </button>
+              ))}
             </div>
+            {providerCategory && (() => {
+              const cat = PROVIDER_CATEGORIES.find(c => c.id === providerCategory)!;
+              const doSearch = () => {
+                if (!providerCity.trim()) return;
+                triggerSend(`Can you help me find ${cat.prompt} near ${providerCity.trim()}?`);
+                setProviderCity("");
+              };
+              return (
+                <div className={styles.providerSearchRow}>
+                  <input
+                    ref={providerInputRef}
+                    className={styles.providerInput}
+                    placeholder={language === "es" ? "Ciudad o código postal..." : "City or zip code..."}
+                    value={providerCity}
+                    onChange={e => setProviderCity(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter") doSearch(); }}
+                  />
+                  <button
+                    className={styles.providerSearchBtn}
+                    disabled={sending || !providerCity.trim()}
+                    onClick={doSearch}
+                  >
+                    {language === "es" ? "Buscar" : "Search"}
+                  </button>
+                </div>
+              );
+            })()}
           </div>
 
           <div className={styles.sidebarCard}>
@@ -813,27 +855,60 @@ export default function ChatPage() {
 
             {mobileSheet === "provider" && (
               <>
-                <div className={styles.mobileSheetTitle}>📍 {language === "es" ? "Encontrar un proveedor" : "Find an HIV Provider"}</div>
+                <div className={styles.mobileSheetTitle}>📍 {language === "es" ? "Encontrar un proveedor" : "Find a Provider"}</div>
                 <p style={{ fontSize: 12, color: "rgba(245,237,224,.45)", marginBottom: 10, lineHeight: 1.5 }}>
-                  {language === "es" ? "Ingresa tu ciudad o código postal" : "Enter your city or zip code"}
+                  {language === "es" ? "Selecciona una categoría" : "Select a category first"}
                 </p>
-                <div className={styles.providerSearchRow}>
-                  <input
-                    ref={mobileProviderInputRef}
-                    className={styles.providerInput}
-                    placeholder={language === "es" ? "Ciudad o código postal..." : "City or zip code..."}
-                    value={providerCity}
-                    onChange={e => setProviderCity(e.target.value)}
-                    onKeyDown={e => { if (e.key === "Enter" && providerCity.trim()) { triggerSend(`Can you help me find an HIV provider near ${providerCity.trim()}?`); setProviderCity(""); setMobileSheet(null); } }}
-                  />
-                  <button
-                    className={styles.providerSearchBtn}
-                    disabled={sending || !providerCity.trim()}
-                    onClick={() => { triggerSend(`Can you help me find an HIV provider near ${providerCity.trim()}?`); setProviderCity(""); setMobileSheet(null); }}
-                  >
-                    {language === "es" ? "Buscar" : "Search"}
-                  </button>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 12 }}>
+                  {PROVIDER_CATEGORIES.map(cat => (
+                    <button
+                      key={cat.id}
+                      onClick={() => setProviderCategory(cat.id)}
+                      style={{
+                        background: providerCategory === cat.id ? "rgba(74,124,111,0.2)" : "rgba(255,248,235,0.04)",
+                        border: `1px solid ${providerCategory === cat.id ? "rgba(74,124,111,0.6)" : "rgba(255,248,235,0.1)"}`,
+                        borderRadius: 10, padding: "9px 6px",
+                        color: providerCategory === cat.id ? "#8ecfbe" : "rgba(245,237,224,0.6)",
+                        fontSize: 10, fontWeight: 500,
+                        cursor: "pointer", textAlign: "center",
+                        fontFamily: "DM Sans, sans-serif",
+                        display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
+                        transition: "all 0.15s ease",
+                      }}
+                    >
+                      <span style={{ fontSize: 18 }}>{cat.icon}</span>
+                      <span style={{ lineHeight: 1.3 }}>{cat.label}</span>
+                    </button>
+                  ))}
                 </div>
+                {providerCategory && (() => {
+                  const cat = PROVIDER_CATEGORIES.find(c => c.id === providerCategory)!;
+                  const doSearch = () => {
+                    if (!providerCity.trim()) return;
+                    triggerSend(`Can you help me find ${cat.prompt} near ${providerCity.trim()}?`);
+                    setProviderCity("");
+                    setMobileSheet(null);
+                  };
+                  return (
+                    <div className={styles.providerSearchRow}>
+                      <input
+                        ref={mobileProviderInputRef}
+                        className={styles.providerInput}
+                        placeholder={language === "es" ? "Ciudad o código postal..." : "City or zip code..."}
+                        value={providerCity}
+                        onChange={e => setProviderCity(e.target.value)}
+                        onKeyDown={e => { if (e.key === "Enter") doSearch(); }}
+                      />
+                      <button
+                        className={styles.providerSearchBtn}
+                        disabled={sending || !providerCity.trim()}
+                        onClick={doSearch}
+                      >
+                        {language === "es" ? "Buscar" : "Search"}
+                      </button>
+                    </div>
+                  );
+                })()}
               </>
             )}
           </div>
