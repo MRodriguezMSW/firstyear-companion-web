@@ -254,7 +254,7 @@ export default function ChatPage() {
 
   // ── Google Places Autocomplete ─────────────────────────────────────────────
   useEffect(() => {
-    const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    const key = process.env.NEXT_PUBLIC_GOOGLE_PLACES_KEY;
     if (!key) return;
     if ((window as any).google?.maps?.places) {
       initPlaces();
@@ -284,7 +284,7 @@ export default function ChatPage() {
   // Re-init autocomplete for mobile sheet provider input when it opens
   useEffect(() => {
     if (mobileSheet !== "provider") return;
-    const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    const key = process.env.NEXT_PUBLIC_GOOGLE_PLACES_KEY;
     if (!key || !(window as any).google?.maps?.places) return;
     if (!mobileProviderInputRef.current) return;
     const opts = { types: ["geocode"], componentRestrictions: { country: "us" } };
