@@ -23,54 +23,86 @@ export default function CrisisButton({ pulsing = false }: { pulsing?: boolean })
 
   return (
     <>
-      {/* Fixed bottom-right: "I am okay" button + phone icon */}
+      {/* Fixed bottom-right: "I am okay" above + phone icon below */}
       <div style={{
         position: "fixed", bottom: 20, right: 20, zIndex: 9999,
-        display: "flex", alignItems: "center", gap: 10,
+        display: "flex", flexDirection: "column", alignItems: "center", gap: 12,
       }}>
         {isFlashing && (
           <button
             onClick={handleCalm}
             style={{
-              background: "rgba(74,124,111,0.95)",
-              border: "1px solid rgba(74,124,111,0.6)",
-              borderRadius: 20,
-              padding: "10px 16px",
+              background: "#4CAF50",
+              border: "none",
+              borderRadius: 14,
+              padding: "14px 20px",
+              minHeight: 48,
               color: "#fff",
               fontFamily: "DM Sans, sans-serif",
-              fontSize: 13, fontWeight: 500,
+              fontSize: 14, fontWeight: 700,
               cursor: "pointer",
-              boxShadow: "0 4px 16px rgba(0,0,0,0.3)",
+              boxShadow: "0 4px 20px rgba(76,175,80,0.5)",
               whiteSpace: "nowrap",
+              letterSpacing: "0.02em",
             }}
           >
             ✓ {t.crisis_calm}
           </button>
         )}
 
-        <button
-          onClick={() => setOpen(true)}
-          aria-label="Crisis resources"
-          style={{
-            width: isFlashing ? 80 : 48,
-            height: isFlashing ? 80 : 48,
-            borderRadius: "50%",
-            background: "#FF6B6B",
-            border: "2px solid rgba(255,255,255,0.25)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: isFlashing ? 32 : 20,
-            cursor: "pointer", padding: 0,
-            boxShadow: "0 4px 20px rgba(255,107,107,0.5)",
-            transition: "width 0.3s ease, height 0.3s ease, font-size 0.3s ease",
-            animation: isFlashing
-              ? "crisisFlash 0.5s ease-in-out infinite"
-              : pulsing
-              ? "crisisPulse 1.4s ease-in-out infinite"
-              : "none",
-          }}
-        >
-          📞
-        </button>
+        {/* Sonar rings — only visible when flashing */}
+        {isFlashing && (
+          <div style={{ position: "relative", width: 100, height: 100, flexShrink: 0 }}>
+            <div style={{
+              position: "absolute", inset: 0, borderRadius: "50%",
+              background: "rgba(255,0,0,0.4)",
+              animation: "sonarRing1 1s ease-out infinite",
+            }} />
+            <div style={{
+              position: "absolute", inset: 0, borderRadius: "50%",
+              background: "rgba(255,0,0,0.3)",
+              animation: "sonarRing2 1s ease-out infinite 0.4s",
+            }} />
+            <button
+              onClick={() => setOpen(true)}
+              aria-label="Crisis resources"
+              style={{
+                position: "absolute", inset: 0,
+                borderRadius: "50%",
+                background: "#FF0000",
+                border: "2px solid rgba(255,255,255,0.3)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 36,
+                cursor: "pointer", padding: 0,
+                boxShadow: "0 0 40px rgba(255,0,0,0.9)",
+                filter: "drop-shadow(0 0 20px rgba(255,0,0,1))",
+                animation: "phoneShake 0.5s infinite",
+              }}
+            >
+              📞
+            </button>
+          </div>
+        )}
+
+        {!isFlashing && (
+          <button
+            onClick={() => setOpen(true)}
+            aria-label="Crisis resources"
+            style={{
+              width: 56, height: 56,
+              borderRadius: "50%",
+              background: "#FF6B6B",
+              border: "2px solid rgba(255,255,255,0.25)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 22,
+              cursor: "pointer", padding: 0,
+              boxShadow: "0 4px 20px rgba(255,107,107,0.5)",
+              animation: pulsing ? "crisisPulse 1.4s ease-in-out infinite" : "none",
+            }}
+          >
+            📞
+          </button>
+        )}
       </div>
 
       {open && (
@@ -176,9 +208,22 @@ export default function CrisisButton({ pulsing = false }: { pulsing?: boolean })
           0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,107,0.7), 0 4px 20px rgba(255,107,107,0.4); }
           50%       { box-shadow: 0 0 0 14px rgba(255,107,107,0), 0 4px 24px rgba(255,107,107,0.7); }
         }
-        @keyframes crisisFlash {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,107,0.9), 0 4px 20px rgba(255,107,107,0.6); opacity: 1; }
-          50%       { box-shadow: 0 0 0 26px rgba(255,107,107,0), 0 4px 30px rgba(255,107,107,0.9); opacity: 0.7; }
+        @keyframes phoneShake {
+          0%,100% { transform: rotate(0deg) scale(1.8); }
+          10%     { transform: rotate(-15deg) scale(1.8); }
+          20%     { transform: rotate(15deg) scale(1.8); }
+          30%     { transform: rotate(-15deg) scale(1.8); }
+          40%     { transform: rotate(15deg) scale(1.8); }
+          50%     { transform: rotate(-10deg) scale(1.8); }
+          60%     { transform: rotate(10deg) scale(1.8); }
+        }
+        @keyframes sonarRing1 {
+          0%   { transform: scale(1); opacity: 0.8; }
+          100% { transform: scale(3.5); opacity: 0; }
+        }
+        @keyframes sonarRing2 {
+          0%   { transform: scale(1); opacity: 0.6; }
+          100% { transform: scale(3); opacity: 0; }
         }
       `}</style>
     </>

@@ -12,15 +12,15 @@ function dotState(i: number, screen = 5) {
 }
 
 const THEMES = [
-  { id: "hopeful",  icon: "🌸", bg: "#FFF0F5" },
-  { id: "sunrise",  icon: "☀️", bg: "#FFF8EE" },
-  { id: "peaceful", icon: "🌿", bg: "#F0FAF4" },
-  { id: "calm",     icon: "🌊", bg: "#EFF8FF" },
-  { id: "free",     icon: "🦋", bg: "#F5F0FF" },
-  { id: "bloom",    icon: "🌺", bg: "#FFF4F0" },
-  { id: "bright",   icon: "🌻", bg: "#FFFDE7" },
-  { id: "soft",     icon: "🕊️", bg: "#F5F5F5" },
-  { id: "joy",      icon: "🌈", bg: "#FFF9F0" },
+  { id: "hopeful",  icon: "🌸", bg: "#C47A8A" },
+  { id: "sunrise",  icon: "☀️", bg: "#C49A5A" },
+  { id: "peaceful", icon: "🌿", bg: "#5A9478" },
+  { id: "calm",     icon: "🌊", bg: "#5A8FAA" },
+  { id: "free",     icon: "🦋", bg: "#8A7AAA" },
+  { id: "bloom",    icon: "🌺", bg: "#C47A5A" },
+  { id: "bright",   icon: "🌻", bg: "#C4AA3A" },
+  { id: "soft",     icon: "🕊️", bg: "#8A8A8A" },
+  { id: "joy",      icon: "🌈", bg: "#AA8A5A" },
 ] as const;
 
 type ThemeId = typeof THEMES[number]["id"];
