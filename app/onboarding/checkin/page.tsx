@@ -6,8 +6,7 @@ import clsx from "clsx";
 import { intensityLabel } from "../data";
 import styles from "../styles/Onboarding.module.css";
 import CrisisButton from "../../components/CrisisButton";
-
-const EMOTIONS = ["Anxious", "Sad", "Overwhelmed", "Numb", "Angry", "Lonely", "Tired", "Hopeful", "Okay"];
+import { getStrings, readLang } from "../../i18n";
 
 function dotState(i: number, screen = 3) {
   return i < screen ? "done" : i === screen ? "active" : "pending";
@@ -32,9 +31,11 @@ export default function CheckInPage() {
   const [intensity, setIntensity] = useState(5);
   const [emotions, setEmotions] = useState<string[]>([]);
   const [freeText, setFreeText] = useState("");
+  const [t, setT] = useState(() => getStrings("en-US"));
   const sliderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    setT(getStrings(readLang()));
     const el = sliderRef.current;
     if (!el) return;
     const handleTouchMove = (e: TouchEvent) => { e.stopPropagation(); e.preventDefault(); };
@@ -65,13 +66,13 @@ export default function CheckInPage() {
               <div key={i} className={clsx(styles.dot, styles[dotState(i)])} />
             ))}
           </div>
-          <p className={styles.eyebrow}>Step 3 of 5</p>
-          <h1 style={{ fontSize: 18, marginBottom: 4 }}>How are you feeling right now?</h1>
-          <p className={styles.subtitle} style={{ marginBottom: 12 }}>This helps me meet you where you are. Skip anything.</p>
+          <p className={styles.eyebrow}>{t.checkin_step}</p>
+          <h1 style={{ fontSize: 18, marginBottom: 4 }}>{t.checkin_title}</h1>
+          <p className={styles.subtitle} style={{ marginBottom: 12 }}>{t.checkin_sub}</p>
 
           <div ref={sliderRef} className={styles.sliderWrap} style={{ touchAction: "none" }}>
             <div className={styles.sliderHeader}>
-              <span className={styles.sliderLabel}>Emotional intensity</span>
+              <span className={styles.sliderLabel}>{t.checkin_intensity_lbl}</span>
               <span className={styles.sliderValue}>{intensityLabel(intensity)} · {intensity}/10</span>
             </div>
             <input
@@ -80,17 +81,17 @@ export default function CheckInPage() {
               style={{ touchAction: "none" }}
             />
             <div className={styles.sliderHints}>
-              <span>0 · Calm</span>
-              <span>10 · Feels unbearable</span>
+              <span>{t.checkin_calm}</span>
+              <span>{t.checkin_intense}</span>
             </div>
           </div>
 
-          <div className={styles.sectionLabel} style={{ marginBottom: 6 }}>What's present for you?</div>
+          <div className={styles.sectionLabel} style={{ marginBottom: 6 }}>{t.checkin_emotions_lbl}</div>
           <div className={styles.emotionGrid} style={{ gap: 6 }}>
-            {EMOTIONS.map((e, i) => (
+            {t.checkin_emotions.map((e, i) => (
               <button
                 key={e}
-                className={clsx(styles.emotionChip, emotions.includes(e) && styles.selected, i === 8 && styles.full)}
+                className={clsx(styles.emotionChip, emotions.includes(e) && styles.selected, i === t.checkin_emotions.length - 1 && styles.full)}
                 onClick={() => toggle(e)}
               >
                 {e}
@@ -98,18 +99,18 @@ export default function CheckInPage() {
             ))}
           </div>
 
-          <label style={{ marginBottom: 4 }}>Anything you want to share right now?</label>
+          <label style={{ marginBottom: 4 }}>{t.checkin_freetext_lbl}</label>
           <textarea
-            placeholder="You can write a sentence or two..."
+            placeholder={t.checkin_freetext_ph}
             value={freeText}
             onChange={(e) => setFreeText(e.target.value)}
             style={{ minHeight: 60, marginBottom: 4 }}
           />
-          <p className={styles.textareaHint}>Avoid names, phone numbers, or anything identifying.</p>
+          <p className={styles.textareaHint}>{t.checkin_hint}</p>
 
           <div className={styles.btnRow}>
-            <button className={styles.btnBack} onClick={() => router.back()}>Back</button>
-            <button className={styles.btnNext} onClick={handleNext}>Continue</button>
+            <button className={styles.btnBack} onClick={() => router.back()}>{t.back}</button>
+            <button className={styles.btnNext} onClick={handleNext}>{t.continue_}</button>
           </div>
         </div>
       </div>

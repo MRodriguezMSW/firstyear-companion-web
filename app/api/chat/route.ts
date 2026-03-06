@@ -64,7 +64,7 @@ export async function POST(req: Request) {
     };
 
     const onboarding: string = typeof body?.onboarding === "string" ? body.onboarding.slice(0, 1400) : "";
-    const language: string = typeof body?.language === "string" ? body.language : "en";
+    const language: string = typeof body?.language === "string" ? body.language : "en-US";
 
     const lastUser = lastMsg(messages, "user");
     const lastAssistant = lastMsg(messages, "assistant");
@@ -339,7 +339,14 @@ Return ONLY JSON with exactly this shape:
 }
 No extra keys. No markdown. No text outside JSON.
 
-${language === "es" ? `\nLANGUAGE INSTRUCTION: Respond ENTIRELY in Spanish. Every word of your reply, every suggestion chip, every label must be in Spanish. Do not switch to English under any circumstances.\n` : ""}
+${(() => {
+  if (language.startsWith("es")) return "\nLANGUAGE INSTRUCTION: Respond ENTIRELY in Spanish. Every word of your reply, every suggestion chip must be in Spanish. Do not switch to English under any circumstances.\n";
+  if (language === "pt-BR") return "\nLANGUAGE INSTRUCTION: Respond ENTIRELY in Brazilian Portuguese (Português Brasileiro). Every word of your reply, every suggestion chip must be in Portuguese. Do not switch to English or Spanish.\n";
+  if (language === "fr") return "\nLANGUAGE INSTRUCTION: Respond ENTIRELY in French. Every word of your reply, every suggestion chip must be in French. Do not switch to English.\n";
+  if (language === "ht") return "\nLANGUAGE INSTRUCTION: Respond ENTIRELY in Haitian Creole (Kreyòl Ayisyen). Every word of your reply, every suggestion chip must be in Haitian Creole. Do not switch to English.\n";
+  if (language === "zh-CN") return "\nLANGUAGE INSTRUCTION: Respond ENTIRELY in Simplified Chinese (简体中文). Every word of your reply, every suggestion chip must be in Chinese. Do not switch to English.\n";
+  return "";
+})()}
 ${onboarding ? `\nUSER CONTEXT FROM ONBOARDING:\n${onboarding}\n\nInstructions for using this context:\n- Address the user by their name if provided — naturally, like a friend would.\n- PRONOUN INSTRUCTION: If "Patient pronouns" appears in the context, use those pronouns in every single response without exception. He/him = use he/him/his. She/her = use she/her/hers. They/them = use they/them/their. Never default to they/them unless the patient selected they/them. Never mix pronouns across a response.\n- If "Companion pronouns" is listed, those are YOUR pronouns — use them if the user ever asks or a reflective reference arises.\n- Adapt your opening tone to the user’s emotional intensity and starting emotions.\n- If needsProviderHelp is true, offer to help find care at a natural moment — not as the first thing you say, and not repeatedly.` : ""}
 
 Current state:

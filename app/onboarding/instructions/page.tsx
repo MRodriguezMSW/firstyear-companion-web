@@ -1,7 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import CrisisButton from "../../components/CrisisButton";
+import { getStrings, readLang } from "../../i18n";
 
 const SCREEN: React.CSSProperties = {
   position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
@@ -22,26 +24,28 @@ const CARD: React.CSSProperties = {
 
 export default function InstructionsPage() {
   const router = useRouter();
+  const [t, setT] = useState(() => getStrings("en-US"));
+
+  useEffect(() => { setT(getStrings(readLang())); }, []);
 
   return (
     <div style={SCREEN}>
       <div style={CONTENT}>
         <div style={CARD}>
           <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: "0.12em", textTransform: "uppercase", color: "#c4956a", marginBottom: 6 }}>
-            You're almost there
+            {t.instr_eyebrow}
           </p>
           <h1 style={{ fontFamily: "'Lora', serif", fontSize: 22, fontWeight: 500, color: "#f5ede0", lineHeight: 1.35, marginBottom: 16 }}>
-            Meet your AI Buddy
+            {t.instr_title}
           </h1>
           <p style={{ fontSize: 14, color: "rgba(245,237,224,0.6)", lineHeight: 1.7, marginBottom: 16 }}>
-            When you enter the chat, a few tiles will appear to help you get started — no pressure to use them.
-            Tap one or more that feel right. After a few seconds your Buddy will respond.
+            {t.instr_body1}
           </p>
           <p style={{ fontSize: 14, color: "rgba(245,237,224,0.6)", lineHeight: 1.7, marginBottom: 16 }}>
-            Or just type whatever's on your mind — whatever feels easiest.
+            {t.instr_body2}
           </p>
           <p style={{ fontSize: 15, color: "#f5ede0", fontWeight: 500, marginBottom: 32 }}>
-            You're in control here.
+            {t.instr_strong}
           </p>
           <button
             style={{
@@ -54,7 +58,7 @@ export default function InstructionsPage() {
             }}
             onClick={() => router.push("/chat")}
           >
-            Let's go
+            {t.instr_btn}
           </button>
         </div>
       </div>

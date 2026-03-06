@@ -5,18 +5,19 @@ import { useState, useEffect } from "react";
 import clsx from "clsx";
 import styles from "../styles/Onboarding.module.css";
 import CrisisButton from "../../components/CrisisButton";
+import { getStrings, readLang } from "../../i18n";
 
 function dotState(i: number, screen = 5) {
   return i < screen ? "done" : i === screen ? "active" : "pending";
 }
 
 const THEMES = [
-  { id: "forest",   label: "Forest",   icon: "🌲", bg: "#0e1f1b", desc: "Teal & amber" },
-  { id: "ocean",    label: "Ocean",    icon: "🌊", bg: "#0a1a2e", desc: "Blue & seafoam" },
-  { id: "dusk",     label: "Dusk",     icon: "🌅", bg: "#1e1018", desc: "Rose & gold" },
-  { id: "midnight", label: "Midnight", icon: "🌙", bg: "#0d0e1f", desc: "Lavender & silver" },
-  { id: "ember",    label: "Ember",    icon: "🍂", bg: "#1a100a", desc: "Burnt orange & brown" },
-  { id: "bloom",    label: "Bloom",    icon: "🌸", bg: "#1a1015", desc: "Blush & cream" },
+  { id: "hopeful",  icon: "🌸", bg: "#1c1018" },
+  { id: "peaceful", icon: "🌿", bg: "#111c16" },
+  { id: "warm",     icon: "🌅", bg: "#1c1408" },
+  { id: "calm",     icon: "💙", bg: "#0c1b22" },
+  { id: "gentle",   icon: "🌙", bg: "#151020" },
+  { id: "grounded", icon: "🌲", bg: "#101a10" },
 ] as const;
 
 type ThemeId = typeof THEMES[number]["id"];
@@ -33,11 +34,13 @@ const CONTENT: React.CSSProperties = {
 
 export default function ThemePage() {
   const router = useRouter();
-  const [selected, setSelected] = useState<ThemeId>("forest");
+  const [selected, setSelected] = useState<ThemeId>("hopeful");
+  const [t, setT] = useState(() => getStrings("en-US"));
 
   useEffect(() => {
+    setT(getStrings(readLang()));
     const saved = localStorage.getItem("companion_theme") as ThemeId | null;
-    if (saved) setSelected(saved);
+    if (saved && THEMES.find(th => th.id === saved)) setSelected(saved);
   }, []);
 
   const pick = (id: ThemeId) => {
@@ -47,7 +50,7 @@ export default function ThemePage() {
 
   const handleFinish = () => {
     localStorage.setItem("companion_theme", selected);
-    router.push("/chat");
+    router.push("/onboarding/instructions");
   };
 
   return (
@@ -62,31 +65,32 @@ export default function ThemePage() {
             <div key={i} className={clsx(styles.dot, styles[dotState(i)])} />
           ))}
         </div>
-        <p className={styles.eyebrow}>Step 5 of 5</p>
-        <h1>Choose your space</h1>
-        <p className={styles.subtitle}>
-          Pick the background that feels most comfortable. You can always change it later.
-        </p>
+        <p className={styles.eyebrow}>{t.theme_step}</p>
+        <h1>{t.theme_title}</h1>
+        <p className={styles.subtitle}>{t.theme_sub}</p>
 
         <div className={styles.themeGrid}>
-          {THEMES.map((t) => (
-            <button
-              key={t.id}
-              className={clsx(styles.themeSwatch, selected === t.id && styles.themeSwatchActive)}
-              onClick={() => pick(t.id)}
-            >
-              <div className={styles.themeSwatchBg} style={{ background: t.bg }}>
-                <span className={styles.themeSwatchIcon}>{t.icon}</span>
-              </div>
-              <span className={styles.themeSwatchLabel}>{t.label}</span>
-              <span className={styles.themeSwatchDesc}>{t.desc}</span>
-            </button>
-          ))}
+          {THEMES.map((th, idx) => {
+            const name = t.theme_names[idx];
+            return (
+              <button
+                key={th.id}
+                className={clsx(styles.themeSwatch, selected === th.id && styles.themeSwatchActive)}
+                onClick={() => pick(th.id)}
+              >
+                <div className={styles.themeSwatchBg} style={{ background: th.bg }}>
+                  <span className={styles.themeSwatchIcon}>{th.icon}</span>
+                </div>
+                <span className={styles.themeSwatchLabel}>{name?.label ?? th.id}</span>
+                <span className={styles.themeSwatchDesc}>{name?.desc ?? ""}</span>
+              </button>
+            );
+          })}
         </div>
 
         <div className={styles.btnRow}>
-          <button className={styles.btnBack} onClick={() => router.back()}>Back</button>
-          <button className={styles.btnNext} onClick={handleFinish}>Start your conversation</button>
+          <button className={styles.btnBack} onClick={() => router.back()}>{t.back}</button>
+          <button className={styles.btnNext} onClick={handleFinish}>{t.theme_btn}</button>
         </div>
       </div>
 

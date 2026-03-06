@@ -1,12 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import clsx from "clsx";
 import styles from "../styles/Onboarding.module.css";
 import CrisisButton from "../../components/CrisisButton";
-
-const PRONOUNS = ["She/her", "He/him", "They/them", "Use my name only", "Prefer not to say"];
+import { getStrings, readLang } from "../../i18n";
 
 function dotState(i: number, screen = 1) {
   return i < screen ? "done" : i === screen ? "active" : "pending";
@@ -26,6 +25,9 @@ export default function IdentityPage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [pronoun, setPronoun] = useState("");
+  const [t, setT] = useState(() => getStrings("en-US"));
+
+  useEffect(() => { setT(getStrings(readLang())); }, []);
 
   const handleNext = () => {
     if (name.trim()) localStorage.setItem("companion_userName", name.trim());
@@ -45,21 +47,21 @@ export default function IdentityPage() {
             <div key={i} className={clsx(styles.dot, styles[dotState(i)])} />
           ))}
         </div>
-        <p className={styles.eyebrow}>Step 1 of 4</p>
-        <h1>How would you like me to address you?</h1>
-        <p className={styles.subtitle}>Everything here is optional. Use whatever feels right.</p>
+        <p className={styles.eyebrow}>{t.identity_step}</p>
+        <h1>{t.identity_title}</h1>
+        <p className={styles.subtitle}>{t.identity_sub}</p>
 
-        <label>Name or nickname</label>
+        <label>{t.identity_name_lbl}</label>
         <input
           className={styles.textInput}
-          placeholder="What should I call you?"
+          placeholder={t.identity_name_ph}
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
 
-        <label>Pronouns</label>
+        <label>{t.identity_pronoun_lbl}</label>
         <div className={styles.chipGrid}>
-          {PRONOUNS.map((p) => (
+          {t.identity_pronouns.map((p) => (
             <button
               key={p}
               className={clsx(styles.chip, pronoun === p && styles.selected)}
@@ -71,8 +73,8 @@ export default function IdentityPage() {
         </div>
 
         <div className={styles.btnRow}>
-          <button className={styles.btnBack} onClick={() => router.back()}>Back</button>
-          <button className={styles.btnNext} onClick={handleNext}>Continue</button>
+          <button className={styles.btnBack} onClick={() => router.back()}>{t.back}</button>
+          <button className={styles.btnNext} onClick={handleNext}>{t.continue_}</button>
         </div>
       </div>
 

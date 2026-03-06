@@ -4,43 +4,137 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import clsx from "clsx";
 import styles from "./styles/Chat.module.css";
 import CrisisButton from "../components/CrisisButton";
+import { getStrings, readLang, getLangFamily } from "../i18n";
 
 const FALLBACK_NAMES = ["Nova", "Sage", "River", "Luna"];
 
-const WELCOME_BUBBLE: Record<"en" | "es", string> = {
-  en: "I'm here with you. Take all the time you need.",
-  es: "Estoy aquí contigo. Tómate todo el tiempo que necesites.",
-};
-
-const AFFIRMATIONS = [
-  "You are safe here.",
-  "Take your time.",
-  "You are not alone.",
-  "You are stronger than you know.",
-  "Healing is not linear — and that's okay.",
+// ── Crisis detection (visual pulse only — no voice) ──────────────────────────
+const CRISIS_PATTERNS = [
+  /\b(kill\s*myself|killing\s*myself|end\s*my\s*life|take\s*my\s*(own\s*)?life|want\s*to\s*die|wish\s*i\s*were\s*dead|no\s*reason\s*to\s*(live|be\s*here)|better\s*off\s*dead|better\s*off\s*without\s*me)\b/i,
+  /\b(suicide|suicidal|self[\s-]?harm|cut\s*(myself|me)|hurt\s*(myself|me)|overdose)\b/i,
+  /\b(hopeless|no hope|feeling hopeless|there('?s| is) no point|can'?t go on|can'?t do this anymore|don'?t want to be here|don'?t want to live)\b/i,
+  /\b(quiero\s*morir|quitarme\s*la\s*vida|hacerme\s*daño|mejor\s*muerto|ya\s*no\s*quiero\s*vivir|sin\s*esperanza|no\s*hay\s*salida)\b/i,
 ];
+function detectCrisis(text: string): boolean {
+  return CRISIS_PATTERNS.some(p => p.test(text));
+}
 
-const PLACEHOLDERS = {
-  en: ["What's on your mind?", "Talk to me...", "I'm listening...", "Whatever you're feeling is okay to share."],
-  es: ["¿Qué tienes en mente?", "Cuéntame...", "Te escucho...", "Lo que sientes está bien compartirlo."],
-};
-
+// ── New themes (lighter / emotionally named) ─────────────────────────────────
 const THEMES = [
-  { id: "forest",   label: "🌲 Forest",   bg: "#0e1f1b" },
-  { id: "ocean",    label: "🌊 Ocean",    bg: "#0a1a2e" },
-  { id: "dusk",     label: "🌅 Dusk",     bg: "#1e1018" },
-  { id: "midnight", label: "🌙 Midnight", bg: "#0d0e1f" },
-  { id: "ember",    label: "🍂 Ember",    bg: "#1a100a" },
-  { id: "bloom",    label: "🌸 Bloom",    bg: "#1a1015" },
+  { id: "hopeful",  label: "🌸 Hopeful",  bg: "#1c1018" },
+  { id: "peaceful", label: "🌿 Peaceful", bg: "#111c16" },
+  { id: "warm",     label: "🌅 Warm",     bg: "#1c1408" },
+  { id: "calm",     label: "💙 Calm",     bg: "#0c1b22" },
+  { id: "gentle",   label: "🌙 Gentle",   bg: "#151020" },
+  { id: "grounded", label: "🌲 Grounded", bg: "#101a10" },
 ] as const;
 
-const AMBIENT_TRACKS = [
-  { name: "Gentle Rain",    type: "rain"    },
-  { name: "Ocean Waves",    type: "ocean"   },
-  { name: "Forest Breeze",  type: "forest"  },
-  { name: "Healing Tone",   type: "healing" },
-  { name: "Soft Wind",      type: "wind"    },
-] as const;
+function chipsToMessage(chips: string[]): string {
+  if (chips.length === 1) return chips[0];
+  const feelParts = chips.filter(c => c.toLowerCase().startsWith("i feel ")).map(c => c.slice(7));
+  const others = chips.filter(c => !c.toLowerCase().startsWith("i feel "));
+  const parts: string[] = [];
+  if (feelParts.length > 0) {
+    parts.push("I feel " + (feelParts.length === 1 ? feelParts[0] : feelParts.length === 2 ? `${feelParts[0]} and ${feelParts[1]}` : `${feelParts.slice(0,-1).join(", ")}, and ${feelParts[feelParts.length-1]}`));
+  }
+  parts.push(...others);
+  return parts.join(". ");
+}
+
+function getTimeGreeting(langCode: string): string {
+  const h = new Date().getHours();
+  const family = getLangFamily(langCode);
+  if (family === "es") {
+    if (h >= 5  && h < 12) return "Buenos días";
+    if (h >= 12 && h < 20) return "Buenas tardes";
+    return "Me alegra que hayas escrito esta noche";
+  }
+  if (h >= 5  && h < 11) return "Good morning";
+  if (h >= 11 && h < 17) return "Good afternoon";
+  if (h >= 17 && h < 21) return "Good evening";
+  return "It's late — I'm really glad you reached out instead of sitting with this alone tonight";
+}
+
+function buildOpeningMessage(ctx: any, langCode: string, welcomeBubble: string): string {
+  const family = getLangFamily(langCode);
+  const greeting = getTimeGreeting(langCode);
+  const name = ctx?.name as string | null;
+  const nameStr = name ? `, ${name}` : "";
+
+  if (family === "es") {
+    return `${greeting}${nameStr}. Me alegra mucho que estés aquí. Recibir un diagnóstico de VIH puede sentirse como si el suelo se moviera bajo tus pies — y lo que sientes ahora mismo, sea miedo, confusión, enojo o incluso entumecimiento, tiene todo el sentido. No estás solo/a en esto, y va a estar bien. Lo digo en serio. Tómate el tiempo que necesites. Cuando estés listo/a para hablar — de lo que sea — aquí estoy.`;
+  }
+  if (family !== "en") {
+    return nameStr ? `${nameStr.replace(/^, /, "")}. ${welcomeBubble}` : welcomeBubble;
+  }
+  return `${greeting}${nameStr}. I'm really glad you're here. Being diagnosed with HIV can feel like the ground just shifted beneath you — and whatever you are feeling right now, whether that's fear, confusion, anger, or even numbness, all of it makes complete sense. You are not alone in this, and you are going to be okay. I mean that. Take all the time you need. When you're ready to talk — about anything at all — I'm right here with you.`;
+}
+
+// ── Web Audio ambient tones ──────────────────────────────────────────────────
+function createAmbientNodes(ctx: AudioContext, type: string, masterGain: GainNode): AudioNode[] {
+  const nodes: AudioNode[] = [];
+
+  // Noise-based sounds
+  if (["rain","forest","wind","fire","stream","thunder"].includes(type)) {
+    const bufSize = ctx.sampleRate * 3;
+    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
+    const src = ctx.createBufferSource();
+    src.buffer = buf; src.loop = true;
+    const filter = ctx.createBiquadFilter();
+    filter.type = type === "thunder" ? "lowpass" : type === "stream" ? "bandpass" : "lowpass";
+    filter.frequency.value = type === "wind" ? 200 : type === "forest" ? 600 : type === "thunder" ? 80 : type === "stream" ? 800 : type === "fire" ? 350 : 400;
+    src.connect(filter); filter.connect(masterGain); src.start();
+    nodes.push(src, filter);
+  } else if (type === "ocean") {
+    const bufSize = ctx.sampleRate * 3;
+    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
+    const src = ctx.createBufferSource();
+    src.buffer = buf; src.loop = true;
+    const filter = ctx.createBiquadFilter();
+    filter.type = "lowpass"; filter.frequency.value = 300;
+    const lfo = ctx.createOscillator(); lfo.frequency.value = 0.12;
+    const lfoGain = ctx.createGain(); lfoGain.gain.value = 0.4;
+    lfo.connect(lfoGain); src.connect(filter); filter.connect(masterGain);
+    lfo.start(); src.start();
+    nodes.push(src, filter, lfo, lfoGain);
+  } else if (type === "healing" || type === "piano") {
+    const freq1 = type === "piano" ? 261.63 : 528;
+    const freq2 = type === "piano" ? 392 : 264;
+    const osc1 = ctx.createOscillator(); osc1.type = "sine"; osc1.frequency.value = freq1;
+    const g1 = ctx.createGain(); g1.gain.value = type === "piano" ? 0.4 : 0.6;
+    osc1.connect(g1); g1.connect(masterGain);
+    const osc2 = ctx.createOscillator(); osc2.type = "sine"; osc2.frequency.value = freq2;
+    const g2 = ctx.createGain(); g2.gain.value = 0.25;
+    osc2.connect(g2); g2.connect(masterGain);
+    osc1.start(); osc2.start();
+    nodes.push(osc1, g1, osc2, g2);
+  } else {
+    // Uplift tracks: warm harmonic pairs
+    const UPLIFT_FREQS: Record<string, number[]> = {
+      rising:    [396, 528, 660],
+      loved:     [396, 528, 660],
+      stronger:  [440, 550],
+      newday:    [396, 462],
+      becoming:  [468, 585],
+      worthy:    [432, 528],
+      brave:     [440, 528],
+      enough:    [528, 594],
+    };
+    const freqs: number[] = UPLIFT_FREQS[type] ?? [432, 528];
+    const gainVal = 0.35 / freqs.length;
+    freqs.forEach((freq: number) => {
+      const osc = ctx.createOscillator(); osc.type = "sine"; osc.frequency.value = freq;
+      const g = ctx.createGain(); g.gain.value = gainVal;
+      osc.connect(g); g.connect(masterGain); osc.start();
+      nodes.push(osc, g);
+    });
+  }
+  return nodes;
+}
 
 const GLOSSARY = [
   { term: "U=U", def: "Undetectable = Untransmittable. If you are on treatment and your viral load is undetectable, you cannot sexually transmit HIV to a partner. This is one of the most important things to know — and it's backed by extensive science." },
@@ -55,135 +149,16 @@ const GLOSSARY = [
   { term: "Ryan White Program", def: "A federal program that helps people living with HIV access care and medication regardless of ability to pay. If you don't have insurance or can't afford care, this program can help." },
 ];
 
-const PROVIDER_CATEGORIES = [
-  { id: "hiv",       icon: "🩺", label: "HIV Provider",               prompt: "HIV care providers" },
-  { id: "mental",    icon: "🧠", label: "Mental Health Therapist",    prompt: "mental health therapists who specialize in chronic illness" },
-  { id: "substance", icon: "💊", label: "Substance Use Counselor",    prompt: "substance use counselors" },
-  { id: "std",       icon: "🧪", label: "STD Testing",                prompt: "STD testing clinics" },
-  { id: "lgbtq",     icon: "🏳️‍🌈", label: "LGBTQ+ Affirming Care",  prompt: "LGBTQ+ affirming healthcare providers" },
-  { id: "prep",      icon: "💉", label: "PrEP Provider",              prompt: "PrEP providers" },
-] as const;
-
-// ── Crisis detection (visual pulse only — no voice) ──────────────────────────
-const CRISIS_PATTERNS = [
-  /\b(kill\s*myself|killing\s*myself|end\s*my\s*life|take\s*my\s*(own\s*)?life|want\s*to\s*die|wish\s*i\s*were\s*dead|no\s*reason\s*to\s*(live|be\s*here)|better\s*off\s*dead|better\s*off\s*without\s*me)\b/i,
-  /\b(suicide|suicidal|self[\s-]?harm|cut\s*(myself|me)|hurt\s*(myself|me)|overdose)\b/i,
-  /\b(hopeless|no hope|feeling hopeless|there('?s| is) no point|can'?t go on|can'?t do this anymore|don'?t want to be here|don'?t want to live)\b/i,
-  /\b(quiero\s*morir|quitarme\s*la\s*vida|hacerme\s*daño|mejor\s*muerto|ya\s*no\s*quiero\s*vivir|sin\s*esperanza|no\s*hay\s*salida)\b/i,
-];
-function detectCrisis(text: string): boolean {
-  return CRISIS_PATTERNS.some(p => p.test(text));
-}
-
-function chipsToMessage(chips: string[]): string {
-  if (chips.length === 1) return chips[0];
-  const feelParts = chips.filter(c => c.toLowerCase().startsWith("i feel ")).map(c => c.slice(7));
-  const others = chips.filter(c => !c.toLowerCase().startsWith("i feel "));
-  const parts: string[] = [];
-  if (feelParts.length > 0) {
-    parts.push("I feel " + (feelParts.length === 1 ? feelParts[0] : feelParts.length === 2 ? `${feelParts[0]} and ${feelParts[1]}` : `${feelParts.slice(0,-1).join(", ")}, and ${feelParts[feelParts.length-1]}`));
-  }
-  parts.push(...others);
-  return parts.join(". ");
-}
-
-function getTimeGreeting(lang: "en" | "es"): string {
-  const h = new Date().getHours();
-  if (lang === "es") {
-    if (h >= 5  && h < 12) return "Buenos días";
-    if (h >= 12 && h < 20) return "Buenas tardes";
-    return "Me alegra que hayas escrito esta noche";
-  }
-  if (h >= 5  && h < 11) return "Good morning";
-  if (h >= 11 && h < 17) return "Good afternoon";
-  if (h >= 17 && h < 21) return "Good evening";
-  return "It's late — I'm really glad you reached out instead of sitting with this alone tonight";
-}
-
-function mapPronoun(raw: string | null) {
-  const p = (raw || "").toLowerCase();
-  if (p.includes("he/him") || p.startsWith("he"))  return { subj: "he",   obj: "him",  poss: "his",   verb: "is"  };
-  if (p.includes("she/her") || p.startsWith("she")) return { subj: "she",  obj: "her",  poss: "her",   verb: "is"  };
-  return                                              { subj: "they", obj: "them", poss: "their", verb: "are" };
-}
-
-function buildOpeningMessage(ctx: any, lang: "en" | "es"): string {
-  const greeting = getTimeGreeting(lang);
-  const name = ctx?.name as string | null;
-  const nameStr = name ? `, ${name}` : "";
-  if (lang === "es") {
-    return `${greeting}${nameStr}. Me alegra mucho que estés aquí. Recibir un diagnóstico de VIH puede sentirse como si el suelo se moviera bajo tus pies — y lo que sientes ahora mismo, sea miedo, confusión, enojo o incluso entumecimiento, tiene todo el sentido. No estás solo/a en esto, y va a estar bien. Lo digo en serio. Tómate el tiempo que necesites. Cuando estés listo/a para hablar — de lo que sea — aquí estoy.`;
-  }
-  return `${greeting}${nameStr}. I'm really glad you're here. Being diagnosed with HIV can feel like the ground just shifted beneath you — and whatever you are feeling right now, whether that's fear, confusion, anger, or even numbness, all of it makes complete sense. You are not alone in this, and you are going to be okay. I mean that. Take all the time you need. When you're ready to talk — about anything at all — I'm right here with you.`;
-}
-
-// ── Web Audio ambient tones ──────────────────────────────────────────────────
-function createAmbientNodes(ctx: AudioContext, type: string, masterGain: GainNode): AudioNode[] {
-  const nodes: AudioNode[] = [];
-  if (type === "rain" || type === "forest" || type === "wind") {
-    const bufSize = ctx.sampleRate * 3;
-    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
-    const data = buf.getChannelData(0);
-    for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
-    const src = ctx.createBufferSource();
-    src.buffer = buf;
-    src.loop = true;
-    const filter = ctx.createBiquadFilter();
-    filter.type = "lowpass";
-    filter.frequency.value = type === "wind" ? 200 : type === "forest" ? 600 : 400;
-    src.connect(filter);
-    filter.connect(masterGain);
-    src.start();
-    nodes.push(src, filter);
-  } else if (type === "ocean") {
-    const bufSize = ctx.sampleRate * 3;
-    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
-    const data = buf.getChannelData(0);
-    for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
-    const src = ctx.createBufferSource();
-    src.buffer = buf;
-    src.loop = true;
-    const filter = ctx.createBiquadFilter();
-    filter.type = "lowpass";
-    filter.frequency.value = 300;
-    const lfo = ctx.createOscillator();
-    lfo.frequency.value = 0.12;
-    const lfoGain = ctx.createGain();
-    lfoGain.gain.value = 0.4;
-    lfo.connect(lfoGain);
-    src.connect(filter);
-    filter.connect(masterGain);
-    lfo.start();
-    src.start();
-    nodes.push(src, filter, lfo, lfoGain);
-  } else if (type === "healing") {
-    const osc1 = ctx.createOscillator();
-    osc1.type = "sine";
-    osc1.frequency.value = 528;
-    const g1 = ctx.createGain();
-    g1.gain.value = 0.6;
-    osc1.connect(g1);
-    g1.connect(masterGain);
-    const osc2 = ctx.createOscillator();
-    osc2.type = "sine";
-    osc2.frequency.value = 264;
-    const g2 = ctx.createGain();
-    g2.gain.value = 0.25;
-    osc2.connect(g2);
-    g2.connect(masterGain);
-    osc1.start();
-    osc2.start();
-    nodes.push(osc1, g1, osc2, g2);
-  }
-  return nodes;
-}
-
-
 type Message = { role: "assistant" | "user"; content: string };
 type BreathPhase = "in" | "hold" | "out" | "done";
 const BREATH_ROUNDS = 3;
 
 export default function ChatPage() {
+  // ── Language / i18n ────────────────────────────────────────────────────────
+  const [langCode, setLangCode] = useState("en-US");
+  const t = getStrings(langCode);
+
+  // ── Messages ──────────────────────────────────────────────────────────────
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", content: "I'm here with you. Take all the time you need." },
   ]);
@@ -193,6 +168,7 @@ export default function ChatPage() {
   const [sending, setSending] = useState(false);
   const [state, setState] = useState({ mode: "companion" as "companion" | "guide", topic: "start", stage: "start:v1" });
 
+  // ── Profile ────────────────────────────────────────────────────────────────
   const [companionName, setCompanionName] = useState(() => FALLBACK_NAMES[Math.floor(Math.random() * FALLBACK_NAMES.length)]);
   const [companionEmoji, setCompanionEmoji] = useState("🌱");
   const [userEmoji, setUserEmoji] = useState("");
@@ -200,10 +176,7 @@ export default function ChatPage() {
   const [onboardingContext, setOnboardingContext] = useState<string>("");
   const [openingCtx, setOpeningCtx] = useState<any>(null);
 
-  // Language — reactive
-  const [language, setLanguageState] = useState<"en" | "es">("en");
-
-  // UI state
+  // ── UI state ───────────────────────────────────────────────────────────────
   const [affirmationIdx, setAffirmationIdx] = useState(0);
   const [placeholderIdx, setPlaceholderIdx] = useState(0);
   const [showBreathing, setShowBreathing] = useState(false);
@@ -214,17 +187,22 @@ export default function ChatPage() {
   const [glossaryTerm, setGlossaryTerm] = useState<typeof GLOSSARY[number] | null>(null);
   const [providerCity, setProviderCity] = useState("");
   const [providerCategory, setProviderCategory] = useState("");
-  const [mobileSheet, setMobileSheet] = useState<"calm" | "relax" | "terms" | "provider" | null>(null);
-
-  // Crisis pulse
+  const [mobileSheet, setMobileSheet] = useState<"calm" | "relax" | "terms" | "provider" | "music" | null>(null);
   const [crisisDetected, setCrisisDetected] = useState(false);
 
-  // Music
+  // ── Sidebar accordions (calm/relax/dict closed; provider/music open) ───────
+  const [sidebarOpen, setSidebarOpen] = useState<Record<string, boolean>>({
+    calm: false, relax: false, dict: false,
+  });
+  const toggleSection = (key: string) => setSidebarOpen(prev => ({ ...prev, [key]: !prev[key] }));
+
+  // ── Music ──────────────────────────────────────────────────────────────────
+  const [musicTab, setMusicTab] = useState<"sounds" | "uplift">("sounds");
   const [musicTrack, setMusicTrack] = useState(0);
   const [musicPlaying, setMusicPlaying] = useState(false);
   const [musicVolume, setMusicVolume] = useState(0.35);
 
-  // Refs
+  // ── Refs ───────────────────────────────────────────────────────────────────
   const inputRef = useRef("");
   const selectedChipsRef = useRef<string[]>([]);
   const bottomRef = useRef<HTMLDivElement | null>(null);
@@ -236,40 +214,34 @@ export default function ChatPage() {
   const providerInputRef = useRef<HTMLInputElement | null>(null);
   const mobileProviderInputRef = useRef<HTMLInputElement | null>(null);
 
+  // ── Effects ────────────────────────────────────────────────────────────────
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, sending, chips]);
-  useEffect(() => { const t = setInterval(() => setAffirmationIdx(i => (i + 1) % AFFIRMATIONS.length), 8000); return () => clearInterval(t); }, []);
-  useEffect(() => { const allP = PLACEHOLDERS[language]; const t = setInterval(() => setPlaceholderIdx(i => (i + 1) % allP.length), 6000); return () => clearInterval(t); }, [language]);
 
-
-  // ── Reactive opening message when language changes ───────────────────────
+  // Affirmation cycle (6s)
   useEffect(() => {
-    setMessages(prev => {
-      if (prev.length === 1 && prev[0].role === "assistant") {
-        const content = openingCtx
-          ? buildOpeningMessage(openingCtx, language)
-          : WELCOME_BUBBLE[language];
-        return [{ role: "assistant", content }];
-      }
-      return prev;
-    });
-  }, [language, openingCtx]);
+    const affirms = t.affirmations;
+    const timer = setInterval(() => setAffirmationIdx(i => (i + 1) % affirms.length), 6000);
+    return () => clearInterval(timer);
+  }, [t]);
 
-  // ── Crisis pulse: activate when last user message contains crisis language ──
+  // Placeholder cycle
+  const PLACEHOLDERS = [t.welcome_bubble, ...(t.initial_chips || [])];
+  useEffect(() => {
+    const timer = setInterval(() => setPlaceholderIdx(i => (i + 1) % PLACEHOLDERS.length), 6000);
+    return () => clearInterval(timer);
+  }, [t]);
+
+  // Crisis pulse
   useEffect(() => {
     const lastUser = [...messages].reverse().find(m => m.role === "user");
-    if (lastUser && detectCrisis(lastUser.content)) {
-      setCrisisDetected(true);
-    }
+    if (lastUser && detectCrisis(lastUser.content)) setCrisisDetected(true);
   }, [messages]);
 
-  // ── Google Places Autocomplete ─────────────────────────────────────────────
+  // Google Places
   useEffect(() => {
     const key = process.env.NEXT_PUBLIC_GOOGLE_PLACES_KEY;
     if (!key) return;
-    if ((window as any).google?.maps?.places) {
-      initPlaces();
-      return;
-    }
+    if ((window as any).google?.maps?.places) { initPlaces(); return; }
     const scriptId = "gmaps-places-script";
     if (document.getElementById(scriptId)) return;
     const script = document.createElement("script");
@@ -291,7 +263,6 @@ export default function ChatPage() {
     }
   }, []);
 
-  // Re-init autocomplete for mobile sheet provider input when it opens
   useEffect(() => {
     if (mobileSheet !== "provider") return;
     const key = process.env.NEXT_PUBLIC_GOOGLE_PLACES_KEY;
@@ -305,10 +276,10 @@ export default function ChatPage() {
     });
   }, [mobileSheet]);
 
-  // ── Load onboarding context ───────────────────────────────────────────────
+  // Load onboarding context + language
   useEffect(() => {
-    const savedLang = localStorage.getItem("companion_language") as "en" | "es" | null;
-    if (savedLang) { setLanguageState(savedLang); }
+    const savedLang = localStorage.getItem("companion_language") ?? "en-US";
+    setLangCode(savedLang);
 
     const raw = localStorage.getItem("companion_context");
     if (raw) {
@@ -319,11 +290,11 @@ export default function ChatPage() {
         if (ctx.userAvatar?.emoji) setUserEmoji(ctx.userAvatar.emoji);
         if (ctx.name) setUserName(ctx.name);
 
-        const lang = (localStorage.getItem("companion_language") as "en" | "es") || "en";
+        const lang = savedLang;
+        const welcome = getStrings(lang).welcome_bubble;
         setOpeningCtx(ctx);
-        setMessages([{ role: "assistant", content: buildOpeningMessage(ctx, lang) }]);
+        setMessages([{ role: "assistant", content: buildOpeningMessage(ctx, lang, welcome) }]);
 
-        const { subj, obj, poss } = mapPronoun(ctx.pronoun);
         const pronounLabel = ctx.pronoun?.toLowerCase().includes("he/him") ? "he/him/his"
           : ctx.pronoun?.toLowerCase().includes("she/her") ? "she/her/hers"
           : ctx.pronoun?.toLowerCase().includes("they/them") ? "they/them/their"
@@ -366,13 +337,17 @@ export default function ChatPage() {
     }
     const name = localStorage.getItem("companion_userName") || "";
     if (name) setUserName(name);
+
+    // Set initial chips and welcome from language
+    setChips(getStrings(savedLang).initial_chips);
+    setMessages([{ role: "assistant", content: getStrings(savedLang).welcome_bubble }]);
   }, []);
 
-  // ── Language ──────────────────────────────────────────────────────────────
-  const setLanguage = (l: "en" | "es") => {
-    setLanguageState(l);
-    localStorage.setItem("companion_language", l);
-  };
+  // Apply saved theme
+  useEffect(() => {
+    const theme = localStorage.getItem("companion_theme") ?? "hopeful";
+    document.documentElement.setAttribute("data-theme", theme);
+  }, []);
 
   // ── Breathing ─────────────────────────────────────────────────────────────
   const startBreathing = () => { setBreathPhase("in"); setBreathCount(4); setBreathRound(1); setShowBreathing(true); };
@@ -415,7 +390,7 @@ export default function ChatPage() {
     ambientNodesRef.current = [];
   };
 
-  const playAmbient = (idx: number, vol: number) => {
+  const playAmbient = (type: string, vol: number) => {
     stopAmbient();
     if (!audioCtxRef.current || audioCtxRef.current.state === "closed") audioCtxRef.current = new AudioContext();
     const ctx = audioCtxRef.current;
@@ -424,19 +399,32 @@ export default function ChatPage() {
     gain.gain.value = vol;
     gain.connect(ctx.destination);
     masterGainRef.current = gain;
-    const nodes = createAmbientNodes(ctx, AMBIENT_TRACKS[idx].type, gain);
+    const nodes = createAmbientNodes(ctx, type, gain);
     ambientNodesRef.current = [gain, ...nodes];
   };
 
+  const currentTrackList = musicTab === "sounds" ? t.sounds : t.uplift;
+  const safeTrackIdx = musicTrack % Math.max(currentTrackList.length, 1);
+  const currentTrack = currentTrackList[safeTrackIdx];
+
   const toggleMusic = () => {
     if (musicPlaying) { stopAmbient(); setMusicPlaying(false); }
-    else { playAmbient(musicTrack, musicVolume); setMusicPlaying(true); }
+    else { if (currentTrack) playAmbient(currentTrack.type, musicVolume); setMusicPlaying(true); }
   };
 
   const nextMusicTrack = () => {
-    const next = (musicTrack + 1) % AMBIENT_TRACKS.length;
+    const next = (safeTrackIdx + 1) % currentTrackList.length;
     setMusicTrack(next);
-    if (musicPlaying) playAmbient(next, musicVolume);
+    if (musicPlaying && currentTrackList[next]) playAmbient(currentTrackList[next].type, musicVolume);
+  };
+
+  const switchMusicTab = (tab: "sounds" | "uplift") => {
+    setMusicTab(tab);
+    setMusicTrack(0);
+    if (musicPlaying) {
+      const list = tab === "sounds" ? t.sounds : t.uplift;
+      if (list[0]) playAmbient(list[0].type, musicVolume);
+    }
   };
 
   const handleMusicVolume = (v: number) => {
@@ -463,7 +451,6 @@ export default function ChatPage() {
     selectedChipsRef.current = [];
     setSelectedChips([]);
     setChips([]);
-
     setSending(true);
     if (textareaRef.current) textareaRef.current.style.height = "auto";
 
@@ -475,20 +462,20 @@ export default function ChatPage() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: nextMessages, state, onboarding: onboardingContext, language }),
+        body: JSON.stringify({ messages: nextMessages, state, onboarding: onboardingContext, language: langCode }),
       });
       const data = await res.json();
       const elapsed = Date.now() - start;
       if (elapsed < 800) await new Promise(r => setTimeout(r, 800 - elapsed));
 
-      const reply = typeof data?.reply === "string" ? data.reply : "I'm here with you. What feels most important right now?";
+      const reply = typeof data?.reply === "string" ? data.reply : t.welcome_bubble;
       const nextChips: string[] = Array.isArray(data?.suggestions) ? data.suggestions.map((s: unknown) => String(s)).slice(0, 6) : [];
 
       if (data?.state) setState(data.state);
       setMessages(prev => [...prev, { role: "assistant", content: reply }]);
       setChips(nextChips);
     } catch {
-      setMessages(prev => [...prev, { role: "assistant", content: "I'm having trouble connecting right now. Please try again in a moment." }]);
+      setMessages(prev => [...prev, { role: "assistant", content: t.welcome_bubble }]);
       setChips([]);
     } finally {
       setSending(false);
@@ -523,7 +510,98 @@ export default function ChatPage() {
 
   const breathLabel = breathPhase === "in" ? "Breathe in..." : breathPhase === "hold" ? "Hold..." : breathPhase === "out" ? "Breathe out..." : "";
   const breathCircleClass = breathPhase === "in" ? styles.breathIn : breathPhase === "hold" ? styles.breathHold : styles.breathOut;
-  const currentPlaceholders = PLACEHOLDERS[language];
+
+  // Provider category search
+  const providerCats = t.provider_cats;
+  const doProviderSearch = (inputEl?: HTMLInputElement | null) => {
+    if (!providerCity.trim()) return;
+    const cat = providerCats.find(c => c.prompt === providerCategory || providerCats.findIndex(x => x === c) === providerCats.findIndex(x => x.prompt === providerCategory));
+    const catObj = providerCats.find((_c, i) => i === Number(providerCategory)) ?? providerCats.find(c => c.prompt === providerCategory);
+    triggerSend(`Can you help me find ${catObj?.prompt ?? providerCategory} near ${providerCity.trim()}?`);
+    setProviderCity("");
+  };
+
+  // Sidebar provider search — find category by id from providerCategory state (stores index as string)
+  const selectedProviderCat = providerCats[Number(providerCategory)] ?? null;
+
+  const renderProviderSection = (isMobile = false) => (
+    <>
+      <p style={{ fontSize: isMobile ? 12 : 11, color: "rgba(245,237,224,.45)", marginBottom: 10, lineHeight: 1.5 }}>
+        {t.sidebar_provider_select}
+      </p>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr 1fr" : "1fr 1fr", gap: 6, marginBottom: 10 }}>
+        {providerCats.map((cat, idx) => (
+          <button
+            key={cat.label}
+            onClick={() => setProviderCategory(String(idx))}
+            style={{
+              background: providerCategory === String(idx) ? "rgba(74,124,111,0.2)" : "rgba(255,248,235,0.04)",
+              border: `1px solid ${providerCategory === String(idx) ? "rgba(74,124,111,0.6)" : "rgba(255,248,235,0.1)"}`,
+              borderRadius: 10, padding: isMobile ? "9px 6px" : "9px 8px",
+              color: providerCategory === String(idx) ? "#8ecfbe" : "rgba(245,237,224,0.6)",
+              fontSize: isMobile ? 10 : 11, fontWeight: 500,
+              cursor: "pointer", textAlign: "center",
+              fontFamily: "DM Sans, sans-serif",
+              display: "flex", flexDirection: "column", alignItems: "center", gap: isMobile ? 3 : 4,
+              transition: "all 0.15s ease",
+            }}
+          >
+            <span style={{ fontSize: isMobile ? 18 : 16 }}>{cat.icon}</span>
+            <span style={{ lineHeight: 1.3 }}>{cat.label}</span>
+          </button>
+        ))}
+      </div>
+      {selectedProviderCat && (
+        <div className={styles.providerSearchRow}>
+          <input
+            ref={isMobile ? mobileProviderInputRef : providerInputRef}
+            className={styles.providerInput}
+            placeholder={t.search + "..."}
+            value={providerCity}
+            onChange={e => setProviderCity(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === "Enter") {
+                triggerSend(`Can you help me find ${selectedProviderCat.prompt} near ${providerCity.trim()}?`);
+                setProviderCity("");
+                if (isMobile) setMobileSheet(null);
+              }
+            }}
+          />
+          <button
+            className={styles.providerSearchBtn}
+            disabled={sending || !providerCity.trim()}
+            onClick={() => {
+              triggerSend(`Can you help me find ${selectedProviderCat.prompt} near ${providerCity.trim()}?`);
+              setProviderCity("");
+              if (isMobile) setMobileSheet(null);
+            }}
+          >
+            {t.search}
+          </button>
+        </div>
+      )}
+    </>
+  );
+
+  const renderMusicSection = () => (
+    <div className={styles.musicPlayer}>
+      <div className={styles.musicTabRow}>
+        <button className={clsx(styles.musicTab, musicTab === "sounds" && styles.musicTabActive)} onClick={() => switchMusicTab("sounds")}>{t.sidebar_music_sounds}</button>
+        <button className={clsx(styles.musicTab, musicTab === "uplift" && styles.musicTabActive)} onClick={() => switchMusicTab("uplift")}>{t.sidebar_music_uplift}</button>
+      </div>
+      <div className={styles.musicTrackName}>{currentTrack?.name ?? ""}</div>
+      <div className={styles.musicControls}>
+        <button className={styles.musicBtn} onClick={toggleMusic}>{musicPlaying ? "⏸" : "▶"}</button>
+        <button className={styles.musicBtn} onClick={nextMusicTrack}>⏭</button>
+      </div>
+      <div className={styles.musicVolumeRow}>
+        <span className={styles.musicVolumeIcon}>🔈</span>
+        <input type="range" min={0} max={1} step={0.01} value={musicVolume} onChange={e => handleMusicVolume(Number(e.target.value))} className={styles.musicVolume} />
+        <span className={styles.musicVolumeIcon}>🔊</span>
+      </div>
+      <p className={styles.musicNote}>Device-generated ambient tones — no download needed</p>
+    </div>
+  );
 
   return (
     <div className={styles.chatRoot} style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, display: "flex", flexDirection: "column" }}>
@@ -535,8 +613,8 @@ export default function ChatPage() {
         <div className={styles.breathOverlay}>
           {breathPhase === "done" ? (
             <div className={styles.breathDoneWrap}>
-              <div className={styles.breathDoneText}>{language === "es" ? "Muy bien. Tómate un momento para notar cómo te sientes." : "Well done. Take a moment to notice how you feel."}</div>
-              <button className={styles.breathDoneBtn} onClick={() => setShowBreathing(false)}>{language === "es" ? "Volver al chat" : "Return to chat"}</button>
+              <div className={styles.breathDoneText}>Well done. Take a moment to notice how you feel.</div>
+              <button className={styles.breathDoneBtn} onClick={() => setShowBreathing(false)}>Return to chat</button>
             </div>
           ) : (
             <>
@@ -544,9 +622,7 @@ export default function ChatPage() {
               <div className={clsx(styles.breathCircle, breathCircleClass)} />
               <div className={styles.breathCounter}>{breathCount}</div>
               <div className={styles.breathRoundText}>Round {Math.min(breathRound, BREATH_ROUNDS)} of {BREATH_ROUNDS}</div>
-              <button className={styles.breathCloseBtn} onClick={() => setShowBreathing(false)}>
-                {language === "es" ? "Detener ejercicio" : "Stop exercise"}
-              </button>
+              <button className={styles.breathCloseBtn} onClick={() => setShowBreathing(false)}>Stop exercise</button>
             </>
           )}
         </div>
@@ -558,7 +634,7 @@ export default function ChatPage() {
           <div className={styles.glossaryModal} onClick={e => e.stopPropagation()}>
             <div className={styles.glossaryModalTerm}>{glossaryTerm.term}</div>
             <div className={styles.glossaryModalDef}>{glossaryTerm.def}</div>
-            <button className={styles.glossaryModalClose} onClick={(e) => { e.stopPropagation(); setGlossaryTerm(null); }}>{language === "es" ? "Cerrar" : "Got it"}</button>
+            <button className={styles.glossaryModalClose} onClick={(e) => { e.stopPropagation(); setGlossaryTerm(null); }}>{t.got_it}</button>
           </div>
         </div>
       )}
@@ -567,12 +643,12 @@ export default function ChatPage() {
       {showThemePicker && (
         <div className={styles.themeOverlay} onClick={() => setShowThemePicker(false)}>
           <div className={styles.themePanel} onClick={e => e.stopPropagation()}>
-            <div className={styles.themePanelTitle}>{language === "es" ? "Elige tu espacio" : "Choose your space"}</div>
+            <div className={styles.themePanelTitle}>Choose your space</div>
             <div className={styles.themePanelGrid}>
-              {THEMES.map(t => (
-                <button key={t.id} className={styles.themePanelSwatch} onClick={() => applyTheme(t.id)}>
-                  <div className={styles.themePanelBg} style={{ background: t.bg }} />
-                  <span className={styles.themePanelLabel}>{t.label}</span>
+              {THEMES.map(th => (
+                <button key={th.id} className={styles.themePanelSwatch} onClick={() => applyTheme(th.id)}>
+                  <div className={styles.themePanelBg} style={{ background: th.bg }} />
+                  <span className={styles.themePanelLabel}>{th.label}</span>
                 </button>
               ))}
             </div>
@@ -580,21 +656,13 @@ export default function ChatPage() {
         </div>
       )}
 
-      {/* ── Full-width header ── */}
+      {/* ── Header ── */}
       <div className={styles.chatHeader} style={{ flexShrink: 0, height: 56 }}>
         <div className={styles.headerAvatar}>{companionEmoji}</div>
         <div className={styles.headerInfo}>
           <div className={styles.headerName}>{companionName}</div>
         </div>
-
         <button className={styles.headerIconBtn} onClick={() => setShowThemePicker(v => !v)} title="Change theme">🎨</button>
-
-        <div className={styles.langToggleHeader}>
-          <button className={clsx(styles.langBtnHeader, language === "en" && styles.langBtnHeaderActive)} onClick={() => setLanguage("en")}>EN</button>
-          <span className={styles.langDividerHeader}>|</span>
-          <button className={clsx(styles.langBtnHeader, language === "es" && styles.langBtnHeaderActive)} onClick={() => setLanguage("es")}>ES</button>
-        </div>
-
         {userEmoji && <div className={styles.headerUserAvatar}>{userEmoji}</div>}
       </div>
 
@@ -603,14 +671,18 @@ export default function ChatPage() {
 
         {/* ── Chat panel ── */}
         <div className={styles.chatPanel}>
+          {/* Affirmation bar */}
           <div className={styles.affirmationBar}>
-            <span key={affirmationIdx} className={styles.affirmationText}>{AFFIRMATIONS[affirmationIdx]}</span>
+            <span key={affirmationIdx} className={styles.affirmationText}>
+              {t.affirmations[affirmationIdx % t.affirmations.length]}
+            </span>
           </div>
 
+          {/* Messages */}
           <div className={styles.messages}>
             <div className={styles.dateDivider}>
               <div className={styles.dateLine} />
-              <div className={styles.dateText}>{language === "es" ? "Hoy" : "Today"}</div>
+              <div className={styles.dateText}>{t.today}</div>
               <div className={styles.dateLine} />
             </div>
 
@@ -627,7 +699,7 @@ export default function ChatPage() {
                     <div className={styles.msgCol}>
                       {!isCont && (
                         <div className={clsx(styles.senderName, isUser ? styles.userName : styles.compName)}>
-                          {isUser ? (userName || (language === "es" ? "Tú" : "You")) : companionName}
+                          {isUser ? (userName || "You") : companionName}
                         </div>
                       )}
                       <div className={clsx(styles.bubble, isUser ? styles.userBubble : styles.compBubble, isCont && styles.cont)}>
@@ -658,16 +730,19 @@ export default function ChatPage() {
           {/* Mobile wellness icon bar */}
           <div className={styles.mobileWellnessBar}>
             <button className={styles.mobileWellnessIconBtn} onClick={() => setMobileSheet("calm")}>
-              <span>🧘</span><span className={styles.mobileWellnessIconLbl}>{language === "es" ? "Calma" : "Calm"}</span>
+              <span>🧘</span><span className={styles.mobileWellnessIconLbl}>{t.wb_calm}</span>
             </button>
             <button className={styles.mobileWellnessIconBtn} onClick={() => setMobileSheet("relax")}>
-              <span>🌿</span><span className={styles.mobileWellnessIconLbl}>{language === "es" ? "Momento" : "Relax"}</span>
+              <span>🌿</span><span className={styles.mobileWellnessIconLbl}>{t.wb_relax}</span>
             </button>
             <button className={styles.mobileWellnessIconBtn} onClick={() => setMobileSheet("terms")}>
-              <span>📖</span><span className={styles.mobileWellnessIconLbl}>{language === "es" ? "Términos" : "HIV Terms"}</span>
+              <span>📖</span><span className={styles.mobileWellnessIconLbl}>{t.wb_terms}</span>
             </button>
             <button className={styles.mobileWellnessIconBtn} onClick={() => setMobileSheet("provider")}>
-              <span>📍</span><span className={styles.mobileWellnessIconLbl}>{language === "es" ? "Proveedor" : "Provider"}</span>
+              <span>📍</span><span className={styles.mobileWellnessIconLbl}>{t.wb_provider}</span>
+            </button>
+            <button className={styles.mobileWellnessIconBtn} onClick={() => setMobileSheet("music")}>
+              <span>🎵</span><span className={styles.mobileWellnessIconLbl}>Music</span>
             </button>
           </div>
 
@@ -678,7 +753,7 @@ export default function ChatPage() {
                 <textarea
                   ref={textareaRef}
                   className={styles.chatInput}
-                  placeholder={currentPlaceholders[placeholderIdx]}
+                  placeholder={PLACEHOLDERS[placeholderIdx % PLACEHOLDERS.length] || ""}
                   value={input}
                   onChange={handleTextareaChange}
                   onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
@@ -691,7 +766,7 @@ export default function ChatPage() {
               </button>
             </div>
             <div className={styles.inputFooter}>
-              <div className={styles.inputHintPrivacy}>🔒 {language === "es" ? "Esta conversación es privada y confidencial" : "This conversation is private and confidential"}</div>
+              <div className={styles.inputHintPrivacy}>🔒 {t.privacy}</div>
               <div className={styles.inputFooterDivider} />
               <div className={styles.inputHintCopyright}>© 2025 FirstYear Companion. All rights reserved. Not a clinical tool.</div>
             </div>
@@ -700,111 +775,79 @@ export default function ChatPage() {
 
         {/* ── Wellness sidebar ── */}
         <div className={styles.wellnessSidebar}>
-          <div className={styles.sidebarCardRow}>
-            <div className={styles.sidebarCard}>
-              <div className={styles.sidebarCardTitle}>🧘 {language === "es" ? "Encuentra tu calma" : "Find your calm"}</div>
-              <div className={styles.sidebarBtnGroup}>
-                <button className={styles.sidebarBtn} onClick={startBreathing} disabled={sending}>{language === "es" ? "Ejercicio de respiración" : "Breathing Exercise"}</button>
-                <button className={styles.sidebarBtn} onClick={() => triggerSend("Can you guide me through a 4-7-8 breathing exercise?")} disabled={sending}>{language === "es" ? "Respiración 4-7-8" : "4-7-8 Breathing"}</button>
-                <button className={styles.sidebarBtn} onClick={() => triggerSend("Can you guide me through a body scan exercise?")} disabled={sending}>{language === "es" ? "Escaneo corporal" : "Body Scan"}</button>
-                <button className={styles.sidebarBtn} onClick={() => triggerSend("Can you guide me through a 5 senses grounding exercise?")} disabled={sending}>{language === "es" ? "Los 5 sentidos" : "5 Senses Grounding"}</button>
-                <button className={styles.sidebarBtn} onClick={() => triggerSend("Can you guide me through a safe place visualization?")} disabled={sending}>{language === "es" ? "Lugar seguro" : "Safe Place"}</button>
-                <button className={styles.sidebarBtn} onClick={() => triggerSend("Can you guide me through a gratitude practice?")} disabled={sending}>{language === "es" ? "Gratitud" : "Gratitude Practice"}</button>
-              </div>
-            </div>
 
-            <div className={styles.sidebarCard}>
-              <div className={styles.sidebarCardTitle}>🌿 {language === "es" ? "Un momento para ti" : "Give yourself a moment"}</div>
-              <div className={styles.sidebarBtnGroup}>
-                <button className={styles.sidebarBtn} onClick={() => triggerSend("Can you share some affirmations for today?")} disabled={sending}>{language === "es" ? "Afirmaciones de hoy" : "Affirmations for today"}</button>
-                <button className={styles.sidebarBtn} onClick={() => triggerSend("I need to be reminded that I'm not alone in this.")} disabled={sending}>{language === "es" ? "No estoy solo/a" : "You are not alone"}</button>
-                <button className={styles.sidebarBtn} onClick={() => triggerSend("What have others felt after their HIV diagnosis?")} disabled={sending}>{language === "es" ? "Lo que otros sienten" : "What others have felt"}</button>
-              </div>
-            </div>
-          </div>
-
+          {/* Find Your Calm — accordion */}
           <div className={styles.sidebarCard}>
-            <div className={styles.sidebarCardTitle}>📖 {language === "es" ? "Diccionario VIH" : "HIV Dictionary"}</div>
-            <div className={styles.glossaryList}>
-              {GLOSSARY.map(g => (
-                <button key={g.term} className={styles.glossaryTerm} onClick={() => setGlossaryTerm(g)}>
-                  <span>{g.term}</span><span className={styles.glossaryTermArrow}>›</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className={styles.sidebarCard}>
-            <div className={styles.sidebarCardTitle}>📍 {language === "es" ? "Encontrar un proveedor" : "Find a Provider"}</div>
-            <p style={{ fontSize: 11, color: "rgba(245,237,224,.45)", marginBottom: 10, lineHeight: 1.5 }}>
-              {language === "es" ? "Selecciona una categoría" : "Select a category first"}
-            </p>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 10 }}>
-              {PROVIDER_CATEGORIES.map(cat => (
-                <button
-                  key={cat.id}
-                  onClick={() => setProviderCategory(cat.id)}
-                  style={{
-                    background: providerCategory === cat.id ? "rgba(74,124,111,0.2)" : "rgba(255,248,235,0.04)",
-                    border: `1px solid ${providerCategory === cat.id ? "rgba(74,124,111,0.6)" : "rgba(255,248,235,0.1)"}`,
-                    borderRadius: 10, padding: "9px 8px",
-                    color: providerCategory === cat.id ? "#8ecfbe" : "rgba(245,237,224,0.6)",
-                    fontSize: 11, fontWeight: 500,
-                    cursor: "pointer", textAlign: "center",
-                    fontFamily: "DM Sans, sans-serif",
-                    display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
-                    transition: "all 0.15s ease",
-                  }}
-                >
-                  <span style={{ fontSize: 16 }}>{cat.icon}</span>
-                  <span style={{ lineHeight: 1.3 }}>{cat.label}</span>
-                </button>
-              ))}
-            </div>
-            {providerCategory && (() => {
-              const cat = PROVIDER_CATEGORIES.find(c => c.id === providerCategory)!;
-              const doSearch = () => {
-                if (!providerCity.trim()) return;
-                triggerSend(`Can you help me find ${cat.prompt} near ${providerCity.trim()}?`);
-                setProviderCity("");
-              };
-              return (
-                <div className={styles.providerSearchRow}>
-                  <input
-                    ref={providerInputRef}
-                    className={styles.providerInput}
-                    placeholder={language === "es" ? "Ciudad o código postal..." : "City or zip code..."}
-                    value={providerCity}
-                    onChange={e => setProviderCity(e.target.value)}
-                    onKeyDown={e => { if (e.key === "Enter") doSearch(); }}
-                  />
-                  <button
-                    className={styles.providerSearchBtn}
-                    disabled={sending || !providerCity.trim()}
-                    onClick={doSearch}
-                  >
-                    {language === "es" ? "Buscar" : "Search"}
+            <button className={styles.sidebarAccordionHeader} onClick={() => toggleSection("calm")}>
+              <span className={styles.sidebarCardTitle}>{t.sidebar_calm_title}</span>
+              <span className={clsx(styles.sidebarAccordionArrow, sidebarOpen.calm && styles.sidebarAccordionArrowOpen)}>▼</span>
+            </button>
+            {sidebarOpen.calm && (
+              <div className={styles.sidebarBtnGroup} style={{ marginTop: 9 }}>
+                {[
+                  () => { startBreathing(); },
+                  () => triggerSend("Can you guide me through a 4-7-8 breathing exercise?"),
+                  () => triggerSend("Can you guide me through a body scan exercise?"),
+                  () => triggerSend("Can you guide me through a 5 senses grounding exercise?"),
+                  () => triggerSend("Can you guide me through a safe place visualization?"),
+                  () => triggerSend("Can you guide me through a gratitude practice?"),
+                ].map((fn, i) => (
+                  <button key={i} className={styles.sidebarBtn} disabled={sending} onClick={fn}>
+                    {t.sidebar_calm_btns[i]}
                   </button>
-                </div>
-              );
-            })()}
+                ))}
+              </div>
+            )}
           </div>
 
+          {/* Give Yourself a Moment — accordion */}
           <div className={styles.sidebarCard}>
-            <div className={styles.sidebarCardTitle}>🎵 {language === "es" ? "Música tranquila" : "Calming music"}</div>
-            <div className={styles.musicPlayer}>
-              <div className={styles.musicTrackName}>{AMBIENT_TRACKS[musicTrack].name}</div>
-              <div className={styles.musicControls}>
-                <button className={styles.musicBtn} onClick={toggleMusic}>{musicPlaying ? "⏸" : "▶"}</button>
-                <button className={styles.musicBtn} onClick={nextMusicTrack}>⏭</button>
+            <button className={styles.sidebarAccordionHeader} onClick={() => toggleSection("relax")}>
+              <span className={styles.sidebarCardTitle}>{t.sidebar_relax_title}</span>
+              <span className={clsx(styles.sidebarAccordionArrow, sidebarOpen.relax && styles.sidebarAccordionArrowOpen)}>▼</span>
+            </button>
+            {sidebarOpen.relax && (
+              <div className={styles.sidebarBtnGroup} style={{ marginTop: 9 }}>
+                {[
+                  () => triggerSend("Can you share some affirmations for today?"),
+                  () => triggerSend("I need to be reminded that I'm not alone in this."),
+                  () => triggerSend("What have others felt after their HIV diagnosis?"),
+                ].map((fn, i) => (
+                  <button key={i} className={styles.sidebarBtn} disabled={sending} onClick={fn}>
+                    {t.sidebar_relax_btns[i]}
+                  </button>
+                ))}
               </div>
-              <div className={styles.musicVolumeRow}>
-                <span className={styles.musicVolumeIcon}>🔈</span>
-                <input type="range" min={0} max={1} step={0.01} value={musicVolume} onChange={e => handleMusicVolume(Number(e.target.value))} className={styles.musicVolume} />
-                <span className={styles.musicVolumeIcon}>🔊</span>
+            )}
+          </div>
+
+          {/* HIV Dictionary — accordion */}
+          <div className={styles.sidebarCard}>
+            <button className={styles.sidebarAccordionHeader} onClick={() => toggleSection("dict")}>
+              <span className={styles.sidebarCardTitle}>{t.sidebar_dict_title}</span>
+              <span className={clsx(styles.sidebarAccordionArrow, sidebarOpen.dict && styles.sidebarAccordionArrowOpen)}>▼</span>
+            </button>
+            {sidebarOpen.dict && (
+              <div className={styles.glossaryList} style={{ marginTop: 9 }}>
+                {GLOSSARY.map(g => (
+                  <button key={g.term} className={styles.glossaryTerm} onClick={() => setGlossaryTerm(g)}>
+                    <span>{g.term}</span><span className={styles.glossaryTermArrow}>›</span>
+                  </button>
+                ))}
               </div>
-              <p className={styles.musicNote}>{language === "es" ? "Tonos ambientales generados en el dispositivo" : "Device-generated ambient tones — no download needed"}</p>
-            </div>
+            )}
+          </div>
+
+          {/* Find a Provider — always expanded */}
+          <div className={styles.sidebarCard}>
+            <div className={styles.sidebarCardTitle}>{t.sidebar_provider_title}</div>
+            {renderProviderSection(false)}
+          </div>
+
+          {/* Calming Music — always expanded */}
+          <div className={styles.sidebarCard}>
+            <div className={styles.sidebarCardTitle}>{t.sidebar_music_title}</div>
+            {renderMusicSection()}
           </div>
         </div>
       </div>
@@ -817,32 +860,44 @@ export default function ChatPage() {
 
             {mobileSheet === "calm" && (
               <>
-                <div className={styles.mobileSheetTitle}>🧘 {language === "es" ? "Encuentra tu calma" : "Find your calm"}</div>
+                <div className={styles.mobileSheetTitle}>{t.sidebar_calm_title}</div>
                 <div className={styles.mobileSheetBtnGroup}>
-                  <button className={styles.sidebarBtn} disabled={sending} onClick={() => { startBreathing(); setMobileSheet(null); }}>{language === "es" ? "Ejercicio de respiración" : "Breathing Exercise"}</button>
-                  <button className={styles.sidebarBtn} disabled={sending} onClick={() => { triggerSend("Can you guide me through a 4-7-8 breathing exercise?"); setMobileSheet(null); }}>{language === "es" ? "Respiración 4-7-8" : "4-7-8 Breathing"}</button>
-                  <button className={styles.sidebarBtn} disabled={sending} onClick={() => { triggerSend("Can you guide me through a body scan exercise?"); setMobileSheet(null); }}>{language === "es" ? "Escaneo corporal" : "Body Scan"}</button>
-                  <button className={styles.sidebarBtn} disabled={sending} onClick={() => { triggerSend("Can you guide me through a 5 senses grounding exercise?"); setMobileSheet(null); }}>{language === "es" ? "Los 5 sentidos" : "5 Senses Grounding"}</button>
-                  <button className={styles.sidebarBtn} disabled={sending} onClick={() => { triggerSend("Can you guide me through a safe place visualization?"); setMobileSheet(null); }}>{language === "es" ? "Lugar seguro" : "Safe Place"}</button>
-                  <button className={styles.sidebarBtn} disabled={sending} onClick={() => { triggerSend("Can you guide me through a gratitude practice?"); setMobileSheet(null); }}>{language === "es" ? "Gratitud" : "Gratitude Practice"}</button>
+                  {[
+                    () => { startBreathing(); setMobileSheet(null); },
+                    () => { triggerSend("Can you guide me through a 4-7-8 breathing exercise?"); setMobileSheet(null); },
+                    () => { triggerSend("Can you guide me through a body scan exercise?"); setMobileSheet(null); },
+                    () => { triggerSend("Can you guide me through a 5 senses grounding exercise?"); setMobileSheet(null); },
+                    () => { triggerSend("Can you guide me through a safe place visualization?"); setMobileSheet(null); },
+                    () => { triggerSend("Can you guide me through a gratitude practice?"); setMobileSheet(null); },
+                  ].map((fn, i) => (
+                    <button key={i} className={styles.sidebarBtn} disabled={sending} onClick={fn}>
+                      {t.sidebar_calm_btns[i]}
+                    </button>
+                  ))}
                 </div>
               </>
             )}
 
             {mobileSheet === "relax" && (
               <>
-                <div className={styles.mobileSheetTitle}>🌿 {language === "es" ? "Un momento para ti" : "Give yourself a moment"}</div>
+                <div className={styles.mobileSheetTitle}>{t.sidebar_relax_title}</div>
                 <div className={styles.mobileSheetBtnGroup}>
-                  <button className={styles.sidebarBtn} disabled={sending} onClick={() => { triggerSend("Can you share some affirmations for today?"); setMobileSheet(null); }}>{language === "es" ? "Afirmaciones de hoy" : "Affirmations for today"}</button>
-                  <button className={styles.sidebarBtn} disabled={sending} onClick={() => { triggerSend("I need to be reminded that I'm not alone in this."); setMobileSheet(null); }}>{language === "es" ? "No estoy solo/a" : "You are not alone"}</button>
-                  <button className={styles.sidebarBtn} disabled={sending} onClick={() => { triggerSend("What have others felt after their HIV diagnosis?"); setMobileSheet(null); }}>{language === "es" ? "Lo que otros sienten" : "What others have felt"}</button>
+                  {[
+                    () => { triggerSend("Can you share some affirmations for today?"); setMobileSheet(null); },
+                    () => { triggerSend("I need to be reminded that I'm not alone in this."); setMobileSheet(null); },
+                    () => { triggerSend("What have others felt after their HIV diagnosis?"); setMobileSheet(null); },
+                  ].map((fn, i) => (
+                    <button key={i} className={styles.sidebarBtn} disabled={sending} onClick={fn}>
+                      {t.sidebar_relax_btns[i]}
+                    </button>
+                  ))}
                 </div>
               </>
             )}
 
             {mobileSheet === "terms" && (
               <>
-                <div className={styles.mobileSheetTitle}>📖 {language === "es" ? "Diccionario VIH" : "HIV Dictionary"}</div>
+                <div className={styles.mobileSheetTitle}>{t.sidebar_dict_title}</div>
                 <div className={styles.glossaryList}>
                   {GLOSSARY.map(g => (
                     <button key={g.term} className={styles.glossaryTerm} onClick={() => { setGlossaryTerm(g); setMobileSheet(null); }}>
@@ -855,60 +910,15 @@ export default function ChatPage() {
 
             {mobileSheet === "provider" && (
               <>
-                <div className={styles.mobileSheetTitle}>📍 {language === "es" ? "Encontrar un proveedor" : "Find a Provider"}</div>
-                <p style={{ fontSize: 12, color: "rgba(245,237,224,.45)", marginBottom: 10, lineHeight: 1.5 }}>
-                  {language === "es" ? "Selecciona una categoría" : "Select a category first"}
-                </p>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 12 }}>
-                  {PROVIDER_CATEGORIES.map(cat => (
-                    <button
-                      key={cat.id}
-                      onClick={() => setProviderCategory(cat.id)}
-                      style={{
-                        background: providerCategory === cat.id ? "rgba(74,124,111,0.2)" : "rgba(255,248,235,0.04)",
-                        border: `1px solid ${providerCategory === cat.id ? "rgba(74,124,111,0.6)" : "rgba(255,248,235,0.1)"}`,
-                        borderRadius: 10, padding: "9px 6px",
-                        color: providerCategory === cat.id ? "#8ecfbe" : "rgba(245,237,224,0.6)",
-                        fontSize: 10, fontWeight: 500,
-                        cursor: "pointer", textAlign: "center",
-                        fontFamily: "DM Sans, sans-serif",
-                        display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
-                        transition: "all 0.15s ease",
-                      }}
-                    >
-                      <span style={{ fontSize: 18 }}>{cat.icon}</span>
-                      <span style={{ lineHeight: 1.3 }}>{cat.label}</span>
-                    </button>
-                  ))}
-                </div>
-                {providerCategory && (() => {
-                  const cat = PROVIDER_CATEGORIES.find(c => c.id === providerCategory)!;
-                  const doSearch = () => {
-                    if (!providerCity.trim()) return;
-                    triggerSend(`Can you help me find ${cat.prompt} near ${providerCity.trim()}?`);
-                    setProviderCity("");
-                    setMobileSheet(null);
-                  };
-                  return (
-                    <div className={styles.providerSearchRow}>
-                      <input
-                        ref={mobileProviderInputRef}
-                        className={styles.providerInput}
-                        placeholder={language === "es" ? "Ciudad o código postal..." : "City or zip code..."}
-                        value={providerCity}
-                        onChange={e => setProviderCity(e.target.value)}
-                        onKeyDown={e => { if (e.key === "Enter") doSearch(); }}
-                      />
-                      <button
-                        className={styles.providerSearchBtn}
-                        disabled={sending || !providerCity.trim()}
-                        onClick={doSearch}
-                      >
-                        {language === "es" ? "Buscar" : "Search"}
-                      </button>
-                    </div>
-                  );
-                })()}
+                <div className={styles.mobileSheetTitle}>{t.sidebar_provider_title}</div>
+                {renderProviderSection(true)}
+              </>
+            )}
+
+            {mobileSheet === "music" && (
+              <>
+                <div className={styles.mobileSheetTitle}>{t.sidebar_music_title}</div>
+                {renderMusicSection()}
               </>
             )}
           </div>

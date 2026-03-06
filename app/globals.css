@@ -47,3 +47,9 @@ input, textarea, select {
 [data-theme="midnight"] { --bg: #0d0e1f; --orb1: rgba(100,100,190,.15); --orb2: rgba(160,160,210,.08); }
 [data-theme="ember"]    { --bg: #1a100a; --orb1: rgba(190,90,40,.15);   --orb2: rgba(160,120,70,.10);  }
 [data-theme="bloom"]    { --bg: #1a1015; --orb1: rgba(200,110,150,.15); --orb2: rgba(220,195,175,.08); }
+[data-theme="hopeful"]  { --bg: #1c1018; --orb1: rgba(200,120,140,.15); --orb2: rgba(220,200,180,.10); }
+[data-theme="peaceful"] { --bg: #111c16; --orb1: rgba(80,140,110,.15);  --orb2: rgba(200,200,160,.08); }
+[data-theme="warm"]     { --bg: #1c1408; --orb1: rgba(200,140,60,.15);  --orb2: rgba(220,200,140,.10); }
+[data-theme="calm"]     { --bg: #0c1b22; --orb1: rgba(60,140,190,.15);  --orb2: rgba(100,200,190,.08); }
+[data-theme="gentle"]   { --bg: #151020; --orb1: rgba(140,110,200,.15); --orb2: rgba(200,180,220,.08); }
+[data-theme="grounded"] { --bg: #101a10; --orb1: rgba(70,130,80,.15);   --orb2: rgba(160,140,100,.10); }

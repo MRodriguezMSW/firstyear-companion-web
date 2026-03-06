@@ -6,19 +6,11 @@ import clsx from "clsx";
 import { daysSince, diagnosisContext } from "../data";
 import styles from "../styles/Onboarding.module.css";
 import CrisisButton from "../../components/CrisisButton";
+import { getStrings, readLang } from "../../i18n";
 
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const currentYear = new Date().getFullYear();
-
-const DX_RANGES = [
-  ["Within the last 3 months", "New diagnosis · early adjustment"],
-  ["3–12 months ago",           "Still within the first year"    ],
-  ["1–3 years ago",             "Building stability and routine" ],
-  ["More than 3 years ago",     "Longer-term management"         ],
-  ["Prefer not to say",         ""                               ],
-] as const;
-
-const YN = ["Yes", "No"] as const;
+const DX_RANGE_SUBS = ["New diagnosis · early adjustment", "Still within the first year", "Building stability and routine", "Longer-term management"];
 
 function dotState(i: number, screen = 2) {
   return i < screen ? "done" : i === screen ? "active" : "pending";
@@ -48,16 +40,16 @@ export default function TimelinePage() {
   const [ddMonth, setDdMonth] = useState("");
   const [ddDay,   setDdDay]   = useState("");
   const [ddYear,  setDdYear]  = useState("");
-
-  // Modal state
   const [medsModal, setMedsModal]         = useState(false);
   const [providerModal, setProviderModal] = useState(false);
   const [medsAnswered, setMedsAnswered]   = useState(false);
-
-  const days  = daysSince(diagnosisDate);
-  const dxCtx = diagnosisContext(days);
+  const [t, setT] = useState(() => getStrings("en-US"));
+  const [isEn, setIsEn] = useState(true);
 
   useEffect(() => {
+    const lang = readLang();
+    setT(getStrings(lang));
+    setIsEn(lang.startsWith("en"));
     const check = () => setNarrowScreen(window.innerWidth <= 768);
     check();
     window.addEventListener("resize", check);
@@ -77,23 +69,26 @@ export default function TimelinePage() {
     ? new Date(parseInt(ddYear), MONTHS.indexOf(ddMonth) + 1, 0).getDate()
     : 31;
 
+  const days  = daysSince(diagnosisDate);
+  const dxCtx = diagnosisContext(days);
+
   const saveAndProceed = () => {
     if (diagnosisDate) localStorage.setItem("companion_diagnosisDate", diagnosisDate);
     if (timeline)      localStorage.setItem("companion_timeline", timeline);
     if (onMeds)        localStorage.setItem("companion_onMeds", onMeds);
     if (hasProvider)   localStorage.setItem("companion_hasProvider", hasProvider);
-    localStorage.setItem("companion_needsProvider",  String(hasProvider === "No"));
-    localStorage.setItem("companion_wantsMedsIntro", String(onMeds === "No" && medsAnswered));
+    localStorage.setItem("companion_needsProvider",  String(hasProvider === "No" || hasProvider === t.no));
+    localStorage.setItem("companion_wantsMedsIntro", String((onMeds === "No" || onMeds === t.no) && medsAnswered));
     router.push("/onboarding/checkin");
   };
 
   const handleMedsNo = () => {
-    setOnMeds("No");
+    setOnMeds(t.no);
     setMedsModal(true);
   };
 
   const handleProviderNo = () => {
-    setHasProvider("No");
+    setHasProvider(t.no);
     setProviderModal(true);
   };
 
@@ -103,35 +98,23 @@ export default function TimelinePage() {
       <div className={`${styles.bgOrb} ${styles.bgOrb2}`} />
       <div className={`${styles.bgOrb} ${styles.bgOrb3}`} />
 
-      {/* Meds No modal */}
       {medsModal && (
         <div className={styles.warmModalOverlay}>
           <div className={styles.warmModal}>
-            <p className={styles.warmModalText}>
-              That is okay — starting medications is a big decision and there is no rush. When you are ready I will walk you through everything at your pace. No pressure, just support.
-            </p>
-            <button
-              className={styles.warmModalBtn}
-              onClick={() => { setMedsAnswered(true); setMedsModal(false); }}
-            >
-              Got it, let's continue
+            <p className={styles.warmModalText}>{t.timeline_meds_modal}</p>
+            <button className={styles.warmModalBtn} onClick={() => { setMedsAnswered(true); setMedsModal(false); }}>
+              {t.timeline_meds_btn}
             </button>
           </div>
         </div>
       )}
 
-      {/* Provider No modal */}
       {providerModal && (
         <div className={styles.warmModalOverlay}>
           <div className={styles.warmModal}>
-            <p className={styles.warmModalText}>
-              You do not have to figure this out alone. When we get to the chat just say the word and we will find someone safe, private, and friendly near you. You have already taken a brave step just by being here.
-            </p>
-            <button
-              className={styles.warmModalBtn}
-              onClick={() => setProviderModal(false)}
-            >
-              I'm ready, let's go
+            <p className={styles.warmModalText}>{t.timeline_provider_modal}</p>
+            <button className={styles.warmModalBtn} onClick={() => setProviderModal(false)}>
+              {t.timeline_provider_btn}
             </button>
           </div>
         </div>
@@ -144,17 +127,16 @@ export default function TimelinePage() {
               <div key={i} className={clsx(styles.dot, styles[dotState(i)])} />
             ))}
           </div>
-          <p className={styles.eyebrow}>Step 2 of 4</p>
-          <h1>A quick check-in</h1>
-          <p className={styles.subtitle}>This helps me tailor my support to where you are, but is optional.</p>
+          <p className={styles.eyebrow}>{t.timeline_step}</p>
+          <h1>{t.timeline_title}</h1>
+          <p className={styles.subtitle}>{t.timeline_sub}</p>
 
           <div className={styles.sectionLabel} style={{ marginBottom: 8 }}>
-            When were you diagnosed?{" "}
+            {t.timeline_date_lbl}{" "}
             <span style={{ fontWeight: 300, textTransform: "none", letterSpacing: 0, color: "rgba(245,237,224,.28)" }}>(Optional)</span>
           </div>
-          <p className={styles.dateInvite} style={{ marginBottom: 8 }}>
-            If you remember the date, enter it here — it helps me understand exactly where you are.
-          </p>
+          <p className={styles.dateInvite} style={{ marginBottom: 8 }}>{t.timeline_date_invite}</p>
+
           {narrowScreen ? (
             <div className={styles.dateDropdownRow}>
               <select className={styles.dateDropdown} value={ddMonth} onChange={e => setDdMonth(e.target.value)}>
@@ -183,6 +165,7 @@ export default function TimelinePage() {
               onChange={(e) => { setDiagnosisDate(e.target.value); setTimeline(""); }}
             />
           )}
+
           {dxCtx && (
             <div className={styles.diagnosisContext}>
               <div className={styles.diagnosisContextLabel} style={{ color: dxCtx.color }}>{dxCtx.label}</div>
@@ -191,62 +174,42 @@ export default function TimelinePage() {
           )}
 
           <div className={styles.dateInputWrap} style={{ marginTop: 8, paddingTop: 8 }}>
-            <p className={styles.dateInvite} style={{ marginBottom: 8 }}>Don't remember the exact date? Pick a range instead.</p>
+            <p className={styles.dateInvite} style={{ marginBottom: 8 }}>{t.timeline_range_invite}</p>
             <div className={styles.dxGrid}>
-              {DX_RANGES.slice(0, 4).map(([lbl, sub]) => (
+              {t.timeline_ranges.map((lbl, idx) => (
                 <button
                   key={lbl}
                   className={clsx(styles.dxCell, timeline === lbl && styles.selected)}
                   onClick={() => { setTimeline(lbl); setDiagnosisDate(""); }}
                 >
                   <span className={styles.dxCellLabel}>{lbl}</span>
-                  {sub && <span className={styles.chipSub}>{sub}</span>}
+                  {isEn && <span className={styles.chipSub}>{DX_RANGE_SUBS[idx]}</span>}
                 </button>
               ))}
             </div>
             <button
-              className={clsx(styles.dxPreferNot, timeline === "Prefer not to say" && styles.selected)}
-              onClick={() => { setTimeline("Prefer not to say"); setDiagnosisDate(""); }}
+              className={clsx(styles.dxPreferNot, timeline === t.timeline_prefer_not && styles.selected)}
+              onClick={() => { setTimeline(t.timeline_prefer_not); setDiagnosisDate(""); }}
             >
-              Prefer not to say
+              {t.timeline_prefer_not}
             </button>
           </div>
 
-          <div className={styles.sectionLabel} style={{ marginBottom: 8 }}>Are you currently on HIV medication?</div>
+          <div className={styles.sectionLabel} style={{ marginBottom: 8 }}>{t.timeline_meds_lbl}</div>
           <div className={styles.yesnoRow} style={{ marginBottom: 16 }}>
-            <button
-              className={clsx(styles.ynChip, onMeds === "Yes" && styles.selected)}
-              onClick={() => setOnMeds("Yes")}
-            >
-              Yes
-            </button>
-            <button
-              className={clsx(styles.ynChip, onMeds === "No" && styles.selected)}
-              onClick={handleMedsNo}
-            >
-              No
-            </button>
+            <button className={clsx(styles.ynChip, (onMeds === t.yes || onMeds === "Yes") && styles.selected)} onClick={() => setOnMeds(t.yes)}>{t.yes}</button>
+            <button className={clsx(styles.ynChip, (onMeds === t.no || onMeds === "No") && styles.selected)} onClick={handleMedsNo}>{t.no}</button>
           </div>
 
-          <div className={styles.sectionLabel} style={{ marginBottom: 8 }}>Do you have an HIV provider right now?</div>
+          <div className={styles.sectionLabel} style={{ marginBottom: 8 }}>{t.timeline_provider_lbl}</div>
           <div className={styles.yesnoRow} style={{ marginBottom: 16 }}>
-            <button
-              className={clsx(styles.ynChip, hasProvider === "Yes" && styles.selected)}
-              onClick={() => setHasProvider("Yes")}
-            >
-              Yes
-            </button>
-            <button
-              className={clsx(styles.ynChip, hasProvider === "No" && styles.selected)}
-              onClick={handleProviderNo}
-            >
-              No
-            </button>
+            <button className={clsx(styles.ynChip, (hasProvider === t.yes || hasProvider === "Yes") && styles.selected)} onClick={() => setHasProvider(t.yes)}>{t.yes}</button>
+            <button className={clsx(styles.ynChip, (hasProvider === t.no || hasProvider === "No") && styles.selected)} onClick={handleProviderNo}>{t.no}</button>
           </div>
 
           <div className={styles.btnRow}>
-            <button className={styles.btnBack} onClick={() => router.back()}>Back</button>
-            <button className={styles.btnNext} onClick={saveAndProceed}>Continue</button>
+            <button className={styles.btnBack} onClick={() => router.back()}>{t.back}</button>
+            <button className={styles.btnNext} onClick={saveAndProceed}>{t.continue_}</button>
           </div>
         </div>
       </div>

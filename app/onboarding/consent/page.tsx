@@ -1,9 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "../styles/Onboarding.module.css";
 import CrisisButton from "../../components/CrisisButton";
+import { getStrings, readLang } from "../../i18n";
 
 const SCREEN: React.CSSProperties = {
   position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
@@ -18,6 +19,11 @@ const CONTENT: React.CSSProperties = {
 export default function ConsentPage() {
   const router = useRouter();
   const [checked, setChecked] = useState(false);
+  const [t, setT] = useState(() => getStrings("en-US"));
+
+  useEffect(() => {
+    setT(getStrings(readLang()));
+  }, []);
 
   return (
     <div className={styles.fycRoot} style={SCREEN}>
@@ -27,18 +33,11 @@ export default function ConsentPage() {
 
       <div style={CONTENT}>
         <div className={styles.onboardingCard}>
-          <p className={styles.eyebrow}>Before we begin</p>
-          <h1>A few important notes</h1>
+          <p className={styles.eyebrow}>{t.consent_eyebrow}</p>
+          <h1>{t.consent_title}</h1>
 
           <ul className={styles.consentList}>
-            {[
-              "This app is powered by artificial intelligence.",
-              "It is not a licensed therapist.",
-              "It does not replace medical or mental health care.",
-              "It does not diagnose conditions.",
-              "If you are in crisis, contact 988 or emergency services.",
-              "You can exit at any time.",
-            ].map((item) => (
+            {t.consent_bullets.map((item) => (
               <li key={item} className={styles.consentItem}>
                 <span className={styles.consentBullet}>•</span>
                 {item}
@@ -57,14 +56,14 @@ export default function ConsentPage() {
               style={{ fontSize: 14, lineHeight: 1.6, color: checked ? "#f5ede0" : "rgba(245,237,224,0.65)", cursor: "pointer" }}
               onClick={() => setChecked((v) => !v)}
             >
-              I understand and would like to continue.
+              {t.consent_checkbox}
             </span>
           </div>
 
           <div className={styles.btnRow}>
-            <button className={styles.btnBack} onClick={() => router.back()}>Back</button>
+            <button className={styles.btnBack} onClick={() => router.back()}>{t.back}</button>
             <button className={styles.btnNext} disabled={!checked} onClick={() => router.push("/onboarding/identity")}>
-              Continue
+              {t.continue_}
             </button>
           </div>
         </div>

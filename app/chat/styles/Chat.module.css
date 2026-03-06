@@ -125,9 +125,22 @@
 .sidebarCardTitle {
   font-size: 11px; font-weight: 600;
   color: rgba(245,237,224,.88);
-  letter-spacing: .05em; margin-bottom: 9px;
+  letter-spacing: .05em;
   text-transform: uppercase;
 }
+
+/* ── Accordion ── */
+.sidebarAccordionHeader {
+  width: 100%; background: transparent; border: none;
+  display: flex; justify-content: space-between; align-items: center;
+  cursor: pointer; padding: 0; gap: 8px;
+  font-family: 'DM Sans', sans-serif;
+}
+.sidebarAccordionArrow {
+  font-size: 9px; color: rgba(245,237,224,.3);
+  transition: transform .2s ease; flex-shrink: 0;
+}
+.sidebarAccordionArrowOpen { transform: rotate(180deg); }
 .sidebarBtnGroup { display: flex; flex-direction: column; gap: 5px; }
 .sidebarBtn {
   background: rgba(255,248,235,.05);
@@ -349,15 +362,17 @@
 .affirmationBar {
   flex-shrink: 0;
   text-align: center;
-  padding: 4px 16px;
+  padding: 6px 16px;
   background: rgba(14,31,27,.6);
-  border-bottom: 1px solid rgba(255,248,235,.04);
+  border-bottom: 1px solid rgba(255,248,235,.05);
 }
 .affirmationText {
-  font-size: 11px;
-  color: rgba(245,237,224,.22);
-  letter-spacing: .04em;
-  animation: affirmFade 1s ease both;
+  font-size: 15px;
+  font-weight: 500;
+  color: #f5ede0;
+  letter-spacing: .01em;
+  text-shadow: 0 1px 4px rgba(0,0,0,.4);
+  animation: affirmFade 1.2s ease both;
 }
 @keyframes affirmFade {
   from { opacity: 0; transform: translateY(3px); }
@@ -591,4 +606,28 @@
 @keyframes slideUp {
   from { transform: translateY(100%); opacity: 0; }
   to   { transform: translateY(0); opacity: 1; }
+}
+
+/* ── Music tab row ── */
+.musicTabRow { display: flex; gap: 5px; margin-bottom: 8px; }
+.musicTab {
+  flex: 1; padding: 5px 4px; border-radius: 8px;
+  border: 1px solid rgba(255,248,235,.1);
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px; font-weight: 500;
+  color: rgba(245,237,224,.4);
+  cursor: pointer; transition: all .15s;
+}
+.musicTab:hover { color: rgba(245,237,224,.65); }
+.musicTabActive {
+  background: rgba(74,124,111,.15);
+  border-color: rgba(74,124,111,.4);
+  color: #8ecfbe;
+}
+
+/* ── Crisis flash keyframe (for CrisisButton inline style reference) ── */
+@keyframes crisisFlash {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,107,0.9); opacity: 1; }
+  50%       { box-shadow: 0 0 0 20px rgba(255,107,107,0); opacity: 0.7; }
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import clsx from "clsx";
 import {
   AVATAR_CATEGORIES,
@@ -12,13 +12,13 @@ import {
 } from "../data";
 import styles from "../styles/Onboarding.module.css";
 import CrisisButton from "../../components/CrisisButton";
+import { getStrings, readLang } from "../../i18n";
 
 // ── Companion name rows (exactly 2 rows) ────────────────────────────────────
 const NAME_ROWS = [
   ["Quinn", "Ember", "Sage", "River", "Lux"],
   ["Alma",  "Sky",   "Iris", "Nova",  "✏️ My own"],
 ];
-const ALL_NAMES = NAME_ROWS.flat();
 
 // ── Per-name companion avatar icon sets ─────────────────────────────────────
 type AvaItem = { emoji: string; name: string };
@@ -82,6 +82,7 @@ const CONTENT: React.CSSProperties = {
 
 export default function AvatarPage() {
   const router = useRouter();
+  const [t, setT] = useState(() => getStrings("en-US"));
 
   const [avatarCat, setAvatarCat] = useState("animals");
   const [userAvatarSel, setUserAvatarSel] = useState<{ catId: string; idx: number } | null>(null);
@@ -90,12 +91,13 @@ export default function AvatarPage() {
   const [customName, setCustomName] = useState("");
   const [companionAvaIdx, setCompanionAvaIdx] = useState(0);
 
+  useEffect(() => { setT(getStrings(readLang())); }, []);
+
   const currentCat = AVATAR_CATEGORIES.find((c) => c.id === avatarCat)!;
   const userAvatar = userAvatarSel
     ? AVATAR_CATEGORIES.find((c) => c.id === userAvatarSel.catId)?.avatars[userAvatarSel.idx]
     : null;
 
-  // Icons for the currently selected companion name
   const compAvatars = isCustomName ? DEFAULT_AVATARS : (NAME_AVATARS[companionName] ?? DEFAULT_AVATARS);
   const compAvatar = compAvatars[companionAvaIdx] ?? compAvatars[0];
 
@@ -165,11 +167,9 @@ export default function AvatarPage() {
               <div key={i} className={clsx(styles.dot, styles[dotState(i)])} />
             ))}
           </div>
-          <p className={styles.eyebrow}>Step 4 of 5</p>
-          <h1>Choose your picture</h1>
-          <p style={{ fontSize: 13, color: "rgba(245,237,224,.45)", marginBottom: 14 }}>
-            No names, no photos — just a small piece of you in every conversation.
-          </p>
+          <p className={styles.eyebrow}>{t.avatar_step}</p>
+          <h1>{t.avatar_title}</h1>
+          <p style={{ fontSize: 13, color: "rgba(245,237,224,.45)", marginBottom: 14 }}>{t.avatar_sub}</p>
 
           <div className={styles.previewRow}>
             <div className={clsx(styles.previewAva, userAvatar && styles.chosen)}>
@@ -182,7 +182,7 @@ export default function AvatarPage() {
                   <div style={{ fontSize: 12, color: "rgba(245,237,224,.35)" }}>{userAvatar.desc}</div>
                 </>
               ) : (
-                <div style={{ fontSize: 12, color: "rgba(245,237,224,.35)" }}>Pick one below to see your preview</div>
+                <div style={{ fontSize: 12, color: "rgba(245,237,224,.35)" }}>{t.avatar_preview_hint}</div>
               )}
             </div>
           </div>
@@ -218,7 +218,7 @@ export default function AvatarPage() {
           </div>
 
           <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: "0.09em", textTransform: "uppercase", color: "rgba(245,237,224,.28)", marginBottom: 8 }}>
-            Your companion
+            {t.avatar_companion_lbl}
           </p>
 
           <div className={styles.companionCard}>
@@ -227,11 +227,10 @@ export default function AvatarPage() {
               <div style={{ fontSize: 13, fontWeight: 500, color: "#8ecfbe", marginBottom: 2 }}>
                 {isCustomName ? (customName.trim() || "…") : companionName} · {compAvatar.name}
               </div>
-              <div style={{ fontSize: 12, color: "rgba(245,237,224,.35)" }}>Your companion</div>
+              <div style={{ fontSize: 12, color: "rgba(245,237,224,.35)" }}>{t.avatar_your_companion}</div>
             </div>
           </div>
 
-          {/* Name pills — exactly 2 rows */}
           {NAME_ROWS.map((row, ri) => (
             <div key={ri} className={styles.namePills} style={{ marginBottom: ri === 0 ? 4 : 8 }}>
               {row.map((n) => {
@@ -262,7 +261,6 @@ export default function AvatarPage() {
             />
           )}
 
-          {/* Companion avatar icons — change with name, exactly 6 icons in 2 rows of 3 */}
           <div className={styles.compAvaRow}>
             {compAvatars.map((a, i) => (
               <div
@@ -279,9 +277,9 @@ export default function AvatarPage() {
           </div>
 
           <div className={styles.btnRow}>
-            <button className={styles.btnBack} onClick={() => router.back()}>Back</button>
+            <button className={styles.btnBack} onClick={() => router.back()}>{t.back}</button>
             <button className={styles.btnNext} disabled={!userAvatar} onClick={handleFinish}>
-              {userAvatar ? `Start chat as ${userAvatar.name}` : "Choose an avatar to continue"}
+              {userAvatar ? t.avatar_start(userAvatar.name) : t.avatar_choose}
             </button>
           </div>
         </div>
