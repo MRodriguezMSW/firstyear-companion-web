@@ -10,7 +10,7 @@ const SCREEN: React.CSSProperties = {
   position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
   display: "flex", flexDirection: "column",
   alignItems: "center", justifyContent: "center",
-  overflow: "hidden", padding: "16px", paddingTop: "56px",
+  overflow: "hidden", padding: "16px",
 };
 const CONTENT: React.CSSProperties = {
   width: "100%", maxWidth: 480, position: "relative", zIndex: 1,

@@ -10,11 +10,6 @@ export default function CrisisButton({ pulsing = false }: { pulsing?: boolean })
 
   useEffect(() => { setT(getStrings(readLang())); }, []);
 
-  // When crisis is newly detected, auto-open overlay
-  useEffect(() => {
-    if (pulsing && !flashDismissed) setOpen(true);
-  }, [pulsing]);
-
   // Reset dismissed state when pulsing stops
   useEffect(() => {
     if (!pulsing) setFlashDismissed(false);
@@ -24,35 +19,59 @@ export default function CrisisButton({ pulsing = false }: { pulsing?: boolean })
 
   const handleCalm = () => {
     setFlashDismissed(true);
-    setOpen(false);
   };
 
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        aria-label="Crisis resources"
-        style={{
-          position: "fixed", bottom: 20, right: 20, zIndex: 9999,
-          width: isFlashing ? 72 : 48,
-          height: isFlashing ? 72 : 48,
-          borderRadius: "50%",
-          background: "#FF6B6B",
-          border: "2px solid rgba(255,255,255,0.25)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: isFlashing ? 26 : 20,
-          cursor: "pointer", padding: 0,
-          boxShadow: "0 4px 20px rgba(255,107,107,0.5)",
-          transition: "width 0.3s ease, height 0.3s ease, font-size 0.3s ease",
-          animation: isFlashing
-            ? "crisisFlash 0.5s ease-in-out infinite"
-            : pulsing
-            ? "crisisPulse 1.4s ease-in-out infinite"
-            : "none",
-        }}
-      >
-        📞
-      </button>
+      {/* Fixed bottom-right: "I am okay" button + phone icon */}
+      <div style={{
+        position: "fixed", bottom: 20, right: 20, zIndex: 9999,
+        display: "flex", alignItems: "center", gap: 10,
+      }}>
+        {isFlashing && (
+          <button
+            onClick={handleCalm}
+            style={{
+              background: "rgba(74,124,111,0.95)",
+              border: "1px solid rgba(74,124,111,0.6)",
+              borderRadius: 20,
+              padding: "10px 16px",
+              color: "#fff",
+              fontFamily: "DM Sans, sans-serif",
+              fontSize: 13, fontWeight: 500,
+              cursor: "pointer",
+              boxShadow: "0 4px 16px rgba(0,0,0,0.3)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            ✓ {t.crisis_calm}
+          </button>
+        )}
+
+        <button
+          onClick={() => setOpen(true)}
+          aria-label="Crisis resources"
+          style={{
+            width: isFlashing ? 80 : 48,
+            height: isFlashing ? 80 : 48,
+            borderRadius: "50%",
+            background: "#FF6B6B",
+            border: "2px solid rgba(255,255,255,0.25)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: isFlashing ? 32 : 20,
+            cursor: "pointer", padding: 0,
+            boxShadow: "0 4px 20px rgba(255,107,107,0.5)",
+            transition: "width 0.3s ease, height 0.3s ease, font-size 0.3s ease",
+            animation: isFlashing
+              ? "crisisFlash 0.5s ease-in-out infinite"
+              : pulsing
+              ? "crisisPulse 1.4s ease-in-out infinite"
+              : "none",
+          }}
+        >
+          📞
+        </button>
+      </div>
 
       {open && (
         <div
@@ -145,25 +164,6 @@ export default function CrisisButton({ pulsing = false }: { pulsing?: boolean })
               ))}
             </div>
 
-            {/* I am okay button — dismisses flash */}
-            {pulsing && !flashDismissed && (
-              <button
-                onClick={handleCalm}
-                style={{
-                  width: "100%", padding: "13px",
-                  background: "rgba(74,124,111,0.18)",
-                  border: "1px solid rgba(74,124,111,0.45)",
-                  borderRadius: 12,
-                  fontFamily: "DM Sans, sans-serif",
-                  fontSize: 15, fontWeight: 500, color: "#8ecfbe",
-                  cursor: "pointer", marginBottom: 8,
-                  transition: "all 0.18s",
-                }}
-              >
-                ✓ {t.crisis_calm}
-              </button>
-            )}
-
             <p style={{ fontSize: 11, color: "rgba(245,237,224,0.25)", textAlign: "center", marginTop: 8, lineHeight: 1.6 }}>
               {t.crisis_close_hint}
             </p>
@@ -178,7 +178,7 @@ export default function CrisisButton({ pulsing = false }: { pulsing?: boolean })
         }
         @keyframes crisisFlash {
           0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,107,0.9), 0 4px 20px rgba(255,107,107,0.6); opacity: 1; }
-          50%       { box-shadow: 0 0 0 20px rgba(255,107,107,0), 0 4px 30px rgba(255,107,107,0.9); opacity: 0.7; }
+          50%       { box-shadow: 0 0 0 26px rgba(255,107,107,0), 0 4px 30px rgba(255,107,107,0.9); opacity: 0.7; }
         }
       `}</style>
     </>

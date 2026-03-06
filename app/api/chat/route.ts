@@ -334,10 +334,18 @@ The follow-up should feel like a friend checking in, not a script closing a sess
 Return ONLY JSON with exactly this shape:
 {
   "reply": string,
+  "multi_reply": string[] | null,
   "suggestions": string[],
   "state": { "mode": "companion"|"guide", "topic": string, "stage": string }
 }
-No extra keys. No markdown. No text outside JSON.
+No extra markdown. No text outside JSON.
+
+PROVIDER RESULTS FORMAT — use ONLY when presenting a list of clinic/provider options:
+- Set "reply" to an empty string ""
+- Set "multi_reply" to an array where:
+  - Item [0]: Intro sentence in the user's language, e.g. "Here are some options near [location]:"
+  - Item [1..N]: One provider per item. Each must include the name on its own line, address on the next line, and phone on the next line. Never combine two providers in one item.
+- For all other responses: set "multi_reply" to null and use "reply" as normal.
 
 ${(() => {
   if (language.startsWith("es")) return "\nLANGUAGE INSTRUCTION: Respond ENTIRELY in Spanish. Every word of your reply, every suggestion chip must be in Spanish. Do not switch to English under any circumstances.\n";
@@ -382,6 +390,11 @@ stage=${state.stage}
         ? parsed.reply.trim()
         : "I’m here with you. What feels most important right now?";
 
+    const multiReply: string[] | null =
+      Array.isArray(parsed?.multi_reply) && parsed.multi_reply.length > 0
+        ? parsed.multi_reply.map((s: unknown) => String(s ?? "").trim()).filter(Boolean)
+        : null;
+
     const suggestions = normalizeSuggestions(parsed?.suggestions);
 
     const outState: State =
@@ -394,7 +407,8 @@ stage=${state.stage}
         : state;
 
     return NextResponse.json({
-      reply,
+      reply: multiReply ? "" : reply,
+      multi_reply: multiReply,
       suggestions: suggestions.length ? suggestions : [],
       state: outState,
     });

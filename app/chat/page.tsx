@@ -8,25 +8,36 @@ import { getStrings, readLang, getLangFamily } from "../i18n";
 
 const FALLBACK_NAMES = ["Nova", "Sage", "River", "Luna"];
 
-// ── Crisis detection (visual pulse only — no voice) ──────────────────────────
+// ── Crisis detection — all 6 language families ───────────────────────────────
 const CRISIS_PATTERNS = [
-  /\b(kill\s*myself|killing\s*myself|end\s*my\s*life|take\s*my\s*(own\s*)?life|want\s*to\s*die|wish\s*i\s*were\s*dead|no\s*reason\s*to\s*(live|be\s*here)|better\s*off\s*dead|better\s*off\s*without\s*me)\b/i,
-  /\b(suicide|suicidal|self[\s-]?harm|cut\s*(myself|me)|hurt\s*(myself|me)|overdose)\b/i,
-  /\b(hopeless|no hope|feeling hopeless|there('?s| is) no point|can'?t go on|can'?t do this anymore|don'?t want to be here|don'?t want to live)\b/i,
-  /\b(quiero\s*morir|quitarme\s*la\s*vida|hacerme\s*daño|mejor\s*muerto|ya\s*no\s*quiero\s*vivir|sin\s*esperanza|no\s*hay\s*salida)\b/i,
+  // English
+  /\b(kill\s*myself|killing\s*myself|end\s*my\s*life|take\s*my\s*(own\s*)?life|want\s*to\s*die|wish\s*i\s*were\s*dead|no\s*reason\s*to\s*(live|be\s*here)|better\s*off\s*dead|better\s*off\s*without\s*me|hurt\s*myself|self[\s-]?harm|suicidal|suicide|end\s*it\s*all|don'?t\s*want\s*to\s*(live|be\s*here)|can'?t\s*go\s*on)\b/i,
+  // Spanish
+  /\b(quiero\s*morir|quiero\s*acabar\s*con\s*mi\s*vida|suicida|hacerme\s*daño|no\s*quiero\s*vivir|terminar\s*con\s*todo|quitarme\s*la\s*vida|mejor\s*muerto|ya\s*no\s*quiero\s*vivir|sin\s*esperanza|no\s*hay\s*salida|matarme)\b/i,
+  // Portuguese
+  /\b(quero\s*morrer|suicida|me\s*machucar|acabar\s*com\s*tudo|não\s*quero\s*viver|me\s*matar|tirar\s*minha\s*vida)\b/i,
+  // French
+  /\b(je\s*veux\s*mourir|suicidaire|me\s*blesser|en\s*finir|plus\s*envie\s*de\s*vivre|mettre\s*fin\s*à\s*ma\s*vie)\b/i,
+  // Haitian Creole
+  /\b(mwen\s*vle\s*mouri|touye\s*tèt\s*mwen|fini\s*ak\s*tout|pa\s*vle\s*viv)\b/i,
+  // Chinese
+  /我想死|自杀|伤害自己|不想活了|结束生命|寻死/,
 ];
 function detectCrisis(text: string): boolean {
   return CRISIS_PATTERNS.some(p => p.test(text));
 }
 
-// ── New themes (lighter / emotionally named) ─────────────────────────────────
+// ── 9 light pastel themes ────────────────────────────────────────────────────
 const THEMES = [
-  { id: "hopeful",  label: "🌸 Hopeful",  bg: "#1c1018" },
-  { id: "peaceful", label: "🌿 Peaceful", bg: "#111c16" },
-  { id: "warm",     label: "🌅 Warm",     bg: "#1c1408" },
-  { id: "calm",     label: "💙 Calm",     bg: "#0c1b22" },
-  { id: "gentle",   label: "🌙 Gentle",   bg: "#151020" },
-  { id: "grounded", label: "🌲 Grounded", bg: "#101a10" },
+  { id: "hopeful",  label: "🌸 Hopeful",  bg: "#FFF0F5" },
+  { id: "sunrise",  label: "☀️ Sunrise",  bg: "#FFF8EE" },
+  { id: "peaceful", label: "🌿 Peaceful", bg: "#F0FAF4" },
+  { id: "calm",     label: "🌊 Calm",     bg: "#EFF8FF" },
+  { id: "free",     label: "🦋 Free",     bg: "#F5F0FF" },
+  { id: "bloom",    label: "🌺 Bloom",    bg: "#FFF4F0" },
+  { id: "bright",   label: "🌻 Bright",   bg: "#FFFDE7" },
+  { id: "soft",     label: "🕊️ Soft",    bg: "#F5F5F5" },
+  { id: "joy",      label: "🌈 Joy",      bg: "#FFF9F0" },
 ] as const;
 
 function chipsToMessage(chips: string[]): string {
@@ -136,20 +147,9 @@ function createAmbientNodes(ctx: AudioContext, type: string, masterGain: GainNod
   return nodes;
 }
 
-const GLOSSARY = [
-  { term: "U=U", def: "Undetectable = Untransmittable. If you are on treatment and your viral load is undetectable, you cannot sexually transmit HIV to a partner. This is one of the most important things to know — and it's backed by extensive science." },
-  { term: "ART", def: "Antiretroviral Therapy. The medication used to treat HIV. Usually just one pill, once a day. It keeps the virus suppressed so your immune system can recover and stay healthy." },
-  { term: "Viral Load (VL)", def: "The amount of HIV in your blood. The goal of treatment is to get this number to 'undetectable.' Most people reach that within 3–6 months of starting medication." },
-  { term: "CD4 Count", def: "CD4 cells are a type of immune cell that HIV attacks. A higher CD4 count means a stronger immune system. Treatment helps rebuild your CD4 count over time." },
-  { term: "PrEP", def: "Pre-Exposure Prophylaxis. A pill or injection that HIV-negative people take to prevent getting HIV. It's over 99% effective when taken as prescribed." },
-  { term: "PEP", def: "Post-Exposure Prophylaxis. Emergency medication taken within 72 hours of a possible HIV exposure. The sooner it's started, the better — don't wait if you think you may have been exposed." },
-  { term: "Undetectable", def: "When HIV levels in your blood are so low the test can't detect them. If you're undetectable, U=U applies — you cannot transmit HIV sexually. This is the goal of treatment." },
-  { term: "AIDS", def: "An advanced stage of untreated HIV. With modern treatment, most people living with HIV today never develop AIDS. Starting treatment early prevents this completely." },
-  { term: "Opportunistic Infection", def: "An infection that takes advantage of a weakened immune system. These are rare with treatment. Staying on your medication keeps your immune system strong enough to prevent them." },
-  { term: "Ryan White Program", def: "A federal program that helps people living with HIV access care and medication regardless of ability to pay. If you don't have insurance or can't afford care, this program can help." },
-];
 
 type Message = { role: "assistant" | "user"; content: string };
+type GlossaryEntry = { term: string; def: string };
 type BreathPhase = "in" | "hold" | "out" | "done";
 const BREATH_ROUNDS = 3;
 
@@ -184,7 +184,7 @@ export default function ChatPage() {
   const [breathCount, setBreathCount] = useState(4);
   const [breathRound, setBreathRound] = useState(1);
   const [showThemePicker, setShowThemePicker] = useState(false);
-  const [glossaryTerm, setGlossaryTerm] = useState<typeof GLOSSARY[number] | null>(null);
+  const [glossaryTerm, setGlossaryTerm] = useState<GlossaryEntry | null>(null);
   const [providerCity, setProviderCity] = useState("");
   const [providerCategory, setProviderCategory] = useState("");
   const [mobileSheet, setMobileSheet] = useState<"calm" | "relax" | "terms" | "provider" | "music" | null>(null);
@@ -198,9 +198,8 @@ export default function ChatPage() {
 
   // ── Music ──────────────────────────────────────────────────────────────────
   const [musicTab, setMusicTab] = useState<"sounds" | "uplift">("sounds");
-  const [musicTrack, setMusicTrack] = useState(0);
-  const [musicPlaying, setMusicPlaying] = useState(false);
-  const [musicVolume, setMusicVolume] = useState(0.35);
+  const [activeTrackType, setActiveTrackType] = useState<string | null>(null);
+  const [trackVolumes, setTrackVolumes] = useState<Record<string, number>>({});
 
   // ── Refs ───────────────────────────────────────────────────────────────────
   const inputRef = useRef("");
@@ -403,33 +402,28 @@ export default function ChatPage() {
     ambientNodesRef.current = [gain, ...nodes];
   };
 
-  const currentTrackList = musicTab === "sounds" ? t.sounds : t.uplift;
-  const safeTrackIdx = musicTrack % Math.max(currentTrackList.length, 1);
-  const currentTrack = currentTrackList[safeTrackIdx];
-
-  const toggleMusic = () => {
-    if (musicPlaying) { stopAmbient(); setMusicPlaying(false); }
-    else { if (currentTrack) playAmbient(currentTrack.type, musicVolume); setMusicPlaying(true); }
-  };
-
-  const nextMusicTrack = () => {
-    const next = (safeTrackIdx + 1) % currentTrackList.length;
-    setMusicTrack(next);
-    if (musicPlaying && currentTrackList[next]) playAmbient(currentTrackList[next].type, musicVolume);
-  };
-
-  const switchMusicTab = (tab: "sounds" | "uplift") => {
-    setMusicTab(tab);
-    setMusicTrack(0);
-    if (musicPlaying) {
-      const list = tab === "sounds" ? t.sounds : t.uplift;
-      if (list[0]) playAmbient(list[0].type, musicVolume);
+  const toggleTrack = (type: string) => {
+    if (activeTrackType === type) {
+      stopAmbient();
+      setActiveTrackType(null);
+    } else {
+      const vol = trackVolumes[type] ?? 0.35;
+      playAmbient(type, vol);
+      setActiveTrackType(type);
     }
   };
 
-  const handleMusicVolume = (v: number) => {
-    setMusicVolume(v);
-    if (masterGainRef.current) masterGainRef.current.gain.value = v;
+  const setTrackVol = (type: string, vol: number) => {
+    setTrackVolumes(prev => ({ ...prev, [type]: vol }));
+    if (activeTrackType === type && masterGainRef.current) {
+      masterGainRef.current.gain.value = vol;
+    }
+  };
+
+  const switchMusicTab = (tab: "sounds" | "uplift") => {
+    stopAmbient();
+    setActiveTrackType(null);
+    setMusicTab(tab);
   };
 
   useEffect(() => () => {
@@ -468,11 +462,16 @@ export default function ChatPage() {
       const elapsed = Date.now() - start;
       if (elapsed < 800) await new Promise(r => setTimeout(r, 800 - elapsed));
 
-      const reply = typeof data?.reply === "string" ? data.reply : t.welcome_bubble;
       const nextChips: string[] = Array.isArray(data?.suggestions) ? data.suggestions.map((s: unknown) => String(s)).slice(0, 6) : [];
-
       if (data?.state) setState(data.state);
-      setMessages(prev => [...prev, { role: "assistant", content: reply }]);
+
+      if (Array.isArray(data?.multi_reply) && data.multi_reply.length > 0) {
+        const bubbles = (data.multi_reply as string[]).map(s => String(s).trim()).filter(Boolean);
+        setMessages(prev => [...prev, ...bubbles.map(content => ({ role: "assistant" as const, content }))]);
+      } else {
+        const reply = typeof data?.reply === "string" ? data.reply : t.welcome_bubble;
+        setMessages(prev => [...prev, { role: "assistant", content: reply }]);
+      }
       setChips(nextChips);
     } catch {
       setMessages(prev => [...prev, { role: "assistant", content: t.welcome_bubble }]);
@@ -513,11 +512,10 @@ export default function ChatPage() {
 
   // Provider category search
   const providerCats = t.provider_cats;
-  const doProviderSearch = (inputEl?: HTMLInputElement | null) => {
+  const doProviderSearch = (_inputEl?: HTMLInputElement | null) => {
     if (!providerCity.trim()) return;
-    const cat = providerCats.find(c => c.prompt === providerCategory || providerCats.findIndex(x => x === c) === providerCats.findIndex(x => x.prompt === providerCategory));
-    const catObj = providerCats.find((_c, i) => i === Number(providerCategory)) ?? providerCats.find(c => c.prompt === providerCategory);
-    triggerSend(`Can you help me find ${catObj?.prompt ?? providerCategory} near ${providerCity.trim()}?`);
+    const catObj = providerCats[Number(providerCategory)] ?? null;
+    if (catObj) triggerSend(t.provider_search_msg(catObj.prompt, providerCity.trim()));
     setProviderCity("");
   };
 
@@ -561,7 +559,7 @@ export default function ChatPage() {
             onChange={e => setProviderCity(e.target.value)}
             onKeyDown={e => {
               if (e.key === "Enter") {
-                triggerSend(`Can you help me find ${selectedProviderCat.prompt} near ${providerCity.trim()}?`);
+                triggerSend(t.provider_search_msg(selectedProviderCat.prompt, providerCity.trim()));
                 setProviderCity("");
                 if (isMobile) setMobileSheet(null);
               }
@@ -571,7 +569,7 @@ export default function ChatPage() {
             className={styles.providerSearchBtn}
             disabled={sending || !providerCity.trim()}
             onClick={() => {
-              triggerSend(`Can you help me find ${selectedProviderCat.prompt} near ${providerCity.trim()}?`);
+              triggerSend(t.provider_search_msg(selectedProviderCat.prompt, providerCity.trim()));
               setProviderCity("");
               if (isMobile) setMobileSheet(null);
             }}
@@ -583,25 +581,44 @@ export default function ChatPage() {
     </>
   );
 
-  const renderMusicSection = () => (
-    <div className={styles.musicPlayer}>
-      <div className={styles.musicTabRow}>
-        <button className={clsx(styles.musicTab, musicTab === "sounds" && styles.musicTabActive)} onClick={() => switchMusicTab("sounds")}>{t.sidebar_music_sounds}</button>
-        <button className={clsx(styles.musicTab, musicTab === "uplift" && styles.musicTabActive)} onClick={() => switchMusicTab("uplift")}>{t.sidebar_music_uplift}</button>
+  const renderMusicSection = () => {
+    const trackList = musicTab === "sounds" ? t.sounds : t.uplift;
+    return (
+      <div className={styles.musicPlayer}>
+        <div className={styles.musicTabRow}>
+          <button className={clsx(styles.musicTab, musicTab === "sounds" && styles.musicTabActive)} onClick={() => switchMusicTab("sounds")}>{t.sidebar_music_sounds}</button>
+          <button className={clsx(styles.musicTab, musicTab === "uplift" && styles.musicTabActive)} onClick={() => switchMusicTab("uplift")}>{t.sidebar_music_uplift}</button>
+        </div>
+        {trackList.map((track) => {
+          const isPlaying = activeTrackType === track.type;
+          const vol = trackVolumes[track.type] ?? 0.35;
+          return (
+            <div key={track.type} className={styles.musicTrackRow}>
+              <button
+                className={clsx(styles.musicTrackBtn, isPlaying && styles.musicTrackBtnActive)}
+                onClick={() => toggleTrack(track.type)}
+              >
+                {isPlaying ? "⏸" : "▶"}
+              </button>
+              <div className={styles.musicTrackInfo}>
+                <span className={styles.musicTrackName}>{track.name}</span>
+                {isPlaying && (
+                  <div className={styles.musicLiveBar}>
+                    <span /><span /><span /><span />
+                  </div>
+                )}
+              </div>
+              <input
+                type="range" min={0} max={1} step={0.01} value={vol}
+                onChange={e => setTrackVol(track.type, Number(e.target.value))}
+                className={styles.musicVolumeMini}
+              />
+            </div>
+          );
+        })}
       </div>
-      <div className={styles.musicTrackName}>{currentTrack?.name ?? ""}</div>
-      <div className={styles.musicControls}>
-        <button className={styles.musicBtn} onClick={toggleMusic}>{musicPlaying ? "⏸" : "▶"}</button>
-        <button className={styles.musicBtn} onClick={nextMusicTrack}>⏭</button>
-      </div>
-      <div className={styles.musicVolumeRow}>
-        <span className={styles.musicVolumeIcon}>🔈</span>
-        <input type="range" min={0} max={1} step={0.01} value={musicVolume} onChange={e => handleMusicVolume(Number(e.target.value))} className={styles.musicVolume} />
-        <span className={styles.musicVolumeIcon}>🔊</span>
-      </div>
-      <p className={styles.musicNote}>Device-generated ambient tones — no download needed</p>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className={styles.chatRoot} style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, display: "flex", flexDirection: "column" }}>
@@ -742,7 +759,7 @@ export default function ChatPage() {
               <span>📍</span><span className={styles.mobileWellnessIconLbl}>{t.wb_provider}</span>
             </button>
             <button className={styles.mobileWellnessIconBtn} onClick={() => setMobileSheet("music")}>
-              <span>🎵</span><span className={styles.mobileWellnessIconLbl}>Music</span>
+              <span>🎵</span><span className={styles.mobileWellnessIconLbl}>{t.sidebar_music_title.replace(/^🎵 ?/, "")}</span>
             </button>
           </div>
 
@@ -784,16 +801,12 @@ export default function ChatPage() {
             </button>
             {sidebarOpen.calm && (
               <div className={styles.sidebarBtnGroup} style={{ marginTop: 9 }}>
-                {[
-                  () => { startBreathing(); },
-                  () => triggerSend("Can you guide me through a 4-7-8 breathing exercise?"),
-                  () => triggerSend("Can you guide me through a body scan exercise?"),
-                  () => triggerSend("Can you guide me through a 5 senses grounding exercise?"),
-                  () => triggerSend("Can you guide me through a safe place visualization?"),
-                  () => triggerSend("Can you guide me through a gratitude practice?"),
-                ].map((fn, i) => (
-                  <button key={i} className={styles.sidebarBtn} disabled={sending} onClick={fn}>
-                    {t.sidebar_calm_btns[i]}
+                {t.sidebar_calm_btns.map((label, i) => (
+                  <button key={i} className={styles.sidebarBtn} disabled={sending} onClick={() => {
+                    if (i === 0) { startBreathing(); }
+                    else if (t.sidebar_calm_prompts[i]) triggerSend(t.sidebar_calm_prompts[i]);
+                  }}>
+                    {label}
                   </button>
                 ))}
               </div>
@@ -808,13 +821,11 @@ export default function ChatPage() {
             </button>
             {sidebarOpen.relax && (
               <div className={styles.sidebarBtnGroup} style={{ marginTop: 9 }}>
-                {[
-                  () => triggerSend("Can you share some affirmations for today?"),
-                  () => triggerSend("I need to be reminded that I'm not alone in this."),
-                  () => triggerSend("What have others felt after their HIV diagnosis?"),
-                ].map((fn, i) => (
-                  <button key={i} className={styles.sidebarBtn} disabled={sending} onClick={fn}>
-                    {t.sidebar_relax_btns[i]}
+                {t.sidebar_relax_btns.map((label, i) => (
+                  <button key={i} className={styles.sidebarBtn} disabled={sending} onClick={() => {
+                    if (t.sidebar_relax_prompts[i]) triggerSend(t.sidebar_relax_prompts[i]);
+                  }}>
+                    {label}
                   </button>
                 ))}
               </div>
@@ -829,7 +840,7 @@ export default function ChatPage() {
             </button>
             {sidebarOpen.dict && (
               <div className={styles.glossaryList} style={{ marginTop: 9 }}>
-                {GLOSSARY.map(g => (
+                {t.glossary.map(g => (
                   <button key={g.term} className={styles.glossaryTerm} onClick={() => setGlossaryTerm(g)}>
                     <span>{g.term}</span><span className={styles.glossaryTermArrow}>›</span>
                   </button>
@@ -862,16 +873,12 @@ export default function ChatPage() {
               <>
                 <div className={styles.mobileSheetTitle}>{t.sidebar_calm_title}</div>
                 <div className={styles.mobileSheetBtnGroup}>
-                  {[
-                    () => { startBreathing(); setMobileSheet(null); },
-                    () => { triggerSend("Can you guide me through a 4-7-8 breathing exercise?"); setMobileSheet(null); },
-                    () => { triggerSend("Can you guide me through a body scan exercise?"); setMobileSheet(null); },
-                    () => { triggerSend("Can you guide me through a 5 senses grounding exercise?"); setMobileSheet(null); },
-                    () => { triggerSend("Can you guide me through a safe place visualization?"); setMobileSheet(null); },
-                    () => { triggerSend("Can you guide me through a gratitude practice?"); setMobileSheet(null); },
-                  ].map((fn, i) => (
-                    <button key={i} className={styles.sidebarBtn} disabled={sending} onClick={fn}>
-                      {t.sidebar_calm_btns[i]}
+                  {t.sidebar_calm_btns.map((label, i) => (
+                    <button key={i} className={styles.sidebarBtn} disabled={sending} onClick={() => {
+                      if (i === 0) { startBreathing(); setMobileSheet(null); }
+                      else if (t.sidebar_calm_prompts[i]) { triggerSend(t.sidebar_calm_prompts[i]); setMobileSheet(null); }
+                    }}>
+                      {label}
                     </button>
                   ))}
                 </div>
@@ -882,13 +889,11 @@ export default function ChatPage() {
               <>
                 <div className={styles.mobileSheetTitle}>{t.sidebar_relax_title}</div>
                 <div className={styles.mobileSheetBtnGroup}>
-                  {[
-                    () => { triggerSend("Can you share some affirmations for today?"); setMobileSheet(null); },
-                    () => { triggerSend("I need to be reminded that I'm not alone in this."); setMobileSheet(null); },
-                    () => { triggerSend("What have others felt after their HIV diagnosis?"); setMobileSheet(null); },
-                  ].map((fn, i) => (
-                    <button key={i} className={styles.sidebarBtn} disabled={sending} onClick={fn}>
-                      {t.sidebar_relax_btns[i]}
+                  {t.sidebar_relax_btns.map((label, i) => (
+                    <button key={i} className={styles.sidebarBtn} disabled={sending} onClick={() => {
+                      if (t.sidebar_relax_prompts[i]) { triggerSend(t.sidebar_relax_prompts[i]); setMobileSheet(null); }
+                    }}>
+                      {label}
                     </button>
                   ))}
                 </div>
@@ -899,7 +904,7 @@ export default function ChatPage() {
               <>
                 <div className={styles.mobileSheetTitle}>{t.sidebar_dict_title}</div>
                 <div className={styles.glossaryList}>
-                  {GLOSSARY.map(g => (
+                  {t.glossary.map(g => (
                     <button key={g.term} className={styles.glossaryTerm} onClick={() => { setGlossaryTerm(g); setMobileSheet(null); }}>
                       <span>{g.term}</span><span className={styles.glossaryTermArrow}>›</span>
                     </button>
