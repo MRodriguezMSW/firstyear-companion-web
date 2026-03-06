@@ -27,17 +27,17 @@ function detectCrisis(text: string): boolean {
   return CRISIS_PATTERNS.some(p => p.test(text));
 }
 
-// ── 9 mid-tone warm themes ────────────────────────────────────────────────────
+// ── 9 deep warm themes ────────────────────────────────────────────────────────
 const THEMES = [
-  { id: "hopeful",  label: "🌸 Hopeful",  bg: "#C47A8A" },
-  { id: "sunrise",  label: "☀️ Sunrise",  bg: "#C49A5A" },
-  { id: "peaceful", label: "🌿 Peaceful", bg: "#5A9478" },
-  { id: "calm",     label: "🌊 Calm",     bg: "#5A8FAA" },
-  { id: "free",     label: "🦋 Free",     bg: "#8A7AAA" },
-  { id: "bloom",    label: "🌺 Bloom",    bg: "#C47A5A" },
-  { id: "bright",   label: "🌻 Bright",   bg: "#C4AA3A" },
-  { id: "soft",     label: "🕊️ Soft",    bg: "#8A8A8A" },
-  { id: "joy",      label: "🌈 Joy",      bg: "#AA8A5A" },
+  { id: "hopeful",  label: "🌸 Hopeful",  bg: "#6B1E35" },
+  { id: "sunrise",  label: "☀️ Sunrise",  bg: "#7A4410" },
+  { id: "peaceful", label: "🌿 Peaceful", bg: "#1A5438" },
+  { id: "calm",     label: "🌊 Calm",     bg: "#1A3F62" },
+  { id: "free",     label: "🦋 Free",     bg: "#35245C" },
+  { id: "bloom",    label: "🌺 Bloom",    bg: "#7A2510" },
+  { id: "bright",   label: "🌻 Bright",   bg: "#5C4A00" },
+  { id: "soft",     label: "🕊️ Soft",    bg: "#3A3A3A" },
+  { id: "joy",      label: "🌈 Joy",      bg: "#5E3508" },
 ] as const;
 
 function chipsToMessage(chips: string[]): string {
