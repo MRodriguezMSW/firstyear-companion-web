@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
-import { LANGUAGE_OPTIONS } from "../i18n";
+import { LANGUAGE_OPTIONS, getStrings, readLang } from "../i18n";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -432,11 +432,14 @@ export default function ProfilePage() {
   const [journalText, setJournalText] = useState("");
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [langCode, setLangCode] = useState("en-US");
+  const t = getStrings(langCode);
 
-  // Apply theme from localStorage
+  // Apply theme + language from localStorage
   useEffect(() => {
     const theme = localStorage.getItem("companion_theme") || "grounded";
     document.documentElement.setAttribute("data-theme", theme);
+    setLangCode(readLang());
   }, []);
 
   // Load profile + journal from localStorage
@@ -513,17 +516,17 @@ export default function ProfilePage() {
       {/* Header */}
       <div style={S.header}>
         <button style={S.backBtn} onClick={() => router.push("/chat")}>←</button>
-        <div style={S.headerTitle}>My Profile</div>
+        <div style={S.headerTitle}>{t.profile_title}</div>
       </div>
 
       <div style={S.body}>
         {/* Tab switcher */}
         <div style={S.tabRow}>
           <button style={S.tab(tab === "profile")} onClick={() => setTab("profile")}>
-            👤 Profile
+            {t.profile_tab}
           </button>
           <button style={S.tab(tab === "journal")} onClick={() => setTab("journal")}>
-            📓 My Journal
+            {t.journal_tab}
           </button>
         </div>
 
@@ -532,11 +535,11 @@ export default function ProfilePage() {
           <>
             {/* Preferred name */}
             <div style={S.section}>
-              <div style={S.label}>Preferred name or nickname <span style={{ color: "color-mix(in srgb, var(--text) 25%, transparent)", fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>— optional</span></div>
+              <div style={S.label}>{t.profile_name_label} <span style={{ color: "color-mix(in srgb, var(--text) 25%, transparent)", fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>— {t.optional}</span></div>
               <input
                 style={S.textInput}
                 type="text"
-                placeholder="What should Nova call you?"
+                placeholder={t.profile_name_ph}
                 value={profile.preferredName}
                 onChange={e => setField("preferredName", e.target.value)}
                 maxLength={40}
@@ -545,7 +548,7 @@ export default function ProfilePage() {
 
             {/* Pronouns */}
             <div style={S.section}>
-              <div style={S.label}>Pronouns</div>
+              <div style={S.label}>{t.profile_pronouns_label}</div>
               <div style={S.pillRow}>
                 {PRONOUNS.map(p => (
                   <button key={p} style={S.pill(profile.pronouns === p)} onClick={() => setField("pronouns", p)}>
@@ -557,7 +560,7 @@ export default function ProfilePage() {
                 <input
                   style={{ ...S.textInput, marginTop: 10 }}
                   type="text"
-                  placeholder="Enter your pronouns..."
+                  placeholder={t.profile_name_ph}
                   value={profile.pronounsOther}
                   onChange={e => setField("pronounsOther", e.target.value)}
                   maxLength={40}
@@ -567,7 +570,7 @@ export default function ProfilePage() {
 
             {/* Age range */}
             <div style={S.section}>
-              <div style={S.label}>Age range</div>
+              <div style={S.label}>{t.profile_age_label}</div>
               <div style={S.pillRow}>
                 {AGE_RANGES.map(a => (
                   <button key={a} style={S.pill(profile.ageRange === a)} onClick={() => setField("ageRange", a)}>
@@ -579,7 +582,7 @@ export default function ProfilePage() {
 
             {/* Country */}
             <div style={S.section}>
-              <div style={S.label}>Country or region</div>
+              <div style={S.label}>{t.profile_country_label}</div>
               <select
                 style={S.select}
                 value={profile.country}
@@ -594,7 +597,7 @@ export default function ProfilePage() {
 
             {/* Language */}
             <div style={S.section}>
-              <div style={S.label}>Language preference</div>
+              <div style={S.label}>{t.profile_language_label}</div>
               <select
                 style={S.select}
                 value={profile.language}
@@ -609,7 +612,7 @@ export default function ProfilePage() {
 
             {/* Mood */}
             <div style={S.section}>
-              <div style={S.label}>How are you feeling today?</div>
+              <div style={S.label}>{t.profile_mood_label}</div>
               <div style={S.moodGrid}>
                 {MOODS.map(m => (
                   <button
@@ -630,9 +633,9 @@ export default function ProfilePage() {
 
             {/* Daily check-ins */}
             <div style={S.section}>
-              <div style={S.label}>Daily emotional check-ins</div>
+              <div style={S.label}>{t.profile_checkin_label}</div>
               <div style={S.toggleRow}>
-                <span style={S.toggleLabel}>Would you like a daily mood check-in when you open the app?</span>
+                <span style={S.toggleLabel}>{t.profile_checkin_toggle}</span>
                 <button
                   style={S.toggleBtn(profile.dailyCheckIns)}
                   onClick={() => setField("dailyCheckIns", !profile.dailyCheckIns)}
@@ -645,7 +648,7 @@ export default function ProfilePage() {
 
             {/* Topics */}
             <div style={S.section}>
-              <div style={S.label}>Topics you&apos;d like more help with</div>
+              <div style={S.label}>{t.profile_topics_label}</div>
               <div style={S.pillRow}>
                 {TOPICS.map(t => (
                   <button key={t} style={S.pill(profile.topics.includes(t))} onClick={() => toggleTopic(t)}>
@@ -656,24 +659,20 @@ export default function ProfilePage() {
             </div>
 
             {/* Save */}
-            {saved && <div style={S.savedToast}>Profile saved</div>}
-            <button style={S.saveBtn} onClick={saveProfile}>Save my profile</button>
-            <p style={S.privacyNote}>
-              🔒 Your information stays on this device only. Nothing is shared or stored in the cloud.
-            </p>
+            {saved && <div style={S.savedToast}>{t.profile_saved}</div>}
+            <button style={S.saveBtn} onClick={saveProfile}>{t.profile_save_btn}</button>
+            <p style={S.privacyNote}>{t.profile_privacy_note}</p>
           </>
         )}
 
         {/* ── JOURNAL TAB ── */}
         {tab === "journal" && (
           <>
-            <div style={S.journalNote}>
-              📓 This journal is yours alone. Nova cannot see it and it is never shared.
-            </div>
+            <div style={S.journalNote}>{t.journal_note}</div>
 
             <textarea
               style={S.journalTextarea}
-              placeholder="Write anything — how you feel today, what you learned, what is on your mind..."
+              placeholder={t.journal_placeholder}
               value={journalText}
               onChange={e => setJournalText(e.target.value)}
               rows={5}
@@ -683,12 +682,12 @@ export default function ProfilePage() {
               onClick={saveJournalEntry}
               disabled={!journalText.trim()}
             >
-              Save entry
+              {t.journal_save_btn}
             </button>
 
             {entries.length === 0 ? (
               <div style={{ textAlign: "center", padding: "32px 0", fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: "color-mix(in srgb, var(--text) 30%, transparent)" }}>
-                No entries yet. Write your first one above.
+                {t.journal_empty}
               </div>
             ) : (
               <div style={S.entryList}>
@@ -713,7 +712,7 @@ export default function ProfilePage() {
                           style={S.entryDeleteBtn}
                           onClick={(e) => deleteEntry(entry.id, e)}
                         >
-                          Delete
+                          {t.journal_delete_btn}
                         </button>
                       </div>
                       {isExpanded && (

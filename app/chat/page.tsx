@@ -9,39 +9,103 @@ import { getStrings, readLang, getLangFamily } from "../i18n";
 import type { UserProfile } from "../profile/page";
 import { PROFILE_KEY } from "../profile/page";
 
-const FALLBACK_NAMES = ["Nova", "Sage", "River", "Luna"];
-
-// ── Crisis detection — all 6 language families ───────────────────────────────
+// ── Crisis detection ──────────────────────────────────────────────────────────
 const CRISIS_PATTERNS = [
-  // English
   /\b(kill\s*myself|killing\s*myself|end\s*my\s*life|take\s*my\s*(own\s*)?life|want\s*to\s*die|wish\s*i\s*were\s*dead|no\s*reason\s*to\s*(live|be\s*here)|better\s*off\s*dead|better\s*off\s*without\s*me|hurt\s*myself|self[\s-]?harm|suicidal|suicide|end\s*it\s*all|don'?t\s*want\s*to\s*(live|be\s*here)|can'?t\s*go\s*on)\b/i,
-  // Spanish
   /\b(quiero\s*morir|quiero\s*acabar\s*con\s*mi\s*vida|suicida|hacerme\s*daño|no\s*quiero\s*vivir|terminar\s*con\s*todo|quitarme\s*la\s*vida|mejor\s*muerto|ya\s*no\s*quiero\s*vivir|sin\s*esperanza|no\s*hay\s*salida|matarme)\b/i,
-  // Portuguese
   /\b(quero\s*morrer|suicida|me\s*machucar|acabar\s*com\s*tudo|não\s*quero\s*viver|me\s*matar|tirar\s*minha\s*vida)\b/i,
-  // French
   /\b(je\s*veux\s*mourir|suicidaire|me\s*blesser|en\s*finir|plus\s*envie\s*de\s*vivre|mettre\s*fin\s*à\s*ma\s*vie)\b/i,
-  // Haitian Creole
   /\b(mwen\s*vle\s*mouri|touye\s*tèt\s*mwen|fini\s*ak\s*tout|pa\s*vle\s*viv)\b/i,
-  // Chinese
   /我想死|自杀|伤害自己|不想活了|结束生命|寻死/,
 ];
-function detectCrisis(text: string): boolean {
-  return CRISIS_PATTERNS.some(p => p.test(text));
-}
+function detectCrisis(text: string) { return CRISIS_PATTERNS.some(p => p.test(text)); }
 
-// ── 9 deep warm themes ────────────────────────────────────────────────────────
+// ── Themes ────────────────────────────────────────────────────────────────────
 const THEMES = [
-  { id: "grounded",  label: "🌲 Grounded",  bg: "#1A2E1E" },
-  { id: "ocean",     label: "🌊 Ocean",     bg: "#0D2233" },
-  { id: "ember",     label: "🍂 Ember",     bg: "#2E1A0E" },
-  { id: "midnight",  label: "🌙 Midnight",  bg: "#1A1A2E" },
-  { id: "burgundy",  label: "🍷 Burgundy",  bg: "#2E0E1A" },
-  { id: "walnut",    label: "🪵 Walnut",    bg: "#2E2010" },
-  { id: "sage",      label: "🌿 Sage",      bg: "#1A2E26" },
-  { id: "volcanic",  label: "🌋 Volcanic",  bg: "#2E1A1A" },
-  { id: "dusk",      label: "🐚 Dusk",      bg: "#2A2035" },
+  { id: "grounded", label: "🌲 Grounded", bg: "#1A2E1E" },
+  { id: "ocean",    label: "🌊 Ocean",    bg: "#0D2233" },
+  { id: "ember",    label: "🍂 Ember",    bg: "#2E1A0E" },
+  { id: "midnight", label: "🌙 Midnight", bg: "#1A1A2E" },
+  { id: "burgundy", label: "🍷 Burgundy", bg: "#2E0E1A" },
+  { id: "walnut",   label: "🪵 Walnut",   bg: "#2E2010" },
+  { id: "sage",     label: "🌿 Sage",     bg: "#1A2E26" },
+  { id: "volcanic", label: "🌋 Volcanic", bg: "#2E1A1A" },
+  { id: "dusk",     label: "🐚 Dusk",     bg: "#2A2035" },
 ] as const;
+
+// ── Calm exercises ────────────────────────────────────────────────────────────
+const CALM_EXERCISES = [
+  {
+    id: "breathing-478", emoji: "🫁", name: "4-7-8 Breathing", desc: "A calming breath pattern",
+    steps: [
+      "Get comfortable. Breathe in through your nose for 4 counts... 1... 2... 3... 4.",
+      "Now hold your breath for 7 counts. 7... 6... 5... 4... 3... 2... 1. Good.",
+      "Breathe out slowly through your mouth for 8 counts... 8... 7... 6... 5... 4... 3... 2... 1.",
+      "One more time. Breathe in for 4... 1... 2... 3... 4.",
+      "Hold for 7... 7... 6... 5... 4... 3... 2... 1.",
+      "And breathe out for 8... 8... 7... 6... 5... 4... 3... 2... 1. You did well.",
+    ],
+  },
+  {
+    id: "grounding-54321", emoji: "🌿", name: "5-4-3-2-1 Grounding", desc: "Come back to your senses",
+    steps: [
+      "Look around and name 5 things you can see right now. Take your time.",
+      "Now name 4 things you can hear — sounds near you and far away.",
+      "Now 3 things you can physically feel or touch right now.",
+      "Now 2 things you can smell, or imagine smelling if nothing comes to mind.",
+      "Last one — 1 thing you can taste right now. You are here. You are present. You are safe.",
+    ],
+  },
+  {
+    id: "body-scan", emoji: "🧘", name: "Body Scan", desc: "Release tension gently",
+    steps: [
+      "Close your eyes if that feels okay. Starting at the top of your head — notice any tension in your forehead, your jaw, your neck. Let it soften.",
+      "Now your shoulders. Are they raised? Let them drop and be heavy.",
+      "Your chest. Is your breathing shallow? Try one slightly deeper breath.",
+      "Your belly. This is where we often hold fear. See if you can let it loosen, even just a little.",
+      "Your hands and legs. Notice if they're tense. Let them soften. Well done — you just took care of yourself.",
+    ],
+  },
+  {
+    id: "box-breathing", emoji: "⬜", name: "Box Breathing", desc: "Equal counts for a steady mind",
+    steps: [
+      "Breathe in slowly for 4 counts... 1... 2... 3... 4.",
+      "Hold for 4 counts... 4... 3... 2... 1.",
+      "Breathe out for 4 counts... 4... 3... 2... 1.",
+      "Hold for 4 counts... 4... 3... 2... 1. That's one round. Let's do another.",
+      "Breathe in for 4... Hold for 4... Breathe out for 4... Hold for 4. Beautiful.",
+    ],
+  },
+];
+
+// ── Relax moments ─────────────────────────────────────────────────────────────
+const RELAX_MOMENTS = [
+  {
+    id: "affirmation", emoji: "💙", name: "A word for you",
+    content: "You are doing something incredibly brave just by being here. Living with HIV in a world that still carries so much stigma takes a kind of strength that most people will never understand. But you have it. You showed up. That matters more than you know.",
+  },
+  {
+    id: "not-alone", emoji: "🤝", name: "You are not alone",
+    content: "Right now, hundreds of thousands of people around the world are living full, rich lives with HIV — working, loving, laughing, thriving. Some of them had the same thoughts you're having today. They made it through. So will you. You are not alone in this.",
+  },
+  {
+    id: "hope", emoji: "🌱", name: "A message of hope",
+    content: "This diagnosis does not define your future. Modern HIV treatment means people diagnosed today live near-normal lifespans. Relationships. Children. Careers. Dreams. All of it is still possible. This is not the end of your story. It is a new chapter — and you are the author.",
+  },
+  {
+    id: "breath", emoji: "🌬️", name: "Just breathe",
+    content: "Just breathe for a moment.\n\nIn... and out.\nIn... and out.\nIn... and out.\n\nYou don't have to figure anything out right now. You just have to be here, in this moment. That is enough.",
+  },
+];
+
+// ── Real World Help categories ────────────────────────────────────────────────
+const REAL_WORLD_HELP = [
+  { label: "Find an HIV provider",     prompt: "HIV provider" },
+  { label: "Mental health therapist",  prompt: "mental health therapist" },
+  { label: "STD testing",              prompt: "STD testing site" },
+  { label: "PrEP provider",            prompt: "PrEP provider" },
+  { label: "LGBTQ+ affirming care",    prompt: "LGBTQ+ affirming care provider" },
+];
 
 function chipsToMessage(chips: string[]): string {
   if (chips.length === 1) return chips[0];
@@ -74,9 +138,8 @@ function buildOpeningMessage(ctx: any, langCode: string, welcomeBubble: string):
   const greeting = getTimeGreeting(langCode);
   const name = ctx?.name as string | null;
   const nameStr = name ? `, ${name}` : "";
-
   if (family === "es") {
-    return `${greeting}${nameStr}. Me alegra mucho que estés aquí. Recibir un diagnóstico de VIH puede sentirse como si el suelo se moviera bajo tus pies — y lo que sientes ahora mismo, sea miedo, confusión, enojo o incluso entumecimiento, tiene todo el sentido. No estás solo/a en esto, y va a estar bien. Lo digo en serio. Tómate el tiempo que necesites. Cuando estés listo/a para hablar — de lo que sea — aquí estoy.`;
+    return `${greeting}${nameStr}. Me alegra mucho que estés aquí. Recibir un diagnóstico de VIH puede sentirse como si el suelo se moviera bajo tus pies — y lo que sientes ahora mismo, sea miedo, confusión, enojo o incluso entumecimiento, tiene todo el sentido. No estás solo/a en esto, y va a estar bien. Tómate el tiempo que necesites. Cuando estés listo/a para hablar — de lo que sea — aquí estoy.`;
   }
   if (family !== "en") {
     return nameStr ? `${nameStr.replace(/^, /, "")}. ${welcomeBubble}` : welcomeBubble;
@@ -84,79 +147,10 @@ function buildOpeningMessage(ctx: any, langCode: string, welcomeBubble: string):
   return `${greeting}${nameStr}. I'm really glad you're here. Being diagnosed with HIV can feel like the ground just shifted beneath you — and whatever you are feeling right now, whether that's fear, confusion, anger, or even numbness, all of it makes complete sense. You are not alone in this, and you are going to be okay. I mean that. Take all the time you need. When you're ready to talk — about anything at all — I'm right here with you.`;
 }
 
-// ── Web Audio ambient tones ──────────────────────────────────────────────────
-function createAmbientNodes(ctx: AudioContext, type: string, masterGain: GainNode): AudioNode[] {
-  const nodes: AudioNode[] = [];
-
-  // Noise-based sounds
-  if (["rain","forest","wind","fire","stream","thunder"].includes(type)) {
-    const bufSize = ctx.sampleRate * 3;
-    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
-    const data = buf.getChannelData(0);
-    for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
-    const src = ctx.createBufferSource();
-    src.buffer = buf; src.loop = true;
-    const filter = ctx.createBiquadFilter();
-    filter.type = type === "thunder" ? "lowpass" : type === "stream" ? "bandpass" : "lowpass";
-    filter.frequency.value = type === "wind" ? 200 : type === "forest" ? 600 : type === "thunder" ? 80 : type === "stream" ? 800 : type === "fire" ? 350 : 400;
-    src.connect(filter); filter.connect(masterGain); src.start();
-    nodes.push(src, filter);
-  } else if (type === "ocean") {
-    const bufSize = ctx.sampleRate * 3;
-    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
-    const data = buf.getChannelData(0);
-    for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
-    const src = ctx.createBufferSource();
-    src.buffer = buf; src.loop = true;
-    const filter = ctx.createBiquadFilter();
-    filter.type = "lowpass"; filter.frequency.value = 300;
-    const lfo = ctx.createOscillator(); lfo.frequency.value = 0.12;
-    const lfoGain = ctx.createGain(); lfoGain.gain.value = 0.4;
-    lfo.connect(lfoGain); src.connect(filter); filter.connect(masterGain);
-    lfo.start(); src.start();
-    nodes.push(src, filter, lfo, lfoGain);
-  } else if (type === "healing" || type === "piano") {
-    const freq1 = type === "piano" ? 261.63 : 528;
-    const freq2 = type === "piano" ? 392 : 264;
-    const osc1 = ctx.createOscillator(); osc1.type = "sine"; osc1.frequency.value = freq1;
-    const g1 = ctx.createGain(); g1.gain.value = type === "piano" ? 0.4 : 0.6;
-    osc1.connect(g1); g1.connect(masterGain);
-    const osc2 = ctx.createOscillator(); osc2.type = "sine"; osc2.frequency.value = freq2;
-    const g2 = ctx.createGain(); g2.gain.value = 0.25;
-    osc2.connect(g2); g2.connect(masterGain);
-    osc1.start(); osc2.start();
-    nodes.push(osc1, g1, osc2, g2);
-  } else {
-    // Uplift tracks: warm harmonic pairs
-    const UPLIFT_FREQS: Record<string, number[]> = {
-      rising:    [396, 528, 660],
-      loved:     [396, 528, 660],
-      stronger:  [440, 550],
-      newday:    [396, 462],
-      becoming:  [468, 585],
-      worthy:    [432, 528],
-      brave:     [440, 528],
-      enough:    [528, 594],
-    };
-    const freqs: number[] = UPLIFT_FREQS[type] ?? [432, 528];
-    const gainVal = 0.35 / freqs.length;
-    freqs.forEach((freq: number) => {
-      const osc = ctx.createOscillator(); osc.type = "sine"; osc.frequency.value = freq;
-      const g = ctx.createGain(); g.gain.value = gainVal;
-      osc.connect(g); g.connect(masterGain); osc.start();
-      nodes.push(osc, g);
-    });
-  }
-  return nodes;
-}
-
-
 type Message = { role: "assistant" | "user"; content: string };
 type GlossaryEntry = { term: string; def: string };
-type BreathPhase = "in" | "hold" | "out" | "done";
-const BREATH_ROUNDS = 3;
 
-const MOOD_OPTIONS: { emoji: string; label: string }[] = [
+const MOOD_OPTIONS = [
   { emoji: "😔", label: "Struggling" },
   { emoji: "😟", label: "Anxious" },
   { emoji: "😐", label: "Numb" },
@@ -168,11 +162,11 @@ const MOOD_OPTIONS: { emoji: string; label: string }[] = [
 export default function ChatPage() {
   const router = useRouter();
 
-  // ── Language / i18n ────────────────────────────────────────────────────────
+  // ── Language / i18n ──────────────────────────────────────────────────────
   const [langCode, setLangCode] = useState("en-US");
   const t = getStrings(langCode);
 
-  // ── Messages ──────────────────────────────────────────────────────────────
+  // ── Messages ─────────────────────────────────────────────────────────────
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", content: "I'm here with you. Take all the time you need." },
   ]);
@@ -182,134 +176,128 @@ export default function ChatPage() {
   const [sending, setSending] = useState(false);
   const [state, setState] = useState({ mode: "companion" as "companion" | "guide", topic: "start", stage: "start:v1" });
 
-  // ── Profile ────────────────────────────────────────────────────────────────
-  const [companionName, setCompanionName] = useState(() => FALLBACK_NAMES[Math.floor(Math.random() * FALLBACK_NAMES.length)]);
-  const [companionEmoji, setCompanionEmoji] = useState("🌱");
+  // ── Profile ──────────────────────────────────────────────────────────────
+  const [companionName] = useState("Nova");
+  const [companionEmoji] = useState("🌱");
   const [userEmoji, setUserEmoji] = useState("");
   const [userName, setUserName] = useState<string>("");
   const [onboardingContext, setOnboardingContext] = useState<string>("");
-  const [openingCtx, setOpeningCtx] = useState<any>(null);
   const [profileContext, setProfileContext] = useState<string>("");
   const [showMoodCheckin, setShowMoodCheckin] = useState(false);
   const [checkinName, setCheckinName] = useState<string>("");
 
-  // ── UI state ───────────────────────────────────────────────────────────────
+  // ── UI state ─────────────────────────────────────────────────────────────
   const [affirmationIdx, setAffirmationIdx] = useState(0);
   const [placeholderIdx, setPlaceholderIdx] = useState(0);
-  const [showBreathing, setShowBreathing] = useState(false);
-  const [breathPhase, setBreathPhase] = useState<BreathPhase>("in");
-  const [breathCount, setBreathCount] = useState(4);
-  const [breathRound, setBreathRound] = useState(1);
   const [showThemePicker, setShowThemePicker] = useState(false);
   const [glossaryTerm, setGlossaryTerm] = useState<GlossaryEntry | null>(null);
-  const [providerCity, setProviderCity] = useState("");
-  const [providerCategory, setProviderCategory] = useState("");
-  const [mobileSheet, setMobileSheet] = useState<"calm" | "relax" | "terms" | "provider" | "music" | null>(null);
   const [crisisDetected, setCrisisDetected] = useState(false);
+  const [mobileSheet, setMobileSheet] = useState<"calm" | "relax" | "terms" | "provider" | null>(null);
 
-  // ── Sidebar accordions (calm/relax/dict closed; provider/music open) ───────
-  const [sidebarOpen, setSidebarOpen] = useState<Record<string, boolean>>({
-    calm: false, relax: false, dict: false,
-  });
-  const toggleSection = (key: string) => setSidebarOpen(prev => ({ ...prev, [key]: !prev[key] }));
+  // ── Calm popup state ─────────────────────────────────────────────────────
+  const [calmOpen, setCalmOpen] = useState(false);
+  const [calmExId, setCalmExId] = useState<string | null>(null);
+  const [calmStep, setCalmStep] = useState(0);
 
-  // ── Music ──────────────────────────────────────────────────────────────────
-  const [musicTab, setMusicTab] = useState<"sounds" | "uplift">("sounds");
-  const [activeTrackType, setActiveTrackType] = useState<string | null>(null);
-  const [trackVolumes, setTrackVolumes] = useState<Record<string, number>>({});
+  // ── Relax popup state ────────────────────────────────────────────────────
+  const [relaxOpen, setRelaxOpen] = useState(false);
+  const [relaxMomentId, setRelaxMomentId] = useState<string | null>(null);
 
-  // ── Refs ───────────────────────────────────────────────────────────────────
+  // ── Dict popup state ─────────────────────────────────────────────────────
+  const [dictOpen, setDictOpen] = useState(false);
+
+  // ── Provider search popup state ───────────────────────────────────────────
+  const [providerOpen, setProviderOpen] = useState(false);
+  const [providerCategory, setProviderCategory] = useState<{ label: string; prompt: string } | null>(null);
+  const [providerAddress, setProviderAddress] = useState("");
+  const [providerResults, setProviderResults] = useState<{ name: string; address: string; lat: number; lng: number }[]>([]);
+  const [providerSearching, setProviderSearching] = useState(false);
+  const [providerError, setProviderError] = useState("");
+  const mapDivRef = useRef<HTMLDivElement | null>(null);
+
+  // ── Refs ─────────────────────────────────────────────────────────────────
   const inputRef = useRef("");
   const selectedChipsRef = useRef<string[]>([]);
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const breathTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const masterGainRef = useRef<GainNode | null>(null);
-  const ambientNodesRef = useRef<AudioNode[]>([]);
-  const providerInputRef = useRef<HTMLInputElement | null>(null);
-  const mobileProviderInputRef = useRef<HTMLInputElement | null>(null);
 
-  // ── Effects ────────────────────────────────────────────────────────────────
+  // ── Effects ──────────────────────────────────────────────────────────────
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, sending, chips]);
 
-  // Affirmation cycle (6s)
   useEffect(() => {
     const affirms = t.affirmations;
     const timer = setInterval(() => setAffirmationIdx(i => (i + 1) % affirms.length), 6000);
     return () => clearInterval(timer);
   }, [t]);
 
-  // Placeholder cycle
   const PLACEHOLDERS = [t.welcome_bubble, ...(t.initial_chips || [])];
   useEffect(() => {
     const timer = setInterval(() => setPlaceholderIdx(i => (i + 1) % PLACEHOLDERS.length), 6000);
     return () => clearInterval(timer);
   }, [t]);
 
-  // Crisis pulse
   useEffect(() => {
     const lastUser = [...messages].reverse().find(m => m.role === "user");
     if (lastUser && detectCrisis(lastUser.content)) setCrisisDetected(true);
   }, [messages]);
 
-  // Google Places
-  useEffect(() => {
-    const key = process.env.NEXT_PUBLIC_GOOGLE_PLACES_KEY;
-    if (!key) return;
-    if ((window as any).google?.maps?.places) { initPlaces(); return; }
-    const scriptId = "gmaps-places-script";
-    if (document.getElementById(scriptId)) return;
-    const script = document.createElement("script");
-    script.id = scriptId;
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places`;
-    script.async = true;
-    script.onload = initPlaces;
-    document.head.appendChild(script);
-
-    function initPlaces() {
-      const opts = { types: ["geocode"], componentRestrictions: { country: "us" } };
-      if (providerInputRef.current) {
-        const ac = new (window as any).google.maps.places.Autocomplete(providerInputRef.current, opts);
-        ac.addListener("place_changed", () => {
-          const place = ac.getPlace();
-          if (place?.formatted_address) setProviderCity(place.formatted_address);
-        });
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    if (mobileSheet !== "provider") return;
-    const key = process.env.NEXT_PUBLIC_GOOGLE_PLACES_KEY;
-    if (!key || !(window as any).google?.maps?.places) return;
-    if (!mobileProviderInputRef.current) return;
-    const opts = { types: ["geocode"], componentRestrictions: { country: "us" } };
-    const ac = new (window as any).google.maps.places.Autocomplete(mobileProviderInputRef.current, opts);
-    ac.addListener("place_changed", () => {
-      const place = ac.getPlace();
-      if (place?.formatted_address) setProviderCity(place.formatted_address);
-    });
-  }, [mobileSheet]);
-
-  // Load onboarding context + language
+  // ── Load onboarding + language ────────────────────────────────────────────
   useEffect(() => {
     const savedLang = localStorage.getItem("companion_language") ?? "en-US";
     setLangCode(savedLang);
 
+    // Try NEW onboarding format first (from Screen 2 check-in)
+    const newName      = localStorage.getItem("companion_name") || "";
+    const newJourney   = localStorage.getItem("companion_journey") || "";
+    const newProvider  = localStorage.getItem("companion_provider") || "";
+    const newMedication = localStorage.getItem("companion_medication") || "";
+    const newPronouns  = localStorage.getItem("companion_pronouns") || "";
+    const newMoodsRaw  = localStorage.getItem("companion_moods") || "[]";
+    let newMoods: string[] = [];
+    try { newMoods = JSON.parse(newMoodsRaw); } catch { newMoods = []; }
+
+    const hasNewData = newName || newJourney || newProvider || newMedication || newPronouns || newMoods.length > 0;
+
+    if (hasNewData) {
+      const parts: string[] = [];
+      parts.push(`CRITICAL: You are speaking directly to the patient. Always use "you" and "your" when addressing them directly.`);
+
+      const pronounMap: Record<string, string> = {
+        "She/Her": "she/her/hers", "Ella": "she/her/hers",
+        "He/Him": "he/him/his", "Él": "he/him/his",
+        "They/Them": "they/them/their",
+        "Ze/Zir": "ze/zir/zirs",
+      };
+      if (newPronouns && !newPronouns.toLowerCase().includes("prefer")) {
+        const pLabel = pronounMap[newPronouns] || newPronouns.toLowerCase();
+        parts.push(`Patient pronouns (for third-person reference only, NOT for replacing "you"): ${pLabel}`);
+      }
+      parts.push(`Patient name: ${newName || "not provided — address warmly without a name"}`);
+      if (newJourney)          parts.push(`HIV journey stage: ${newJourney}`);
+      if (newProvider === "No" || newProvider.toLowerCase() === "non" || newProvider === "否")
+        parts.push(`Has HIV provider: No — proactively offer to help find one once, warmly, early in the conversation.`);
+      else if (newProvider)    parts.push(`Has HIV provider: ${newProvider}`);
+      if (newMedication === "No" || newMedication.toLowerCase() === "non" || newMedication === "否")
+        parts.push(`On HIV medication: No — naturally open the door to what starting ART actually feels like, at the right moment.`);
+      else if (newMedication)  parts.push(`On HIV medication: ${newMedication}`);
+      if (newMoods.length > 0) parts.push(`Starting emotions: ${newMoods.join(", ")}`);
+
+      setOnboardingContext(parts.join("\n"));
+      if (newName) setUserName(newName);
+
+      const welcome = getStrings(savedLang).welcome_bubble;
+      setMessages([{ role: "assistant", content: buildOpeningMessage({ name: newName || null, emotions: newMoods }, savedLang, welcome) }]);
+      setChips(getStrings(savedLang).initial_chips);
+      return;
+    }
+
+    // Legacy: try old companion_context JSON
     const raw = localStorage.getItem("companion_context");
     if (raw) {
       try {
         const ctx = JSON.parse(raw);
-        if (ctx.companion?.name) setCompanionName(ctx.companion.name);
-        if (ctx.companion?.avatar?.emoji) setCompanionEmoji(ctx.companion.avatar.emoji);
-        if (ctx.userAvatar?.emoji) setUserEmoji(ctx.userAvatar.emoji);
         if (ctx.name) setUserName(ctx.name);
-
-        const lang = savedLang;
-        const welcome = getStrings(lang).welcome_bubble;
-        setOpeningCtx(ctx);
-        setMessages([{ role: "assistant", content: buildOpeningMessage(ctx, lang, welcome) }]);
+        if (ctx.userAvatar?.emoji) setUserEmoji(ctx.userAvatar.emoji);
 
         const pronounLabel = ctx.pronoun?.toLowerCase().includes("he/him") ? "he/him/his"
           : ctx.pronoun?.toLowerCase().includes("she/her") ? "she/her/hers"
@@ -317,44 +305,29 @@ export default function ChatPage() {
           : null;
 
         const parts: string[] = [];
-        parts.push(`CRITICAL: You are speaking directly to the patient. Always use "you" and "your" when addressing them — NEVER replace "you" with they/them/their/he/him/she/her, regardless of pronoun selection. Every sentence directed at the patient must use second-person ("you are", "your", etc).`);
-        if (pronounLabel) parts.push(`Patient's stated pronouns (for future third-party reference only, NOT for replacing "you" in conversation): ${pronounLabel}`);
+        parts.push(`CRITICAL: You are speaking directly to the patient. Always use "you" and "your" when addressing them.`);
+        if (pronounLabel) parts.push(`Patient pronouns (third-person only): ${pronounLabel}`);
         if (ctx.name)               parts.push(`User's name: ${ctx.name}`);
         if (ctx.diagnosisDate)      parts.push(`Diagnosis date: ${ctx.diagnosisDate}`);
         if (ctx.daysSinceDiagnosis !== null && ctx.daysSinceDiagnosis !== undefined) parts.push(`Days since diagnosis: ${ctx.daysSinceDiagnosis}`);
         if (ctx.diagnosisRange)     parts.push(`Diagnosis range: ${ctx.diagnosisRange}`);
         if (ctx.hasProvider === "No") parts.push(`Has HIV provider: No — proactively offer to help find one once, warmly, near the start of conversation.`);
         else if (ctx.hasProvider)   parts.push(`Has HIV provider: ${ctx.hasProvider}`);
-        if (ctx.onMedication === "No") parts.push(`On HIV medication: No — naturally open the door to what starting ART actually feels like, at the right moment.`);
+        if (ctx.onMedication === "No") parts.push(`On HIV medication: No — naturally open the door to what starting ART feels like, at the right moment.`);
         else if (ctx.onMedication)  parts.push(`On HIV medication: ${ctx.onMedication}`);
-        if (ctx.needsProviderHelp)  parts.push(`Wants help finding an HIV provider: Yes — proactively offer to help find a provider once, warmly, early in the conversation.`);
-        if (ctx.wantsMedsIntro)     parts.push(`Patient wants to learn about starting HIV medications — open a door naturally to what starting ART actually feels like, early in the conversation.`);
         if (ctx.emotionalIntensity !== undefined) parts.push(`Emotional intensity at start: ${ctx.emotionalIntensity}/10`);
         if (ctx.emotions?.length)   parts.push(`Starting emotions: ${ctx.emotions.join(", ")}`);
         if (ctx.note)               parts.push(`User's opening note: "${ctx.note}"`);
-        if (ctx.userAvatar)         parts.push(`User's avatar: ${ctx.userAvatar.emoji} ${ctx.userAvatar.name}`);
-        if (ctx.companion) {
-          parts.push(`Companion name: ${ctx.companion.name}`);
-          parts.push(`Companion pronouns: ${ctx.companion.pronouns}`);
-        }
         if (parts.length) setOnboardingContext(parts.join("\n"));
+
+        const welcome = getStrings(savedLang).welcome_bubble;
+        setMessages([{ role: "assistant", content: buildOpeningMessage(ctx, savedLang, welcome) }]);
+        setChips(getStrings(savedLang).initial_chips);
         return;
       } catch { /* fall through */ }
     }
 
-    const fycProfile = localStorage.getItem("fyc_profile");
-    if (fycProfile) {
-      try {
-        const p = JSON.parse(fycProfile);
-        if (p.companion?.name) setCompanionName(p.companion.name);
-        if (p.companion?.avatar?.emoji) setCompanionEmoji(p.companion.avatar.emoji);
-        if (p.userAvatar?.emoji) setUserEmoji(p.userAvatar.emoji);
-      } catch { /* ignore */ }
-    }
-    const name = localStorage.getItem("companion_userName") || "";
-    if (name) setUserName(name);
-
-    // Load user profile (from /profile page)
+    // User profile
     const userProfileRaw = localStorage.getItem(PROFILE_KEY);
     if (userProfileRaw) {
       try {
@@ -370,7 +343,6 @@ export default function ChatPage() {
         if (up.topics?.length) profileParts.push(`Topics patient wants help with: ${up.topics.join(", ")}`);
         if (profileParts.length) setProfileContext(profileParts.join("\n"));
 
-        // Daily mood check-in
         if (up.dailyCheckIns) {
           const today = new Date().toISOString().slice(0, 10);
           if (!up.lastMoodDate || up.lastMoodDate !== today) {
@@ -381,99 +353,73 @@ export default function ChatPage() {
       } catch { /* ignore */ }
     }
 
-    // Set initial chips and welcome from language
     setChips(getStrings(savedLang).initial_chips);
     setMessages([{ role: "assistant", content: getStrings(savedLang).welcome_bubble }]);
   }, []);
 
-  // Apply saved theme
   useEffect(() => {
     const theme = localStorage.getItem("companion_theme") ?? "grounded";
     document.documentElement.setAttribute("data-theme", theme);
   }, []);
 
-  // ── Breathing ─────────────────────────────────────────────────────────────
-  const startBreathing = () => { setBreathPhase("in"); setBreathCount(4); setBreathRound(1); setShowBreathing(true); };
-
-  useEffect(() => {
-    if (!showBreathing) { if (breathTimerRef.current) clearInterval(breathTimerRef.current); return; }
-    if (breathPhase === "done") return;
-    breathTimerRef.current = setInterval(() => {
-      setBreathCount(prev => {
-        if (prev > 1) return prev - 1;
-        clearInterval(breathTimerRef.current!);
-        setBreathPhase(ph => {
-          if (ph === "in")   { setTimeout(() => setBreathCount(7), 0); return "hold"; }
-          if (ph === "hold") { setTimeout(() => setBreathCount(8), 0); return "out"; }
-          setBreathRound(r => {
-            const next = r + 1;
-            if (next > BREATH_ROUNDS) setTimeout(() => setBreathPhase("done"), 0);
-            else setTimeout(() => { setBreathCount(4); setBreathPhase("in"); }, 800);
-            return next;
-          });
-          return "out";
-        });
-        return prev;
-      });
-    }, 1000);
-    return () => { if (breathTimerRef.current) clearInterval(breathTimerRef.current); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showBreathing, breathPhase]);
-
-  // ── Theme ─────────────────────────────────────────────────────────────────
   const applyTheme = (id: string) => {
     localStorage.setItem("companion_theme", id);
     document.documentElement.setAttribute("data-theme", id);
     setShowThemePicker(false);
   };
 
-  // ── Ambient music ─────────────────────────────────────────────────────────
-  const stopAmbient = () => {
-    ambientNodesRef.current.forEach(n => { try { (n as any).stop?.(); n.disconnect(); } catch {} });
-    ambientNodesRef.current = [];
-  };
-
-  const playAmbient = (type: string, vol: number) => {
-    stopAmbient();
-    if (!audioCtxRef.current || audioCtxRef.current.state === "closed") audioCtxRef.current = new AudioContext();
-    const ctx = audioCtxRef.current;
-    if (ctx.state === "suspended") ctx.resume();
-    const gain = ctx.createGain();
-    gain.gain.value = vol;
-    gain.connect(ctx.destination);
-    masterGainRef.current = gain;
-    const nodes = createAmbientNodes(ctx, type, gain);
-    ambientNodesRef.current = [gain, ...nodes];
-  };
-
-  const toggleTrack = (type: string) => {
-    if (activeTrackType === type) {
-      stopAmbient();
-      setActiveTrackType(null);
-    } else {
-      const vol = trackVolumes[type] ?? 0.35;
-      playAmbient(type, vol);
-      setActiveTrackType(type);
-    }
-  };
-
-  const setTrackVol = (type: string, vol: number) => {
-    setTrackVolumes(prev => ({ ...prev, [type]: vol }));
-    if (activeTrackType === type && masterGainRef.current) {
-      masterGainRef.current.gain.value = vol;
-    }
-  };
-
-  const switchMusicTab = (tab: "sounds" | "uplift") => {
-    stopAmbient();
-    setActiveTrackType(null);
-    setMusicTab(tab);
-  };
-
-  useEffect(() => () => {
-    stopAmbient();
-    if (audioCtxRef.current) audioCtxRef.current.close().catch(() => {});
+  // ── Load Google Maps script lazily ────────────────────────────────────────
+  useEffect(() => {
+    const key = process.env.NEXT_PUBLIC_GOOGLE_PLACES_KEY;
+    if (!key || document.getElementById("gm-script")) return;
+    const s = document.createElement("script");
+    s.id = "gm-script";
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places`;
+    s.async = true;
+    document.head.appendChild(s);
   }, []);
+
+  // ── Provider nearby search ────────────────────────────────────────────────
+  const searchProviders = useCallback(() => {
+    if (!providerAddress.trim()) return;
+    const g = (window as any).google;
+    if (!g?.maps) {
+      setProviderError("Google Maps is not loaded. Please check your API key.");
+      return;
+    }
+    setProviderSearching(true);
+    setProviderError("");
+    setProviderResults([]);
+    const geocoder = new g.maps.Geocoder();
+    geocoder.geocode({ address: providerAddress }, (results: any[], status: string) => {
+      if (status !== "OK" || !results?.[0]) {
+        setProviderSearching(false);
+        setProviderError("Could not find that location. Try a city, zip code, or address.");
+        return;
+      }
+      const location = results[0].geometry.location;
+      const map = new g.maps.Map(mapDivRef.current!, { center: location, zoom: 14 });
+      const service = new g.maps.places.PlacesService(map);
+      service.nearbySearch(
+        { location, radius: 16000, keyword: providerCategory?.prompt ?? "HIV provider" },
+        (placeResults: any[], placeStatus: string) => {
+          setProviderSearching(false);
+          if (placeStatus === g.maps.places.PlacesServiceStatus.OK && placeResults?.length) {
+            setProviderResults(
+              placeResults.slice(0, 6).map((p: any) => ({
+                name: p.name,
+                address: p.vicinity ?? "",
+                lat: p.geometry.location.lat(),
+                lng: p.geometry.location.lng(),
+              }))
+            );
+          } else {
+            setProviderError("No results found nearby. Try a different location or category.");
+          }
+        }
+      );
+    });
+  }, [providerAddress, providerCategory]);
 
   // ── Send ──────────────────────────────────────────────────────────────────
   const send = async () => {
@@ -528,14 +474,14 @@ export default function ChatPage() {
   const sendRef = useRef(send);
   useEffect(() => { sendRef.current = send; });
 
-  const triggerSend = (text: string) => {
+  const triggerSend = useCallback((text: string) => {
     if (sending) return;
     inputRef.current = text;
     setInput(text);
     selectedChipsRef.current = [];
     setSelectedChips([]);
     setTimeout(() => sendRef.current(), 50);
-  };
+  }, [sending]);
 
   const toggleChip = (text: string) => {
     if (sending) return;
@@ -551,117 +497,53 @@ export default function ChatPage() {
     e.target.style.height = `${Math.min(e.target.scrollHeight, 100)}px`;
   };
 
-  const breathLabel = breathPhase === "in" ? "Breathe in..." : breathPhase === "hold" ? "Hold..." : breathPhase === "out" ? "Breathe out..." : "";
-  const breathCircleClass = breathPhase === "in" ? styles.breathIn : breathPhase === "hold" ? styles.breathHold : styles.breathOut;
+  // ── Calm exercise helpers ─────────────────────────────────────────────────
+  const currentExercise = CALM_EXERCISES.find(e => e.id === calmExId);
+  const totalSteps = currentExercise?.steps.length ?? 0;
+  const isLastStep = calmStep >= totalSteps - 1;
 
-  // Provider category search
-  const providerCats = t.provider_cats;
-  const doProviderSearch = (_inputEl?: HTMLInputElement | null) => {
-    if (!providerCity.trim()) return;
-    const catObj = providerCats[Number(providerCategory)] ?? null;
-    if (catObj) triggerSend(t.provider_search_msg(catObj.prompt, providerCity.trim()));
-    setProviderCity("");
+  // ── Relax moment helpers ──────────────────────────────────────────────────
+  const currentMoment = RELAX_MOMENTS.find(m => m.id === relaxMomentId);
+
+  // ── Sidebar card shared style ─────────────────────────────────────────────
+  const sCard: React.CSSProperties = {
+    background: "color-mix(in srgb, var(--text) 2%, transparent)",
+    border: "1px solid color-mix(in srgb, var(--text) 8%, transparent)",
+    borderRadius: 14, padding: 13, flexShrink: 0,
   };
+  const sTitle: React.CSSProperties = {
+    fontSize: 13, fontWeight: 600,
+    color: "color-mix(in srgb, var(--text) 88%, transparent)",
+    marginBottom: 10,
+    fontFamily: "'DM Sans', sans-serif",
+  };
+  const sBtn = (disabled?: boolean): React.CSSProperties => ({
+    width: "100%",
+    background: "color-mix(in srgb, var(--text) 5%, transparent)",
+    border: "1px solid color-mix(in srgb, var(--text) 10%, transparent)",
+    borderRadius: 9, padding: "9px 11px",
+    fontFamily: "'DM Sans', sans-serif",
+    fontSize: 12, fontWeight: 500, color: "var(--text)",
+    cursor: disabled ? "not-allowed" : "pointer",
+    textAlign: "left" as const,
+    transition: "all 0.18s ease",
+    opacity: disabled ? 0.4 : 1,
+    marginBottom: 5,
+  });
 
-  // Sidebar provider search — find category by id from providerCategory state (stores index as string)
-  const selectedProviderCat = providerCats[Number(providerCategory)] ?? null;
-
-  const renderProviderSection = (isMobile = false) => (
-    <>
-      <p style={{ fontSize: isMobile ? 12 : 11, color: "rgba(245,237,224,.45)", marginBottom: 10, lineHeight: 1.5 }}>
-        {t.sidebar_provider_select}
-      </p>
-      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr 1fr" : "1fr 1fr", gap: 6, marginBottom: 10 }}>
-        {providerCats.map((cat, idx) => (
-          <button
-            key={cat.label}
-            onClick={() => setProviderCategory(String(idx))}
-            style={{
-              background: providerCategory === String(idx) ? "rgba(74,124,111,0.2)" : "rgba(255,248,235,0.04)",
-              border: `1px solid ${providerCategory === String(idx) ? "rgba(74,124,111,0.6)" : "rgba(255,248,235,0.1)"}`,
-              borderRadius: 10, padding: isMobile ? "9px 6px" : "9px 8px",
-              color: providerCategory === String(idx) ? "#8ecfbe" : "rgba(245,237,224,0.6)",
-              fontSize: isMobile ? 10 : 11, fontWeight: 500,
-              cursor: "pointer", textAlign: "center",
-              fontFamily: "DM Sans, sans-serif",
-              display: "flex", flexDirection: "column", alignItems: "center", gap: isMobile ? 3 : 4,
-              transition: "all 0.15s ease",
-            }}
-          >
-            <span style={{ fontSize: isMobile ? 18 : 16 }}>{cat.icon}</span>
-            <span style={{ lineHeight: 1.3 }}>{cat.label}</span>
-          </button>
-        ))}
-      </div>
-      {selectedProviderCat && (
-        <div className={styles.providerSearchRow}>
-          <input
-            ref={isMobile ? mobileProviderInputRef : providerInputRef}
-            className={styles.providerInput}
-            placeholder={t.search + "..."}
-            value={providerCity}
-            onChange={e => setProviderCity(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === "Enter") {
-                triggerSend(t.provider_search_msg(selectedProviderCat.prompt, providerCity.trim()));
-                setProviderCity("");
-                if (isMobile) setMobileSheet(null);
-              }
-            }}
-          />
-          <button
-            className={styles.providerSearchBtn}
-            disabled={sending || !providerCity.trim()}
-            onClick={() => {
-              triggerSend(t.provider_search_msg(selectedProviderCat.prompt, providerCity.trim()));
-              setProviderCity("");
-              if (isMobile) setMobileSheet(null);
-            }}
-          >
-            {t.search}
-          </button>
-        </div>
-      )}
-    </>
-  );
-
-  const renderMusicSection = () => {
-    const trackList = musicTab === "sounds" ? t.sounds : t.uplift;
-    return (
-      <div className={styles.musicPlayer}>
-        <div className={styles.musicTabRow}>
-          <button className={clsx(styles.musicTab, musicTab === "sounds" && styles.musicTabActive)} onClick={() => switchMusicTab("sounds")}>{t.sidebar_music_sounds}</button>
-          <button className={clsx(styles.musicTab, musicTab === "uplift" && styles.musicTabActive)} onClick={() => switchMusicTab("uplift")}>{t.sidebar_music_uplift}</button>
-        </div>
-        {trackList.map((track) => {
-          const isPlaying = activeTrackType === track.type;
-          const vol = trackVolumes[track.type] ?? 0.35;
-          return (
-            <div key={track.type} className={styles.musicTrackRow}>
-              <button
-                className={clsx(styles.musicTrackBtn, isPlaying && styles.musicTrackBtnActive)}
-                onClick={() => toggleTrack(track.type)}
-              >
-                {isPlaying ? "⏸" : "▶"}
-              </button>
-              <div className={styles.musicTrackInfo}>
-                <span className={styles.musicTrackName}>{track.name}</span>
-                {isPlaying && (
-                  <div className={styles.musicLiveBar}>
-                    <span /><span /><span /><span />
-                  </div>
-                )}
-              </div>
-              <input
-                type="range" min={0} max={1} step={0.01} value={vol}
-                onChange={e => setTrackVol(track.type, Number(e.target.value))}
-                className={styles.musicVolumeMini}
-              />
-            </div>
-          );
-        })}
-      </div>
-    );
+  // ── Popup overlay shared style ────────────────────────────────────────────
+  const overlayStyle: React.CSSProperties = {
+    position: "fixed", inset: 0, zIndex: 300,
+    background: "rgba(0,0,0,0.65)", backdropFilter: "blur(8px)",
+    display: "flex", alignItems: "center", justifyContent: "center",
+    padding: 20,
+  };
+  const popupStyle: React.CSSProperties = {
+    background: "var(--bg)",
+    border: "1px solid color-mix(in srgb, var(--text) 12%, transparent)",
+    borderRadius: 20, padding: "24px",
+    maxWidth: 480, width: "100%",
+    maxHeight: "80vh", overflowY: "auto",
   };
 
   return (
@@ -669,38 +551,18 @@ export default function ChatPage() {
       <div className={clsx(styles.orb, styles.orb1)} />
       <div className={clsx(styles.orb, styles.orb2)} />
 
-      {/* ── Breathing overlay ── */}
-      {showBreathing && (
-        <div className={styles.breathOverlay}>
-          {breathPhase === "done" ? (
-            <div className={styles.breathDoneWrap}>
-              <div className={styles.breathDoneText}>Well done. Take a moment to notice how you feel.</div>
-              <button className={styles.breathDoneBtn} onClick={() => setShowBreathing(false)}>Return to chat</button>
-            </div>
-          ) : (
-            <>
-              <div className={styles.breathLabel}>{breathLabel}</div>
-              <div className={clsx(styles.breathCircle, breathCircleClass)} />
-              <div className={styles.breathCounter}>{breathCount}</div>
-              <div className={styles.breathRoundText}>Round {Math.min(breathRound, BREATH_ROUNDS)} of {BREATH_ROUNDS}</div>
-              <button className={styles.breathCloseBtn} onClick={() => setShowBreathing(false)}>Stop exercise</button>
-            </>
-          )}
-        </div>
-      )}
-
       {/* ── Glossary modal ── */}
       {glossaryTerm && (
         <div className={styles.glossaryOverlay} onClick={() => setGlossaryTerm(null)}>
           <div className={styles.glossaryModal} onClick={e => e.stopPropagation()}>
             <div className={styles.glossaryModalTerm}>{glossaryTerm.term}</div>
             <div className={styles.glossaryModalDef}>{glossaryTerm.def}</div>
-            <button className={styles.glossaryModalClose} onClick={(e) => { e.stopPropagation(); setGlossaryTerm(null); }}>{t.got_it}</button>
+            <button className={styles.glossaryModalClose} onClick={() => setGlossaryTerm(null)}>{t.got_it}</button>
           </div>
         </div>
       )}
 
-      {/* ── Theme picker overlay ── */}
+      {/* ── Theme picker ── */}
       {showThemePicker && (
         <div className={styles.themeOverlay} onClick={() => setShowThemePicker(false)}>
           <div className={styles.themePanel} onClick={e => e.stopPropagation()}>
@@ -717,7 +579,7 @@ export default function ChatPage() {
         </div>
       )}
 
-      {/* ── Daily mood check-in overlay ── */}
+      {/* ── Daily mood check-in ── */}
       {showMoodCheckin && (
         <div style={{ position: "fixed", inset: 0, zIndex: 600, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
           <div style={{ background: "var(--bg)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 24, padding: "28px 24px", maxWidth: 360, width: "100%" }}>
@@ -729,43 +591,219 @@ export default function ChatPage() {
             </p>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 16 }}>
               {MOOD_OPTIONS.map(m => (
-                <button
-                  key={m.label}
-                  onClick={() => {
-                    // Save mood to profile
-                    const raw = localStorage.getItem(PROFILE_KEY);
-                    const today = new Date().toISOString().slice(0, 10);
-                    const existing = raw ? (() => { try { return JSON.parse(raw); } catch { return {}; } })() : {};
-                    const updated = { ...existing, mood: m.label, moodEmoji: m.emoji, lastMoodDate: today };
-                    localStorage.setItem(PROFILE_KEY, JSON.stringify(updated));
-                    // Update profile context
-                    setProfileContext(prev => {
-                      const lines = prev.split("\n").filter(l => !l.startsWith("Mood today:"));
-                      return [...lines, `Mood today: ${m.emoji} ${m.label}`].join("\n");
-                    });
-                    setShowMoodCheckin(false);
-                  }}
-                  style={{
-                    background: "color-mix(in srgb, var(--text) 5%, transparent)",
-                    border: "1px solid color-mix(in srgb, var(--text) 10%, transparent)",
-                    borderRadius: 12,
-                    padding: "12px 6px",
-                    display: "flex", flexDirection: "column", alignItems: "center", gap: 5,
-                    cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
-                    transition: "all 0.15s ease",
-                  }}
-                >
+                <button key={m.label} onClick={() => {
+                  const raw = localStorage.getItem(PROFILE_KEY);
+                  const today = new Date().toISOString().slice(0, 10);
+                  const existing = raw ? (() => { try { return JSON.parse(raw); } catch { return {}; } })() : {};
+                  localStorage.setItem(PROFILE_KEY, JSON.stringify({ ...existing, mood: m.label, moodEmoji: m.emoji, lastMoodDate: today }));
+                  setProfileContext(prev => {
+                    const lines = prev.split("\n").filter(l => !l.startsWith("Mood today:"));
+                    return [...lines, `Mood today: ${m.emoji} ${m.label}`].join("\n");
+                  });
+                  setShowMoodCheckin(false);
+                }} style={{ background: "color-mix(in srgb, var(--text) 5%, transparent)", border: "1px solid color-mix(in srgb, var(--text) 10%, transparent)", borderRadius: 12, padding: "12px 6px", display: "flex", flexDirection: "column", alignItems: "center", gap: 5, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", transition: "all 0.15s ease" }}>
                   <span style={{ fontSize: 22 }}>{m.emoji}</span>
                   <span style={{ fontSize: 11, color: "color-mix(in srgb, var(--text) 60%, transparent)", fontWeight: 500 }}>{m.label}</span>
                 </button>
               ))}
             </div>
-            <button
-              onClick={() => setShowMoodCheckin(false)}
-              style={{ width: "100%", background: "transparent", border: "none", fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "color-mix(in srgb, var(--text) 30%, transparent)", cursor: "pointer", padding: "6px 0" }}
-            >
+            <button onClick={() => setShowMoodCheckin(false)} style={{ width: "100%", background: "transparent", border: "none", fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "color-mix(in srgb, var(--text) 30%, transparent)", cursor: "pointer", padding: "6px 0" }}>
               Skip for now
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Calm popup ── */}
+      {calmOpen && (
+        <div style={overlayStyle} onClick={() => { setCalmOpen(false); setCalmExId(null); setCalmStep(0); }}>
+          <div style={popupStyle} onClick={e => e.stopPropagation()}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
+              <div style={{ fontFamily: "'Lora', serif", fontSize: 18, fontWeight: 500, color: "var(--text)" }}>
+                {calmExId ? `${currentExercise?.emoji} ${currentExercise?.name}` : "🧘 Find your calm"}
+              </div>
+              <button onClick={() => { setCalmOpen(false); setCalmExId(null); setCalmStep(0); }} style={{ background: "transparent", border: "none", fontSize: 20, color: "color-mix(in srgb, var(--text) 50%, transparent)", cursor: "pointer", padding: "4px 8px" }}>×</button>
+            </div>
+
+            {!calmExId ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {CALM_EXERCISES.map(ex => (
+                  <button key={ex.id} onClick={() => { setCalmExId(ex.id); setCalmStep(0); }}
+                    style={{ background: "color-mix(in srgb, var(--text) 4%, transparent)", border: "1px solid color-mix(in srgb, var(--text) 10%, transparent)", borderRadius: 12, padding: "14px 16px", cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans', sans-serif", transition: "all 0.15s ease" }}>
+                    <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 3 }}>{ex.emoji} {ex.name}</div>
+                    <div style={{ fontSize: 12, color: "color-mix(in srgb, var(--text) 50%, transparent)" }}>{ex.desc}</div>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div>
+                <div style={{ background: "color-mix(in srgb, var(--text) 4%, transparent)", border: "1px solid color-mix(in srgb, var(--text) 8%, transparent)", borderRadius: 14, padding: "20px 22px", marginBottom: 20, minHeight: 80 }}>
+                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: "var(--text)", lineHeight: 1.75, margin: 0 }}>
+                    {currentExercise?.steps[calmStep]}
+                  </p>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "color-mix(in srgb, var(--text) 35%, transparent)" }}>
+                    Step {calmStep + 1} of {totalSteps}
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button onClick={() => { setCalmExId(null); setCalmStep(0); }} style={{ background: "transparent", border: "1px solid color-mix(in srgb, var(--text) 15%, transparent)", borderRadius: 10, padding: "9px 16px", fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "color-mix(in srgb, var(--text) 55%, transparent)", cursor: "pointer" }}>← Back</button>
+                    {!isLastStep ? (
+                      <button onClick={() => setCalmStep(s => s + 1)} style={{ background: "rgba(74,124,111,0.2)", border: "1px solid rgba(74,124,111,0.45)", borderRadius: 10, padding: "9px 20px", fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500, color: "#8ecfbe", cursor: "pointer" }}>Next →</button>
+                    ) : (
+                      <button onClick={() => { setCalmOpen(false); setCalmExId(null); setCalmStep(0); }} style={{ background: "rgba(74,124,111,0.2)", border: "1px solid rgba(74,124,111,0.45)", borderRadius: 10, padding: "9px 20px", fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500, color: "#8ecfbe", cursor: "pointer" }}>Done ✓</button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Relax popup ── */}
+      {relaxOpen && (
+        <div style={overlayStyle} onClick={() => { setRelaxOpen(false); setRelaxMomentId(null); }}>
+          <div style={popupStyle} onClick={e => e.stopPropagation()}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
+              <div style={{ fontFamily: "'Lora', serif", fontSize: 18, fontWeight: 500, color: "var(--text)" }}>
+                {relaxMomentId ? `${currentMoment?.emoji} ${currentMoment?.name}` : "🌿 Give yourself a moment"}
+              </div>
+              <button onClick={() => { setRelaxOpen(false); setRelaxMomentId(null); }} style={{ background: "transparent", border: "none", fontSize: 20, color: "color-mix(in srgb, var(--text) 50%, transparent)", cursor: "pointer", padding: "4px 8px" }}>×</button>
+            </div>
+
+            {!relaxMomentId ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {RELAX_MOMENTS.map(m => (
+                  <button key={m.id} onClick={() => setRelaxMomentId(m.id)}
+                    style={{ background: "color-mix(in srgb, var(--text) 4%, transparent)", border: "1px solid color-mix(in srgb, var(--text) 10%, transparent)", borderRadius: 12, padding: "14px 16px", cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans', sans-serif", transition: "all 0.15s ease" }}>
+                    <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 3 }}>{m.emoji} {m.name}</div>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div>
+                <div style={{ background: "color-mix(in srgb, var(--text) 4%, transparent)", border: "1px solid color-mix(in srgb, var(--text) 8%, transparent)", borderRadius: 14, padding: "22px 24px", marginBottom: 20 }}>
+                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: "var(--text)", lineHeight: 1.9, margin: 0, whiteSpace: "pre-line" }}>
+                    {currentMoment?.content}
+                  </p>
+                </div>
+                <button onClick={() => setRelaxMomentId(null)} style={{ background: "transparent", border: "1px solid color-mix(in srgb, var(--text) 15%, transparent)", borderRadius: 10, padding: "9px 16px", fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "color-mix(in srgb, var(--text) 55%, transparent)", cursor: "pointer" }}>← Back</button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── HIV Dictionary popup ── */}
+      {dictOpen && !glossaryTerm && (
+        <div style={overlayStyle} onClick={() => setDictOpen(false)}>
+          <div style={{ ...popupStyle, maxWidth: 560 }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
+              <div style={{ fontFamily: "'Lora', serif", fontSize: 18, fontWeight: 500, color: "var(--text)" }}>📖 {t.sidebar_dict_title}</div>
+              <button onClick={() => setDictOpen(false)} style={{ background: "transparent", border: "none", fontSize: 20, color: "color-mix(in srgb, var(--text) 50%, transparent)", cursor: "pointer", padding: "4px 8px" }}>×</button>
+            </div>
+            <div className={styles.glossaryList}>
+              {t.glossary.map(g => (
+                <button key={g.term} className={styles.glossaryTerm} onClick={() => { setGlossaryTerm(g); setDictOpen(false); }}>
+                  <span>{g.term}</span><span className={styles.glossaryTermArrow}>›</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Provider search popup ── */}
+      {providerOpen && (
+        <div style={overlayStyle} onClick={() => setProviderOpen(false)}>
+          <div style={{ ...popupStyle, maxWidth: 560 }} onClick={e => e.stopPropagation()}>
+            {/* Hidden map div for PlacesService */}
+            <div ref={mapDivRef} style={{ display: "none", width: 1, height: 1 }} />
+
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
+              <div style={{ fontFamily: "'Lora', serif", fontSize: 18, fontWeight: 500, color: "var(--text)" }}>
+                📍 {providerCategory?.label ?? "Find a Provider"}
+              </div>
+              <button onClick={() => setProviderOpen(false)} style={{ background: "transparent", border: "none", fontSize: 20, color: "color-mix(in srgb, var(--text) 50%, transparent)", cursor: "pointer", padding: "4px 8px" }}>×</button>
+            </div>
+
+            {/* Search input */}
+            <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+              <input
+                type="text"
+                value={providerAddress}
+                onChange={e => setProviderAddress(e.target.value)}
+                onKeyDown={e => { if (e.key === "Enter") searchProviders(); }}
+                placeholder="Enter your city, zip code, or address..."
+                style={{
+                  flex: 1, background: "color-mix(in srgb, var(--text) 5%, transparent)",
+                  border: "1px solid color-mix(in srgb, var(--text) 12%, transparent)",
+                  borderRadius: 10, padding: "11px 14px",
+                  fontFamily: "'DM Sans', sans-serif", fontSize: 14,
+                  color: "var(--text)", outline: "none",
+                }}
+              />
+              <button
+                onClick={searchProviders}
+                disabled={providerSearching || !providerAddress.trim()}
+                style={{
+                  background: "linear-gradient(135deg, #c4956a 0%, #a87a52 100%)",
+                  border: "none", borderRadius: 10, padding: "11px 18px",
+                  fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 500,
+                  color: "#fff", cursor: providerSearching ? "not-allowed" : "pointer",
+                  opacity: providerSearching || !providerAddress.trim() ? 0.6 : 1,
+                  flexShrink: 0,
+                }}
+              >
+                {providerSearching ? "..." : "Search"}
+              </button>
+            </div>
+
+            {/* Error */}
+            {providerError && (
+              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "#e07070", marginBottom: 12, lineHeight: 1.5 }}>
+                {providerError}
+              </div>
+            )}
+
+            {/* Results */}
+            {providerResults.length > 0 && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {providerResults.map((r, i) => (
+                  <a
+                    key={i}
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.name + " " + r.address)}&query_place_id=`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: "block", textDecoration: "none",
+                      background: "color-mix(in srgb, var(--text) 4%, transparent)",
+                      border: "1px solid color-mix(in srgb, var(--text) 9%, transparent)",
+                      borderRadius: 12, padding: "14px 16px",
+                      transition: "border-color 0.15s",
+                    }}
+                  >
+                    <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>
+                      {r.name}
+                    </div>
+                    <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "color-mix(in srgb, var(--text) 55%, transparent)" }}>
+                      📍 {r.address}
+                    </div>
+                    <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "rgba(142,207,190,0.7)", marginTop: 6 }}>
+                      Open in Google Maps →
+                    </div>
+                  </a>
+                ))}
+              </div>
+            )}
+
+            {/* No API key notice */}
+            {!process.env.NEXT_PUBLIC_GOOGLE_PLACES_KEY && (
+              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "color-mix(in srgb, var(--text) 45%, transparent)", lineHeight: 1.6 }}>
+                Provider search requires a Google Places API key (NEXT_PUBLIC_GOOGLE_PLACES_KEY). Once configured, enter your location to find nearby providers.
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -775,6 +813,13 @@ export default function ChatPage() {
         <div className={styles.headerAvatar}>{companionEmoji}</div>
         <div className={styles.headerInfo}>
           <div className={styles.headerName}>{companionName}</div>
+          <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "color-mix(in srgb, var(--text) 45%, transparent)", letterSpacing: "0.02em" }}>
+            {t.avatar_your_companion}
+          </div>
+        </div>
+        <div style={{ flex: 1 }} />
+        <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "color-mix(in srgb, var(--text) 40%, transparent)", letterSpacing: "0.03em", marginRight: 8 }}>
+          🔒 Private and confidential
         </div>
         <button className={styles.headerIconBtn} onClick={() => setShowThemePicker(v => !v)} title="Change theme">🎨</button>
         <button className={styles.headerIconBtn} onClick={() => router.push("/profile")} title="My profile" style={{ fontSize: 19 }}>👤</button>
@@ -788,7 +833,7 @@ export default function ChatPage() {
         <div className={styles.chatPanel}>
           {/* Affirmation bar */}
           <div className={styles.affirmationBar}>
-            <span key={affirmationIdx} className={styles.affirmationText}>
+            <span key={affirmationIdx} className={styles.affirmationText} style={{ fontFamily: "'Lora', serif" }}>
               {t.affirmations[affirmationIdx % t.affirmations.length]}
             </span>
           </div>
@@ -856,9 +901,6 @@ export default function ChatPage() {
             <button className={styles.mobileWellnessIconBtn} onClick={() => setMobileSheet("provider")}>
               <span>📍</span><span className={styles.mobileWellnessIconLbl}>{t.wb_provider}</span>
             </button>
-            <button className={styles.mobileWellnessIconBtn} onClick={() => setMobileSheet("music")}>
-              <span>🎵</span><span className={styles.mobileWellnessIconLbl}>{t.sidebar_music_title.replace(/^🎵 ?/, "")}</span>
-            </button>
           </div>
 
           {/* Input bar */}
@@ -891,73 +933,40 @@ export default function ChatPage() {
         {/* ── Wellness sidebar ── */}
         <div className={styles.wellnessSidebar}>
 
-          {/* Find Your Calm — accordion */}
-          <div className={styles.sidebarCard}>
-            <button className={styles.sidebarAccordionHeader} onClick={() => toggleSection("calm")}>
-              <span className={styles.sidebarCardTitle}>{t.sidebar_calm_title}</span>
-              <span className={clsx(styles.sidebarAccordionArrow, sidebarOpen.calm && styles.sidebarAccordionArrowOpen)}>▼</span>
+          {/* Card 1: Quick Support */}
+          <div style={sCard}>
+            <div style={sTitle}>{t.sidebar_quick_support}</div>
+            <button style={sBtn()} onClick={() => setCalmOpen(true)}>{t.sidebar_calm_title}</button>
+            <button style={sBtn()} onClick={() => setRelaxOpen(true)}>{t.sidebar_relax_title}</button>
+            <button style={sBtn()} onClick={() => setDictOpen(true)}>{t.sidebar_dict_title}</button>
+          </div>
+
+          {/* Card 2: Real World Help */}
+          <div style={sCard}>
+            <div style={sTitle}>{t.sidebar_real_world}</div>
+            {REAL_WORLD_HELP.map(item => (
+              <button key={item.label} style={sBtn()} onClick={() => {
+                setProviderCategory(item);
+                setProviderOpen(true);
+                setProviderResults([]);
+                setProviderAddress("");
+              }}>
+                {item.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Card 3: Personalize Later */}
+          <div style={{ ...sCard, background: "rgba(74,124,111,0.06)", border: "1px solid rgba(74,124,111,0.18)" }}>
+            <div style={{ ...sTitle, color: "rgba(142,207,190,0.85)" }}>{t.sidebar_personalize}</div>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "color-mix(in srgb, var(--text) 50%, transparent)", lineHeight: 1.65, margin: 0 }}>
+              {t.sidebar_personalize_body}
+            </p>
+            <button onClick={() => router.push("/profile")} style={{ marginTop: 12, background: "rgba(74,124,111,0.12)", border: "1px solid rgba(74,124,111,0.3)", borderRadius: 9, padding: "7px 14px", fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "#8ecfbe", cursor: "pointer", width: "100%" }}>
+              {t.sidebar_go_profile}
             </button>
-            {sidebarOpen.calm && (
-              <div className={styles.sidebarBtnGroup} style={{ marginTop: 9 }}>
-                {t.sidebar_calm_btns.map((label, i) => (
-                  <button key={i} className={styles.sidebarBtn} disabled={sending} onClick={() => {
-                    if (i === 0) { startBreathing(); }
-                    else if (t.sidebar_calm_prompts[i]) triggerSend(t.sidebar_calm_prompts[i]);
-                  }}>
-                    {label}
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
 
-          {/* Give Yourself a Moment — accordion */}
-          <div className={styles.sidebarCard}>
-            <button className={styles.sidebarAccordionHeader} onClick={() => toggleSection("relax")}>
-              <span className={styles.sidebarCardTitle}>{t.sidebar_relax_title}</span>
-              <span className={clsx(styles.sidebarAccordionArrow, sidebarOpen.relax && styles.sidebarAccordionArrowOpen)}>▼</span>
-            </button>
-            {sidebarOpen.relax && (
-              <div className={styles.sidebarBtnGroup} style={{ marginTop: 9 }}>
-                {t.sidebar_relax_btns.map((label, i) => (
-                  <button key={i} className={styles.sidebarBtn} disabled={sending} onClick={() => {
-                    if (t.sidebar_relax_prompts[i]) triggerSend(t.sidebar_relax_prompts[i]);
-                  }}>
-                    {label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* HIV Dictionary — accordion */}
-          <div className={styles.sidebarCard}>
-            <button className={styles.sidebarAccordionHeader} onClick={() => toggleSection("dict")}>
-              <span className={styles.sidebarCardTitle}>{t.sidebar_dict_title}</span>
-              <span className={clsx(styles.sidebarAccordionArrow, sidebarOpen.dict && styles.sidebarAccordionArrowOpen)}>▼</span>
-            </button>
-            {sidebarOpen.dict && (
-              <div className={styles.glossaryList} style={{ marginTop: 9 }}>
-                {t.glossary.map(g => (
-                  <button key={g.term} className={styles.glossaryTerm} onClick={() => setGlossaryTerm(g)}>
-                    <span>{g.term}</span><span className={styles.glossaryTermArrow}>›</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Find a Provider — always expanded */}
-          <div className={styles.sidebarCard}>
-            <div className={styles.sidebarCardTitle}>{t.sidebar_provider_title}</div>
-            {renderProviderSection(false)}
-          </div>
-
-          {/* Calming Music — always expanded */}
-          <div className={styles.sidebarCard}>
-            <div className={styles.sidebarCardTitle}>{t.sidebar_music_title}</div>
-            {renderMusicSection()}
-          </div>
         </div>
       </div>
 
@@ -969,16 +978,11 @@ export default function ChatPage() {
 
             {mobileSheet === "calm" && (
               <>
-                <div className={styles.mobileSheetTitle}>{t.sidebar_calm_title}</div>
+                <div className={styles.mobileSheetTitle}>{t.sidebar_quick_support}</div>
                 <div className={styles.mobileSheetBtnGroup}>
-                  {t.sidebar_calm_btns.map((label, i) => (
-                    <button key={i} className={styles.sidebarBtn} disabled={sending} onClick={() => {
-                      if (i === 0) { startBreathing(); setMobileSheet(null); }
-                      else if (t.sidebar_calm_prompts[i]) { triggerSend(t.sidebar_calm_prompts[i]); setMobileSheet(null); }
-                    }}>
-                      {label}
-                    </button>
-                  ))}
+                  <button className={styles.sidebarBtn} onClick={() => { setMobileSheet(null); setCalmOpen(true); }}>{t.sidebar_calm_title}</button>
+                  <button className={styles.sidebarBtn} onClick={() => { setMobileSheet(null); setRelaxOpen(true); }}>{t.sidebar_relax_title}</button>
+                  <button className={styles.sidebarBtn} onClick={() => { setMobileSheet(null); setDictOpen(true); }}>{t.sidebar_dict_title}</button>
                 </div>
               </>
             )}
@@ -987,11 +991,9 @@ export default function ChatPage() {
               <>
                 <div className={styles.mobileSheetTitle}>{t.sidebar_relax_title}</div>
                 <div className={styles.mobileSheetBtnGroup}>
-                  {t.sidebar_relax_btns.map((label, i) => (
-                    <button key={i} className={styles.sidebarBtn} disabled={sending} onClick={() => {
-                      if (t.sidebar_relax_prompts[i]) { triggerSend(t.sidebar_relax_prompts[i]); setMobileSheet(null); }
-                    }}>
-                      {label}
+                  {RELAX_MOMENTS.map(m => (
+                    <button key={m.id} className={styles.sidebarBtn} onClick={() => { setMobileSheet(null); setRelaxMomentId(m.id); setRelaxOpen(true); }}>
+                      {m.emoji} {m.name}
                     </button>
                   ))}
                 </div>
@@ -1013,15 +1015,20 @@ export default function ChatPage() {
 
             {mobileSheet === "provider" && (
               <>
-                <div className={styles.mobileSheetTitle}>{t.sidebar_provider_title}</div>
-                {renderProviderSection(true)}
-              </>
-            )}
-
-            {mobileSheet === "music" && (
-              <>
-                <div className={styles.mobileSheetTitle}>{t.sidebar_music_title}</div>
-                {renderMusicSection()}
+                <div className={styles.mobileSheetTitle}>{t.sidebar_real_world}</div>
+                <div className={styles.mobileSheetBtnGroup}>
+                  {REAL_WORLD_HELP.map(item => (
+                    <button key={item.label} className={styles.sidebarBtn} onClick={() => {
+                      setProviderCategory(item);
+                      setProviderOpen(true);
+                      setProviderResults([]);
+                      setProviderAddress("");
+                      setMobileSheet(null);
+                    }}>
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
               </>
             )}
           </div>
