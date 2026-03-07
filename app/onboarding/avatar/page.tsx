@@ -287,10 +287,10 @@ export default function AvatarPage() {
             {userAvatar ? t.avatar_start(userAvatar.name) : t.avatar_choose}
           </button>
         </div>
-        <p style={{ textAlign: "center", marginTop: 8 }}>
+        <p className={styles.skipHint} style={{ marginTop: 10 }}>
           <button
             onClick={handleSkip}
-            style={{ background: "none", border: "none", padding: "4px 8px", cursor: "pointer", fontSize: 12, color: "rgba(245,237,224,.35)", textDecoration: "underline" }}
+            style={{ background: "none", border: "1px solid rgba(245,237,224,.2)", borderRadius: 20, padding: "6px 18px", cursor: "pointer", fontSize: 13, color: "rgba(245,237,224,.55)", letterSpacing: "0.02em" }}
           >
             {t.skip ?? "Skip for now"}
           </button>

@@ -145,6 +145,23 @@ export default function TimelinePage() {
             ))}
           </select>
         </div>
+        <button
+          onClick={() => {
+            const now = new Date();
+            setDdMonth(MONTHS[now.getMonth()]);
+            setDdDay(String(now.getDate()));
+            setDdYear(String(now.getFullYear()));
+            setTimeline("");
+          }}
+          style={{
+            marginTop: 6, width: "100%", background: "rgba(196,149,106,.12)",
+            border: "1px solid rgba(196,149,106,.3)", borderRadius: 10,
+            color: "rgba(245,237,224,.7)", fontSize: 13, padding: "8px 12px",
+            cursor: "pointer", letterSpacing: "0.02em",
+          }}
+        >
+          📅 I was diagnosed today
+        </button>
 
         {dxCtx && (
           <div className={styles.diagnosisContext} style={{ marginTop: 4, marginBottom: 4, padding: "7px 12px" }}>
