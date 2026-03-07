@@ -33,50 +33,6 @@ const THEMES = [
   { id: "dusk",     label: "🐚 Dusk",     bg: "#2A2035" },
 ] as const;
 
-// ── Calm exercises ────────────────────────────────────────────────────────────
-const CALM_EXERCISES = [
-  {
-    id: "breathing-478", emoji: "🫁", name: "4-7-8 Breathing", desc: "A calming breath pattern",
-    steps: [
-      "Get comfortable. Breathe in through your nose for 4 counts... 1... 2... 3... 4.",
-      "Now hold your breath for 7 counts. 7... 6... 5... 4... 3... 2... 1. Good.",
-      "Breathe out slowly through your mouth for 8 counts... 8... 7... 6... 5... 4... 3... 2... 1.",
-      "One more time. Breathe in for 4... 1... 2... 3... 4.",
-      "Hold for 7... 7... 6... 5... 4... 3... 2... 1.",
-      "And breathe out for 8... 8... 7... 6... 5... 4... 3... 2... 1. You did well.",
-    ],
-  },
-  {
-    id: "grounding-54321", emoji: "🌿", name: "5-4-3-2-1 Grounding", desc: "Come back to your senses",
-    steps: [
-      "Look around and name 5 things you can see right now. Take your time.",
-      "Now name 4 things you can hear — sounds near you and far away.",
-      "Now 3 things you can physically feel or touch right now.",
-      "Now 2 things you can smell, or imagine smelling if nothing comes to mind.",
-      "Last one — 1 thing you can taste right now. You are here. You are present. You are safe.",
-    ],
-  },
-  {
-    id: "body-scan", emoji: "🧘", name: "Body Scan", desc: "Release tension gently",
-    steps: [
-      "Close your eyes if that feels okay. Starting at the top of your head — notice any tension in your forehead, your jaw, your neck. Let it soften.",
-      "Now your shoulders. Are they raised? Let them drop and be heavy.",
-      "Your chest. Is your breathing shallow? Try one slightly deeper breath.",
-      "Your belly. This is where we often hold fear. See if you can let it loosen, even just a little.",
-      "Your hands and legs. Notice if they're tense. Let them soften. Well done — you just took care of yourself.",
-    ],
-  },
-  {
-    id: "box-breathing", emoji: "⬜", name: "Box Breathing", desc: "Equal counts for a steady mind",
-    steps: [
-      "Breathe in slowly for 4 counts... 1... 2... 3... 4.",
-      "Hold for 4 counts... 4... 3... 2... 1.",
-      "Breathe out for 4 counts... 4... 3... 2... 1.",
-      "Hold for 4 counts... 4... 3... 2... 1. That's one round. Let's do another.",
-      "Breathe in for 4... Hold for 4... Breathe out for 4... Hold for 4. Beautiful.",
-    ],
-  },
-];
 
 // ── Relax moments ─────────────────────────────────────────────────────────────
 const RELAX_MOMENTS = [
@@ -98,14 +54,6 @@ const RELAX_MOMENTS = [
   },
 ];
 
-// ── Real World Help categories ────────────────────────────────────────────────
-const REAL_WORLD_HELP = [
-  { label: "Find an HIV provider",     prompt: "HIV provider" },
-  { label: "Mental health therapist",  prompt: "mental health therapist" },
-  { label: "STD testing",              prompt: "STD testing site" },
-  { label: "PrEP provider",            prompt: "PrEP provider" },
-  { label: "LGBTQ+ affirming care",    prompt: "LGBTQ+ affirming care provider" },
-];
 
 function chipsToMessage(chips: string[]): string {
   if (chips.length === 1) return chips[0];
@@ -210,10 +158,13 @@ export default function ChatPage() {
   const [providerOpen, setProviderOpen] = useState(false);
   const [providerCategory, setProviderCategory] = useState<{ label: string; prompt: string } | null>(null);
   const [providerAddress, setProviderAddress] = useState("");
-  const [providerResults, setProviderResults] = useState<{ name: string; address: string; lat: number; lng: number }[]>([]);
+  const [providerResults, setProviderResults] = useState<{ name: string; address: string; phone: string; website: string; rating: number | null; placeId: string; lat: number; lng: number }[]>([]);
   const [providerSearching, setProviderSearching] = useState(false);
   const [providerError, setProviderError] = useState("");
+  const [selectedPlaceCoords, setSelectedPlaceCoords] = useState<{ lat: number; lng: number } | null>(null);
   const mapDivRef = useRef<HTMLDivElement | null>(null);
+  const addressInputRef = useRef<HTMLInputElement | null>(null);
+  const autocompleteRef = useRef<any>(null);
 
   // ── Refs ─────────────────────────────────────────────────────────────────
   const inputRef = useRef("");
@@ -379,6 +330,37 @@ export default function ChatPage() {
     document.head.appendChild(s);
   }, []);
 
+  // ── Attach Google Places Autocomplete when popup opens ────────────────────
+  useEffect(() => {
+    if (!providerOpen) {
+      if (autocompleteRef.current) {
+        const g = (window as any).google;
+        if (g?.maps?.event) g.maps.event.clearInstanceListeners(autocompleteRef.current);
+        autocompleteRef.current = null;
+      }
+      return;
+    }
+    const attach = () => {
+      const g = (window as any).google;
+      if (!g?.maps?.places || !addressInputRef.current) return;
+      const ac = new g.maps.places.Autocomplete(addressInputRef.current, { types: ["geocode"] });
+      autocompleteRef.current = ac;
+      ac.addListener("place_changed", () => {
+        const place = ac.getPlace();
+        if (place?.geometry?.location) {
+          setProviderAddress(place.formatted_address ?? addressInputRef.current?.value ?? "");
+          setSelectedPlaceCoords({
+            lat: place.geometry.location.lat(),
+            lng: place.geometry.location.lng(),
+          });
+        }
+      });
+    };
+    // Small delay to let the popup DOM render before attaching
+    const timer = setTimeout(attach, 150);
+    return () => clearTimeout(timer);
+  }, [providerOpen]);
+
   // ── Provider nearby search ────────────────────────────────────────────────
   const searchProviders = useCallback(() => {
     if (!providerAddress.trim()) return;
@@ -390,36 +372,61 @@ export default function ChatPage() {
     setProviderSearching(true);
     setProviderError("");
     setProviderResults([]);
-    const geocoder = new g.maps.Geocoder();
-    geocoder.geocode({ address: providerAddress }, (results: any[], status: string) => {
-      if (status !== "OK" || !results?.[0]) {
-        setProviderSearching(false);
-        setProviderError("Could not find that location. Try a city, zip code, or address.");
-        return;
-      }
-      const location = results[0].geometry.location;
+
+    const doSearch = (location: any) => {
       const map = new g.maps.Map(mapDivRef.current!, { center: location, zoom: 14 });
       const service = new g.maps.places.PlacesService(map);
       service.nearbySearch(
-        { location, radius: 16000, keyword: providerCategory?.prompt ?? "HIV provider" },
+        { location, radius: 16000, keyword: providerCategory?.prompt ?? "HIV clinic infectious disease" },
         (placeResults: any[], placeStatus: string) => {
-          setProviderSearching(false);
-          if (placeStatus === g.maps.places.PlacesServiceStatus.OK && placeResults?.length) {
-            setProviderResults(
-              placeResults.slice(0, 6).map((p: any) => ({
-                name: p.name,
-                address: p.vicinity ?? "",
-                lat: p.geometry.location.lat(),
-                lng: p.geometry.location.lng(),
-              }))
-            );
-          } else {
-            setProviderError("No results found nearby. Try a different location or category.");
+          if (placeStatus !== g.maps.places.PlacesServiceStatus.OK || !placeResults?.length) {
+            setProviderSearching(false);
+            setProviderError(t.provider_no_results);
+            return;
           }
+          const list = placeResults.slice(0, 5);
+          const detailed: any[] = new Array(list.length).fill(null);
+          let count = 0;
+          list.forEach((p: any, idx: number) => {
+            service.getDetails(
+              { placeId: p.place_id, fields: ["name", "formatted_address", "formatted_phone_number", "website", "rating"] },
+              (detail: any) => {
+                detailed[idx] = {
+                  name: detail?.name ?? p.name,
+                  address: detail?.formatted_address ?? p.vicinity ?? "",
+                  phone: detail?.formatted_phone_number ?? "",
+                  website: detail?.website ?? "",
+                  rating: detail?.rating ?? null,
+                  placeId: p.place_id,
+                  lat: p.geometry.location.lat(),
+                  lng: p.geometry.location.lng(),
+                };
+                count++;
+                if (count === list.length) {
+                  setProviderSearching(false);
+                  setProviderResults(detailed.filter(Boolean));
+                }
+              }
+            );
+          });
         }
       );
-    });
-  }, [providerAddress, providerCategory]);
+    };
+
+    if (selectedPlaceCoords) {
+      doSearch(new g.maps.LatLng(selectedPlaceCoords.lat, selectedPlaceCoords.lng));
+    } else {
+      const geocoder = new g.maps.Geocoder();
+      geocoder.geocode({ address: providerAddress }, (results: any[], status: string) => {
+        if (status !== "OK" || !results?.[0]) {
+          setProviderSearching(false);
+          setProviderError(t.provider_error_location);
+          return;
+        }
+        doSearch(results[0].geometry.location);
+      });
+    }
+  }, [providerAddress, providerCategory, selectedPlaceCoords]);
 
   // ── Send ──────────────────────────────────────────────────────────────────
   const send = async () => {
@@ -498,7 +505,7 @@ export default function ChatPage() {
   };
 
   // ── Calm exercise helpers ─────────────────────────────────────────────────
-  const currentExercise = CALM_EXERCISES.find(e => e.id === calmExId);
+  const currentExercise = t.calm_exercises.find(e => e.id === calmExId);
   const totalSteps = currentExercise?.steps.length ?? 0;
   const isLastStep = calmStep >= totalSteps - 1;
 
@@ -620,14 +627,14 @@ export default function ChatPage() {
           <div style={popupStyle} onClick={e => e.stopPropagation()}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
               <div style={{ fontFamily: "'Lora', serif", fontSize: 18, fontWeight: 500, color: "var(--text)" }}>
-                {calmExId ? `${currentExercise?.emoji} ${currentExercise?.name}` : "🧘 Find your calm"}
+                {calmExId ? `${currentExercise?.emoji} ${currentExercise?.name}` : `🧘 ${t.calm_title}`}
               </div>
               <button onClick={() => { setCalmOpen(false); setCalmExId(null); setCalmStep(0); }} style={{ background: "transparent", border: "none", fontSize: 20, color: "color-mix(in srgb, var(--text) 50%, transparent)", cursor: "pointer", padding: "4px 8px" }}>×</button>
             </div>
 
             {!calmExId ? (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {CALM_EXERCISES.map(ex => (
+                {t.calm_exercises.map(ex => (
                   <button key={ex.id} onClick={() => { setCalmExId(ex.id); setCalmStep(0); }}
                     style={{ background: "color-mix(in srgb, var(--text) 4%, transparent)", border: "1px solid color-mix(in srgb, var(--text) 10%, transparent)", borderRadius: 12, padding: "14px 16px", cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans', sans-serif", transition: "all 0.15s ease" }}>
                     <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 3 }}>{ex.emoji} {ex.name}</div>
@@ -644,14 +651,14 @@ export default function ChatPage() {
                 </div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "color-mix(in srgb, var(--text) 35%, transparent)" }}>
-                    Step {calmStep + 1} of {totalSteps}
+                    {t.calm_step_of(calmStep + 1, totalSteps)}
                   </div>
                   <div style={{ display: "flex", gap: 8 }}>
-                    <button onClick={() => { setCalmExId(null); setCalmStep(0); }} style={{ background: "transparent", border: "1px solid color-mix(in srgb, var(--text) 15%, transparent)", borderRadius: 10, padding: "9px 16px", fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "color-mix(in srgb, var(--text) 55%, transparent)", cursor: "pointer" }}>← Back</button>
+                    <button onClick={() => { setCalmExId(null); setCalmStep(0); }} style={{ background: "transparent", border: "1px solid color-mix(in srgb, var(--text) 15%, transparent)", borderRadius: 10, padding: "9px 16px", fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "color-mix(in srgb, var(--text) 55%, transparent)", cursor: "pointer" }}>{t.calm_back}</button>
                     {!isLastStep ? (
-                      <button onClick={() => setCalmStep(s => s + 1)} style={{ background: "rgba(74,124,111,0.2)", border: "1px solid rgba(74,124,111,0.45)", borderRadius: 10, padding: "9px 20px", fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500, color: "#8ecfbe", cursor: "pointer" }}>Next →</button>
+                      <button onClick={() => setCalmStep(s => s + 1)} style={{ background: "rgba(74,124,111,0.2)", border: "1px solid rgba(74,124,111,0.45)", borderRadius: 10, padding: "9px 20px", fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500, color: "#8ecfbe", cursor: "pointer" }}>{t.calm_next}</button>
                     ) : (
-                      <button onClick={() => { setCalmOpen(false); setCalmExId(null); setCalmStep(0); }} style={{ background: "rgba(74,124,111,0.2)", border: "1px solid rgba(74,124,111,0.45)", borderRadius: 10, padding: "9px 20px", fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500, color: "#8ecfbe", cursor: "pointer" }}>Done ✓</button>
+                      <button onClick={() => { setCalmOpen(false); setCalmExId(null); setCalmStep(0); }} style={{ background: "rgba(74,124,111,0.2)", border: "1px solid rgba(74,124,111,0.45)", borderRadius: 10, padding: "9px 20px", fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500, color: "#8ecfbe", cursor: "pointer" }}>{t.calm_done}</button>
                     )}
                   </div>
                 </div>
@@ -729,13 +736,17 @@ export default function ChatPage() {
             </div>
 
             {/* Search input */}
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "color-mix(in srgb, var(--text) 50%, transparent)", marginBottom: 12, lineHeight: 1.5 }}>
+              {t.provider_address_subtitle}
+            </p>
             <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
               <input
+                ref={addressInputRef}
                 type="text"
                 value={providerAddress}
-                onChange={e => setProviderAddress(e.target.value)}
+                onChange={e => { setProviderAddress(e.target.value); setSelectedPlaceCoords(null); }}
                 onKeyDown={e => { if (e.key === "Enter") searchProviders(); }}
-                placeholder="Enter your city, zip code, or address..."
+                placeholder={t.provider_address_ph}
                 style={{
                   flex: 1, background: "color-mix(in srgb, var(--text) 5%, transparent)",
                   border: "1px solid color-mix(in srgb, var(--text) 12%, transparent)",
@@ -756,7 +767,7 @@ export default function ChatPage() {
                   flexShrink: 0,
                 }}
               >
-                {providerSearching ? "..." : "Search"}
+                {providerSearching ? "..." : t.provider_search_btn}
               </button>
             </div>
 
@@ -769,31 +780,48 @@ export default function ChatPage() {
 
             {/* Results */}
             {providerResults.length > 0 && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {providerResults.map((r, i) => (
-                  <a
+                  <div
                     key={i}
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.name + " " + r.address)}&query_place_id=`}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     style={{
-                      display: "block", textDecoration: "none",
                       background: "color-mix(in srgb, var(--text) 4%, transparent)",
                       border: "1px solid color-mix(in srgb, var(--text) 9%, transparent)",
                       borderRadius: 12, padding: "14px 16px",
-                      transition: "border-color 0.15s",
                     }}
                   >
                     <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>
                       {r.name}
+                      {r.rating !== null && (
+                        <span style={{ fontSize: 11, fontWeight: 400, color: "#c4956a", marginLeft: 8 }}>⭐ {r.rating.toFixed(1)}</span>
+                      )}
                     </div>
-                    <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "color-mix(in srgb, var(--text) 55%, transparent)" }}>
-                      📍 {r.address}
+                    {r.address && (
+                      <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "color-mix(in srgb, var(--text) 55%, transparent)", marginBottom: 6 }}>
+                        📍 {r.address}
+                      </div>
+                    )}
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 6 }}>
+                      {r.phone && (
+                        <a href={`tel:${r.phone.replace(/\D/g, "")}`} style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(142,207,190,0.85)", textDecoration: "none" }}>
+                          {t.provider_phone_label} {r.phone}
+                        </a>
+                      )}
+                      {r.website && (
+                        <a href={r.website} target="_blank" rel="noopener noreferrer" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(142,207,190,0.85)", textDecoration: "none" }}>
+                          {t.provider_website_label}
+                        </a>
+                      )}
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.name + " " + r.address)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(142,207,190,0.85)", textDecoration: "none" }}
+                      >
+                        {t.provider_directions} →
+                      </a>
                     </div>
-                    <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "rgba(142,207,190,0.7)", marginTop: 6 }}>
-                      Open in Google Maps →
-                    </div>
-                  </a>
+                  </div>
                 ))}
               </div>
             )}
@@ -944,14 +972,15 @@ export default function ChatPage() {
           {/* Card 2: Real World Help */}
           <div style={sCard}>
             <div style={sTitle}>{t.sidebar_real_world}</div>
-            {REAL_WORLD_HELP.map(item => (
-              <button key={item.label} style={sBtn()} onClick={() => {
-                setProviderCategory(item);
+            {t.provider_cats.map(cat => (
+              <button key={cat.label} style={sBtn()} onClick={() => {
+                setProviderCategory({ label: cat.label, prompt: cat.prompt });
                 setProviderOpen(true);
                 setProviderResults([]);
                 setProviderAddress("");
+                setSelectedPlaceCoords(null);
               }}>
-                {item.label}
+                {cat.icon} {cat.label}
               </button>
             ))}
           </div>
@@ -1017,15 +1046,16 @@ export default function ChatPage() {
               <>
                 <div className={styles.mobileSheetTitle}>{t.sidebar_real_world}</div>
                 <div className={styles.mobileSheetBtnGroup}>
-                  {REAL_WORLD_HELP.map(item => (
-                    <button key={item.label} className={styles.sidebarBtn} onClick={() => {
-                      setProviderCategory(item);
+                  {t.provider_cats.map(cat => (
+                    <button key={cat.label} className={styles.sidebarBtn} onClick={() => {
+                      setProviderCategory({ label: cat.label, prompt: cat.prompt });
                       setProviderOpen(true);
                       setProviderResults([]);
                       setProviderAddress("");
+                      setSelectedPlaceCoords(null);
                       setMobileSheet(null);
                     }}>
-                      {item.label}
+                      {cat.icon} {cat.label}
                     </button>
                   ))}
                 </div>

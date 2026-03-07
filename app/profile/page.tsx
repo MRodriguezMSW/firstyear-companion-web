@@ -4,19 +4,12 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 import { LANGUAGE_OPTIONS, getStrings, readLang } from "../i18n";
 
-// ── Constants ─────────────────────────────────────────────────────────────────
-
-const PRONOUNS = ["She/Her", "He/Him", "They/Them", "Ze/Zir", "Prefer not to say", "Other"];
-const AGE_RANGES = ["Under 18", "18–24", "25–34", "35–44", "45–54", "55+", "Prefer not to say"];
-const MOODS: { emoji: string; label: string }[] = [
-  { emoji: "😔", label: "Struggling" },
-  { emoji: "😟", label: "Anxious" },
-  { emoji: "😐", label: "Numb" },
-  { emoji: "🙂", label: "Okay" },
-  { emoji: "😊", label: "Good" },
-  { emoji: "💪", label: "Strong" },
-];
-const TOPICS = [
+// ── Constants (English keys — stored in profile for AI context) ────────────────
+const PRONOUN_KEYS = ["She/Her", "He/Him", "They/Them", "Ze/Zir", "Prefer not to say", "Other"];
+const AGE_RANGE_KEYS = ["Under 18", "18–24", "25–34", "35–44", "45–54", "55+", "Prefer not to say"];
+const MOOD_KEYS = ["Struggling", "Anxious", "Numb", "Okay", "Good", "Strong"];
+const MOOD_EMOJIS = ["😔", "😟", "😐", "🙂", "😊", "💪"];
+const TOPIC_KEYS = [
   "Coping with diagnosis",
   "Understanding medication",
   "Relationships and disclosure",
@@ -550,9 +543,9 @@ export default function ProfilePage() {
             <div style={S.section}>
               <div style={S.label}>{t.profile_pronouns_label}</div>
               <div style={S.pillRow}>
-                {PRONOUNS.map(p => (
-                  <button key={p} style={S.pill(profile.pronouns === p)} onClick={() => setField("pronouns", p)}>
-                    {p}
+                {PRONOUN_KEYS.map((key, i) => (
+                  <button key={key} style={S.pill(profile.pronouns === key)} onClick={() => setField("pronouns", key)}>
+                    {t.profile_pronouns[i] ?? key}
                   </button>
                 ))}
               </div>
@@ -572,9 +565,9 @@ export default function ProfilePage() {
             <div style={S.section}>
               <div style={S.label}>{t.profile_age_label}</div>
               <div style={S.pillRow}>
-                {AGE_RANGES.map(a => (
-                  <button key={a} style={S.pill(profile.ageRange === a)} onClick={() => setField("ageRange", a)}>
-                    {a}
+                {AGE_RANGE_KEYS.map((key, i) => (
+                  <button key={key} style={S.pill(profile.ageRange === key)} onClick={() => setField("ageRange", key)}>
+                    {t.profile_age_ranges[i] ?? key}
                   </button>
                 ))}
               </div>
@@ -588,7 +581,7 @@ export default function ProfilePage() {
                 value={profile.country}
                 onChange={e => setField("country", e.target.value)}
               >
-                <option value="">Select a country...</option>
+                <option value="">{t.country_ph}</option>
                 {COUNTRIES.map(c => (
                   <option key={c} value={c}>{c}</option>
                 ))}
@@ -603,7 +596,7 @@ export default function ProfilePage() {
                 value={profile.language}
                 onChange={e => setField("language", e.target.value)}
               >
-                <option value="">Select a language...</option>
+                <option value="">{t.language_ph}</option>
                 {LANGUAGE_OPTIONS.map(l => (
                   <option key={l.code} value={l.code}>{l.flag} {l.label}</option>
                 ))}
@@ -614,18 +607,18 @@ export default function ProfilePage() {
             <div style={S.section}>
               <div style={S.label}>{t.profile_mood_label}</div>
               <div style={S.moodGrid}>
-                {MOODS.map(m => (
+                {MOOD_KEYS.map((key, i) => (
                   <button
-                    key={m.label}
-                    style={S.moodBtn(profile.mood === m.label)}
+                    key={key}
+                    style={S.moodBtn(profile.mood === key)}
                     onClick={() => {
-                      setField("mood", m.label);
-                      setField("moodEmoji", m.emoji);
+                      setField("mood", key);
+                      setField("moodEmoji", MOOD_EMOJIS[i]);
                       setField("lastMoodDate", new Date().toISOString().slice(0, 10));
                     }}
                   >
-                    <span style={S.moodEmoji}>{m.emoji}</span>
-                    <span style={S.moodLabel(profile.mood === m.label)}>{m.label}</span>
+                    <span style={S.moodEmoji}>{MOOD_EMOJIS[i]}</span>
+                    <span style={S.moodLabel(profile.mood === key)}>{t.profile_moods[i]?.label ?? key}</span>
                   </button>
                 ))}
               </div>
@@ -650,9 +643,9 @@ export default function ProfilePage() {
             <div style={S.section}>
               <div style={S.label}>{t.profile_topics_label}</div>
               <div style={S.pillRow}>
-                {TOPICS.map(t => (
-                  <button key={t} style={S.pill(profile.topics.includes(t))} onClick={() => toggleTopic(t)}>
-                    {t}
+                {TOPIC_KEYS.map((key, i) => (
+                  <button key={key} style={S.pill(profile.topics.includes(key))} onClick={() => toggleTopic(key)}>
+                    {t.profile_topics[i] ?? key}
                   </button>
                 ))}
               </div>

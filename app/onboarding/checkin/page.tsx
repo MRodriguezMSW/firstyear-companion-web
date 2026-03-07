@@ -19,6 +19,17 @@ export default function CheckInPage() {
   const [modal, setModal] = useState<"provider" | "meds" | null>(null);
 
   useEffect(() => {
+    // Lock scroll on html/body for this page
+    const prevHtml = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.documentElement.style.overflow = prevHtml;
+      document.body.style.overflow = "";
+    };
+  }, []);
+
+  useEffect(() => {
     const saved = localStorage.getItem("companion_language") ?? "en-US";
     setLang(saved);
   }, []);
@@ -30,12 +41,12 @@ export default function CheckInPage() {
 
   const handleProviderSelect = (opt: string) => {
     setProvider(opt);
-    if (opt === t.yesno[1]) setModal("provider"); // "No"
+    if (opt === t.yesno[1]) setModal("provider");
   };
 
   const handleMedSelect = (opt: string) => {
     setMedication(opt);
-    if (opt === t.yesno[1]) setModal("meds"); // "No"
+    if (opt === t.yesno[1]) setModal("meds");
   };
 
   const saveAndGo = () => {
@@ -50,74 +61,46 @@ export default function CheckInPage() {
     router.push("/chat");
   };
 
-  const kicker: React.CSSProperties = {
-    fontFamily: "'DM Sans', sans-serif",
-    fontSize: 11, fontWeight: 600, letterSpacing: "0.1em",
-    textTransform: "uppercase", color: "#c4956a", marginBottom: 6, opacity: 0.85,
+  const lbl: React.CSSProperties = {
+    display: "block", fontFamily: "'DM Sans', sans-serif",
+    fontSize: 10, fontWeight: 600, color: "rgba(216,208,192,0.5)",
+    letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 6,
   };
 
-  const label: React.CSSProperties = {
-    display: "block",
-    fontFamily: "'DM Sans', sans-serif",
-    fontSize: 12, fontWeight: 500,
-    color: "rgba(216,208,192,0.55)",
-    letterSpacing: "0.06em", textTransform: "uppercase",
-    marginBottom: 10,
-  };
-
-  const pillBtn = (active: boolean): React.CSSProperties => ({
+  const pill = (active: boolean): React.CSSProperties => ({
     background: active ? "rgba(74,124,111,0.22)" : "rgba(255,255,255,0.04)",
     border: `1px solid ${active ? "rgba(74,124,111,0.65)" : "rgba(255,255,255,0.09)"}`,
-    borderRadius: 12, padding: "12px 18px",
-    fontFamily: "'DM Sans', sans-serif", fontSize: 14,
+    borderRadius: 10, padding: "7px 12px",
+    fontFamily: "'DM Sans', sans-serif", fontSize: 12,
     color: active ? "#8ecfbe" : "rgba(216,208,192,0.7)",
-    cursor: "pointer", textAlign: "left" as const,
-    transition: "all 0.15s ease",
+    cursor: "pointer", transition: "all 0.15s ease", whiteSpace: "nowrap" as const,
   });
 
-  const ynBtn = (active: boolean): React.CSSProperties => ({
+  const yn = (active: boolean): React.CSSProperties => ({
     flex: 1,
     background: active ? "rgba(74,124,111,0.22)" : "rgba(255,255,255,0.04)",
     border: `1px solid ${active ? "rgba(74,124,111,0.65)" : "rgba(255,255,255,0.09)"}`,
-    borderRadius: 10, padding: "11px 8px",
-    fontFamily: "'DM Sans', sans-serif", fontSize: 13,
+    borderRadius: 8, padding: "8px 6px",
+    fontFamily: "'DM Sans', sans-serif", fontSize: 12,
     color: active ? "#8ecfbe" : "rgba(216,208,192,0.65)",
-    cursor: "pointer", textAlign: "center" as const,
-    transition: "all 0.15s ease",
+    cursor: "pointer", textAlign: "center" as const, transition: "all 0.15s ease",
   });
 
-  const chipBtn = (active: boolean): React.CSSProperties => ({
+  const chip = (active: boolean): React.CSSProperties => ({
     background: active ? "rgba(74,124,111,0.22)" : "rgba(255,255,255,0.04)",
     border: `1px solid ${active ? "rgba(74,124,111,0.65)" : "rgba(255,255,255,0.09)"}`,
-    borderRadius: 20, padding: "9px 18px",
-    fontFamily: "'DM Sans', sans-serif", fontSize: 13,
+    borderRadius: 16, padding: "5px 11px",
+    fontFamily: "'DM Sans', sans-serif", fontSize: 12,
     color: active ? "#8ecfbe" : "rgba(216,208,192,0.7)",
-    cursor: "pointer", whiteSpace: "nowrap" as const,
-    transition: "all 0.15s ease",
+    cursor: "pointer", whiteSpace: "nowrap" as const, transition: "all 0.15s ease",
   });
 
   return (
-    <div className={styles.fycRoot} style={{
-      position: "fixed", inset: 0,
-      overflowY: "auto", overflowX: "hidden",
-      background: "var(--bg)",
+    <div style={{
+      position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+      display: "flex", flexDirection: "column",
+      overflow: "hidden", background: "var(--bg, #1A2E1E)",
     }}>
-      <style>{`
-        @media (max-width: 640px) {
-          .s2-card { padding: 18px 16px !important; }
-          .s2-header { margin-bottom: 16px !important; }
-          .s2-title { font-size: 20px !important; margin-bottom: 6px !important; }
-          .s2-sub { font-size: 13px !important; margin-bottom: 20px !important; }
-          .s2-section { margin-bottom: 18px !important; }
-          .s2-name-input { padding: 10px 12px !important; height: 36px !important; font-size: 14px !important; box-sizing: border-box; }
-          .s2-mood-chip { padding: 6px 12px !important; font-size: 13px !important; }
-          .s2-pill { padding: 8px 12px !important; font-size: 13px !important; }
-          .s2-yn-btn { padding: 9px 6px !important; font-size: 12px !important; }
-          .s2-footer { padding-top: 16px !important; }
-          .s2-outer { padding: 16px 14px 40px !important; }
-          .s2-progress { margin-bottom: 16px !important; }
-        }
-      `}</style>
       <div className={`${styles.bgOrb} ${styles.bgOrb1}`} />
       <div className={`${styles.bgOrb} ${styles.bgOrb2}`} />
 
@@ -125,7 +108,7 @@ export default function CheckInPage() {
       {modal && (
         <div className={styles.warmModalOverlay} onClick={() => setModal(null)}>
           <div className={styles.warmModal} onClick={e => e.stopPropagation()}>
-            <div style={{ fontFamily: "'Lora', serif", fontSize: 18, fontWeight: 500, color: "var(--text)", marginBottom: 14, lineHeight: 1.4 }}>
+            <div style={{ fontFamily: "'Lora', serif", fontSize: 18, fontWeight: 500, color: "var(--text)", marginBottom: 14 }}>
               {modal === "provider" ? "💙" : "🌱"}
             </div>
             <p className={styles.warmModalText}>
@@ -138,170 +121,100 @@ export default function CheckInPage() {
         </div>
       )}
 
-      <div className="s2-outer" style={{ maxWidth: 780, margin: "0 auto", padding: "24px 20px 60px", position: "relative", zIndex: 1 }}>
+      {/* Scrollable content */}
+      <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", WebkitOverflowScrolling: "touch", position: "relative", zIndex: 1, display: "flex", flexDirection: "column" }}>
+        <div style={{ maxWidth: 680, margin: "0 auto", padding: "12px 14px 16px", flex: 1, display: "flex", flexDirection: "column" }}>
 
-        {/* Progress header */}
-        <div className="s2-progress" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
-          <div>
-            <div style={kicker}>{t.page_label}</div>
-            <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "rgba(216,208,192,0.45)" }}>{t.page_sub}</div>
-          </div>
-          <div style={{ display: "flex", gap: 6 }}>
-            <div style={{ width: 10, height: 4, borderRadius: 2, background: "rgba(196,149,106,0.4)" }} />
-            <div style={{ width: 28, height: 4, borderRadius: 2, background: "#c4956a" }} />
-            <div style={{ width: 10, height: 4, borderRadius: 2, background: "rgba(216,208,192,0.15)" }} />
-          </div>
-        </div>
+          {/* Main card */}
+          <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 20, padding: "16px 18px", flex: 1, display: "flex", flexDirection: "column" }}>
 
-        {/* Main card */}
-        <div className="s2-card" style={{
-          background: "rgba(255,255,255,0.05)",
-          border: "1px solid rgba(255,255,255,0.09)",
-          borderRadius: 24, padding: "36px 40px",
-        }}>
-          <div style={kicker}>Optional</div>
-          <h2 className="s2-title" style={{
-            fontFamily: "'Lora', serif", fontSize: 26, fontWeight: 500,
-            color: "var(--text)", margin: "0 0 10px", lineHeight: 1.25,
-          }}>{t.title}</h2>
-          <p className="s2-sub" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: "rgba(216,208,192,0.6)", marginBottom: 36, lineHeight: 1.6 }}>
-            {t.sub}
-          </p>
-
-          {/* 1. Name */}
-          <div className="s2-section" style={{ marginBottom: 32 }}>
-            <label style={label}>{t.name_label}</label>
-            <input
-              type="text"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              placeholder={t.name_ph}
-              className="s2-name-input"
-              style={{
-                width: "100%", boxSizing: "border-box",
-                background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.09)",
-                borderRadius: 12, padding: "14px 16px",
-                fontFamily: "'DM Sans', sans-serif", fontSize: 15,
-                color: "var(--text)", outline: "none",
-              }}
-            />
-          </div>
-
-          {/* 2. Journey */}
-          <div className="s2-section" style={{ marginBottom: 32 }}>
-            <label style={label}>{t.journey_label}</label>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {t.journey_opts.map(opt => (
-                <button key={opt} style={pillBtn(journey === opt)} onClick={() => setJourney(opt)}>
-                  {opt}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* 3. Provider */}
-          <div className="s2-section" style={{ marginBottom: 32 }}>
-            <label style={label}>{t.provider_label}</label>
-            <div style={{ display: "flex", gap: 8 }}>
-              {t.yesno.map(opt => (
-                <button key={opt} className="s2-yn-btn" style={ynBtn(provider === opt)} onClick={() => handleProviderSelect(opt)}>
-                  {opt}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* 4. Medication */}
-          <div className="s2-section" style={{ marginBottom: 32 }}>
-            <label style={label}>{t.meds_label}</label>
-            <div style={{ display: "flex", gap: 8 }}>
-              {t.yesno.map(opt => (
-                <button key={opt} className="s2-yn-btn" style={ynBtn(medication === opt)} onClick={() => handleMedSelect(opt)}>
-                  {opt}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* 5. Pronouns */}
-          <div className="s2-section" style={{ marginBottom: 32 }}>
-            <label style={label}>{t.pronouns_label}</label>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 8 }}>
-              {t.pronouns_opts.map(opt => (
-                <button key={opt} className="s2-pill" style={pillBtn(pronouns === opt)} onClick={() => setPronouns(pronouns === opt ? "" : opt)}>
-                  {opt}
-                </button>
-              ))}
-            </div>
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.38)", margin: 0 }}>
-              {t.pronouns_note}
+            <h2 style={{ fontFamily: "'Lora', serif", fontSize: 20, fontWeight: 500, color: "var(--text)", margin: "0 0 4px" }}>{t.title}</h2>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.55)", marginBottom: 16, lineHeight: 1.5 }}>
+              {t.sub}
             </p>
-          </div>
 
-          {/* 6. Mood */}
-          <div className="s2-section" style={{ marginBottom: 36 }}>
-            <label style={label}>{t.mood_label}</label>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {t.mood_opts.map(opt => (
-                <button key={opt} className="s2-mood-chip" style={chipBtn(moods.includes(opt))} onClick={() => toggleMood(opt)}>
-                  {opt}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="s2-footer" style={{
-            borderTop: "1px solid rgba(255,255,255,0.07)",
-            paddingTop: 24, display: "flex", alignItems: "center",
-            justifyContent: "space-between", flexWrap: "wrap", gap: 14,
-          }}>
-            <button
-              onClick={() => { router.push("/chat"); }}
-              style={{
-                background: "transparent",
-                border: "1px solid rgba(255,255,255,0.1)",
-                borderRadius: 12, padding: "13px 24px",
-                fontFamily: "'DM Sans', sans-serif", fontSize: 14,
-                color: "rgba(216,208,192,0.45)", cursor: "pointer",
-              }}
-            >
-              {t.skip_btn}
-            </button>
-
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
-              <button
-                onClick={saveAndGo}
-                style={{
-                  background: "linear-gradient(135deg, #c4956a 0%, #a87a52 100%)",
-                  border: "none", borderRadius: 12, padding: "15px 36px",
-                  fontFamily: "'DM Sans', sans-serif", fontSize: 15, fontWeight: 500,
-                  color: "#fff", cursor: "pointer",
-                  boxShadow: "0 4px 20px rgba(196,149,106,0.3)",
-                }}
-              >
-                {t.start_btn} →
-              </button>
-              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "rgba(216,208,192,0.28)" }}>
-                {t.skip_hint}
-              </span>
-            </div>
-          </div>
-
-          {/* Optional skip flag */}
-          <div style={{ marginTop: 20 }}>
-            <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
+            {/* 1. Name */}
+            <div style={{ marginBottom: 12 }}>
+              <label style={lbl}>{t.name_label}</label>
               <input
-                type="checkbox"
-                checked={skipFlag}
-                onChange={e => setSkipFlag(e.target.checked)}
-                style={{ accentColor: "#c4956a", width: 14, height: 14, cursor: "pointer" }}
+                type="text" value={name} onChange={e => setName(e.target.value)}
+                placeholder={t.name_ph}
+                style={{
+                  width: "100%", boxSizing: "border-box", height: 36,
+                  background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)",
+                  borderRadius: 8, padding: "0 12px",
+                  fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "var(--text)", outline: "none",
+                }}
               />
-              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.32)" }}>
-                {t.skip_label}
-              </span>
-            </label>
+            </div>
+
+            {/* 2. Journey */}
+            <div style={{ marginBottom: 12 }}>
+              <label style={lbl}>{t.journey_label}</label>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {t.journey_opts.map(opt => (
+                  <button key={opt} style={pill(journey === opt)} onClick={() => setJourney(opt)}>{opt}</button>
+                ))}
+              </div>
+            </div>
+
+            {/* 3. Provider */}
+            <div style={{ marginBottom: 12 }}>
+              <label style={lbl}>{t.provider_label}</label>
+              <div style={{ display: "flex", gap: 6 }}>
+                {t.yesno.slice(0, 2).map(opt => (
+                  <button key={opt} style={yn(provider === opt)} onClick={() => handleProviderSelect(opt)}>{opt}</button>
+                ))}
+              </div>
+            </div>
+
+            {/* 4. Medication */}
+            <div style={{ marginBottom: 12 }}>
+              <label style={lbl}>{t.meds_label}</label>
+              <div style={{ display: "flex", gap: 6 }}>
+                {t.yesno.slice(0, 2).map(opt => (
+                  <button key={opt} style={yn(medication === opt)} onClick={() => handleMedSelect(opt)}>{opt}</button>
+                ))}
+              </div>
+            </div>
+
+            {/* 5. Pronouns */}
+            <div style={{ marginBottom: 12 }}>
+              <label style={lbl}>{t.pronouns_label}</label>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {t.pronouns_opts.map(opt => (
+                  <button key={opt} style={pill(pronouns === opt)} onClick={() => setPronouns(pronouns === opt ? "" : opt)}>{opt}</button>
+                ))}
+              </div>
+            </div>
+
+            {/* 6. Mood */}
+            <div style={{ marginBottom: 14 }}>
+              <label style={lbl}>{t.mood_label}</label>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {t.mood_opts.map(opt => (
+                  <button key={opt} style={chip(moods.includes(opt))} onClick={() => toggleMood(opt)}>{opt}</button>
+                ))}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: 14, marginTop: "auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+              <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+                <input type="checkbox" checked={skipFlag} onChange={e => setSkipFlag(e.target.checked)}
+                  style={{ accentColor: "#c4956a", width: 13, height: 13, cursor: "pointer" }} />
+                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "rgba(216,208,192,0.32)" }}>{t.skip_label}</span>
+              </label>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <button onClick={() => router.push("/chat")} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "9px 16px", fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.45)", cursor: "pointer" }}>
+                  {t.skip_btn}
+                </button>
+                <button onClick={saveAndGo} style={{ background: "linear-gradient(135deg, #c4956a 0%, #a87a52 100%)", border: "none", borderRadius: 8, padding: "9px 24px", fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500, color: "#fff", cursor: "pointer", boxShadow: "0 4px 16px rgba(196,149,106,0.3)" }}>
+                  {t.start_btn} →
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
