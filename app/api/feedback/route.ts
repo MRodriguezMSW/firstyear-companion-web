@@ -80,7 +80,7 @@ export async function POST(req: Request) {
     // NOTE: onboarding@resend.dev can only deliver to the email used to create
     // your Resend account. If that differs, set FEEDBACK_EMAIL in Vercel env vars
     // to match your Resend account email, OR verify a custom domain at resend.com.
-    const toEmail = process.env.FEEDBACK_EMAIL ?? "Mrodriguez0426@gmail.com";
+    const toEmail = process.env.FEEDBACK_EMAIL ?? "mrodriguez0426@gmail.com";
 
     console.log(`[Feedback] Sending to ${toEmail} via Resend…`);
 
