@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import styles from "./styles/Chat.module.css";
 import CrisisButton from "../components/CrisisButton";
 import { getStrings, readLang, getLangFamily } from "../i18n";
+import type { UserProfile } from "../profile/page";
+import { PROFILE_KEY } from "../profile/page";
 
 const FALLBACK_NAMES = ["Nova", "Sage", "River", "Luna"];
 
@@ -29,15 +32,15 @@ function detectCrisis(text: string): boolean {
 
 // ── 9 deep warm themes ────────────────────────────────────────────────────────
 const THEMES = [
-  { id: "hopeful",  label: "🌸 Hopeful",  bg: "#6B1E35" },
-  { id: "sunrise",  label: "☀️ Sunrise",  bg: "#7A4410" },
-  { id: "peaceful", label: "🌿 Peaceful", bg: "#1A5438" },
-  { id: "calm",     label: "🌊 Calm",     bg: "#1A3F62" },
-  { id: "free",     label: "🦋 Free",     bg: "#35245C" },
-  { id: "bloom",    label: "🌺 Bloom",    bg: "#7A2510" },
-  { id: "bright",   label: "🌻 Bright",   bg: "#5C4A00" },
-  { id: "soft",     label: "🕊️ Soft",    bg: "#3A3A3A" },
-  { id: "joy",      label: "🌈 Joy",      bg: "#5E3508" },
+  { id: "grounded",  label: "🌲 Grounded",  bg: "#1A2E1E" },
+  { id: "ocean",     label: "🌊 Ocean",     bg: "#0D2233" },
+  { id: "ember",     label: "🍂 Ember",     bg: "#2E1A0E" },
+  { id: "midnight",  label: "🌙 Midnight",  bg: "#1A1A2E" },
+  { id: "burgundy",  label: "🍷 Burgundy",  bg: "#2E0E1A" },
+  { id: "walnut",    label: "🪵 Walnut",    bg: "#2E2010" },
+  { id: "sage",      label: "🌿 Sage",      bg: "#1A2E26" },
+  { id: "volcanic",  label: "🌋 Volcanic",  bg: "#2E1A1A" },
+  { id: "dusk",      label: "🐚 Dusk",      bg: "#2A2035" },
 ] as const;
 
 function chipsToMessage(chips: string[]): string {
@@ -153,7 +156,18 @@ type GlossaryEntry = { term: string; def: string };
 type BreathPhase = "in" | "hold" | "out" | "done";
 const BREATH_ROUNDS = 3;
 
+const MOOD_OPTIONS: { emoji: string; label: string }[] = [
+  { emoji: "😔", label: "Struggling" },
+  { emoji: "😟", label: "Anxious" },
+  { emoji: "😐", label: "Numb" },
+  { emoji: "🙂", label: "Okay" },
+  { emoji: "😊", label: "Good" },
+  { emoji: "💪", label: "Strong" },
+];
+
 export default function ChatPage() {
+  const router = useRouter();
+
   // ── Language / i18n ────────────────────────────────────────────────────────
   const [langCode, setLangCode] = useState("en-US");
   const t = getStrings(langCode);
@@ -175,6 +189,9 @@ export default function ChatPage() {
   const [userName, setUserName] = useState<string>("");
   const [onboardingContext, setOnboardingContext] = useState<string>("");
   const [openingCtx, setOpeningCtx] = useState<any>(null);
+  const [profileContext, setProfileContext] = useState<string>("");
+  const [showMoodCheckin, setShowMoodCheckin] = useState(false);
+  const [checkinName, setCheckinName] = useState<string>("");
 
   // ── UI state ───────────────────────────────────────────────────────────────
   const [affirmationIdx, setAffirmationIdx] = useState(0);
@@ -325,10 +342,10 @@ export default function ChatPage() {
       } catch { /* fall through */ }
     }
 
-    const profile = localStorage.getItem("fyc_profile");
-    if (profile) {
+    const fycProfile = localStorage.getItem("fyc_profile");
+    if (fycProfile) {
       try {
-        const p = JSON.parse(profile);
+        const p = JSON.parse(fycProfile);
         if (p.companion?.name) setCompanionName(p.companion.name);
         if (p.companion?.avatar?.emoji) setCompanionEmoji(p.companion.avatar.emoji);
         if (p.userAvatar?.emoji) setUserEmoji(p.userAvatar.emoji);
@@ -337,6 +354,33 @@ export default function ChatPage() {
     const name = localStorage.getItem("companion_userName") || "";
     if (name) setUserName(name);
 
+    // Load user profile (from /profile page)
+    const userProfileRaw = localStorage.getItem(PROFILE_KEY);
+    if (userProfileRaw) {
+      try {
+        const up: UserProfile = JSON.parse(userProfileRaw);
+        const profileParts: string[] = [];
+        const displayName = up.preferredName?.trim() || null;
+        profileParts.push(`Patient name: ${displayName ?? "not provided — address warmly without a name"}`);
+        const pronounsDisplay = up.pronouns === "Other" ? (up.pronounsOther || "they/them") : (up.pronouns || "not specified");
+        profileParts.push(`Patient pronouns: ${pronounsDisplay}`);
+        if (up.ageRange) profileParts.push(`Age range: ${up.ageRange}`);
+        if (up.country) profileParts.push(`Country or region: ${up.country}`);
+        if (up.mood && up.moodEmoji) profileParts.push(`Mood today: ${up.moodEmoji} ${up.mood}`);
+        if (up.topics?.length) profileParts.push(`Topics patient wants help with: ${up.topics.join(", ")}`);
+        if (profileParts.length) setProfileContext(profileParts.join("\n"));
+
+        // Daily mood check-in
+        if (up.dailyCheckIns) {
+          const today = new Date().toISOString().slice(0, 10);
+          if (!up.lastMoodDate || up.lastMoodDate !== today) {
+            setCheckinName(displayName || "");
+            setShowMoodCheckin(true);
+          }
+        }
+      } catch { /* ignore */ }
+    }
+
     // Set initial chips and welcome from language
     setChips(getStrings(savedLang).initial_chips);
     setMessages([{ role: "assistant", content: getStrings(savedLang).welcome_bubble }]);
@@ -344,7 +388,7 @@ export default function ChatPage() {
 
   // Apply saved theme
   useEffect(() => {
-    const theme = localStorage.getItem("companion_theme") ?? "hopeful";
+    const theme = localStorage.getItem("companion_theme") ?? "grounded";
     document.documentElement.setAttribute("data-theme", theme);
   }, []);
 
@@ -456,7 +500,7 @@ export default function ChatPage() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: nextMessages, state, onboarding: onboardingContext, language: langCode }),
+        body: JSON.stringify({ messages: nextMessages, state, onboarding: onboardingContext, language: langCode, profile: profileContext }),
       });
       const data = await res.json();
       const elapsed = Date.now() - start;
@@ -673,6 +717,59 @@ export default function ChatPage() {
         </div>
       )}
 
+      {/* ── Daily mood check-in overlay ── */}
+      {showMoodCheckin && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 600, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+          <div style={{ background: "var(--bg)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 24, padding: "28px 24px", maxWidth: 360, width: "100%" }}>
+            <div style={{ fontFamily: "'Lora', serif", fontSize: 19, fontWeight: 500, color: "var(--text)", marginBottom: 6, lineHeight: 1.35 }}>
+              How are you feeling today{checkinName ? `, ${checkinName}` : ""}?
+            </div>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "color-mix(in srgb, var(--text) 50%, transparent)", marginBottom: 20, lineHeight: 1.6 }}>
+              Take a moment to check in with yourself.
+            </p>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 16 }}>
+              {MOOD_OPTIONS.map(m => (
+                <button
+                  key={m.label}
+                  onClick={() => {
+                    // Save mood to profile
+                    const raw = localStorage.getItem(PROFILE_KEY);
+                    const today = new Date().toISOString().slice(0, 10);
+                    const existing = raw ? (() => { try { return JSON.parse(raw); } catch { return {}; } })() : {};
+                    const updated = { ...existing, mood: m.label, moodEmoji: m.emoji, lastMoodDate: today };
+                    localStorage.setItem(PROFILE_KEY, JSON.stringify(updated));
+                    // Update profile context
+                    setProfileContext(prev => {
+                      const lines = prev.split("\n").filter(l => !l.startsWith("Mood today:"));
+                      return [...lines, `Mood today: ${m.emoji} ${m.label}`].join("\n");
+                    });
+                    setShowMoodCheckin(false);
+                  }}
+                  style={{
+                    background: "color-mix(in srgb, var(--text) 5%, transparent)",
+                    border: "1px solid color-mix(in srgb, var(--text) 10%, transparent)",
+                    borderRadius: 12,
+                    padding: "12px 6px",
+                    display: "flex", flexDirection: "column", alignItems: "center", gap: 5,
+                    cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+                    transition: "all 0.15s ease",
+                  }}
+                >
+                  <span style={{ fontSize: 22 }}>{m.emoji}</span>
+                  <span style={{ fontSize: 11, color: "color-mix(in srgb, var(--text) 60%, transparent)", fontWeight: 500 }}>{m.label}</span>
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setShowMoodCheckin(false)}
+              style={{ width: "100%", background: "transparent", border: "none", fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "color-mix(in srgb, var(--text) 30%, transparent)", cursor: "pointer", padding: "6px 0" }}
+            >
+              Skip for now
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ── Header ── */}
       <div className={styles.chatHeader} style={{ flexShrink: 0, height: 56 }}>
         <div className={styles.headerAvatar}>{companionEmoji}</div>
@@ -680,6 +777,7 @@ export default function ChatPage() {
           <div className={styles.headerName}>{companionName}</div>
         </div>
         <button className={styles.headerIconBtn} onClick={() => setShowThemePicker(v => !v)} title="Change theme">🎨</button>
+        <button className={styles.headerIconBtn} onClick={() => router.push("/profile")} title="My profile" style={{ fontSize: 19 }}>👤</button>
         {userEmoji && <div className={styles.headerUserAvatar}>{userEmoji}</div>}
       </div>
 

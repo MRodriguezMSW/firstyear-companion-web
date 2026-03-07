@@ -65,6 +65,7 @@ export async function POST(req: Request) {
 
     const onboarding: string = typeof body?.onboarding === "string" ? body.onboarding.slice(0, 1400) : "";
     const language: string = typeof body?.language === "string" ? body.language : "en-US";
+    const profileRaw: string = typeof body?.profile === "string" ? body.profile.slice(0, 800) : "";
 
     const lastUser = lastMsg(messages, "user");
     const lastAssistant = lastMsg(messages, "assistant");
@@ -356,6 +357,7 @@ ${(() => {
   return "";
 })()}
 ${onboarding ? `\nUSER CONTEXT FROM ONBOARDING:\n${onboarding}\n\nInstructions for using this context:\n- Address the user by their name if provided — naturally, like a friend would.\n- PRONOUN INSTRUCTION: If "Patient pronouns" appears in the context, use those pronouns in every single response without exception. He/him = use he/him/his. She/her = use she/her/hers. They/them = use they/them/their. Never default to they/them unless the patient selected they/them. Never mix pronouns across a response.\n- If "Companion pronouns" is listed, those are YOUR pronouns — use them if the user ever asks or a reflective reference arises.\n- Adapt your opening tone to the user’s emotional intensity and starting emotions.\n- If needsProviderHelp is true, offer to help find care at a natural moment — not as the first thing you say, and not repeatedly.` : ""}
+${profileRaw ? `\nPATIENT PROFILE (updated preferences — use these preferentially for name/pronouns if both onboarding and profile are present):\n${profileRaw}\n\nProfile instructions:\n- Always address the patient by their preferred name if provided. If no name is set, use a warm natural address.\n- When speaking directly to the patient always use "you" and "your" — never replace with pronouns. Use their selected pronouns only when referring to them in third person context.\n- If the patient’s mood today is "Struggling" or "Anxious", lead every response with extra gentleness and emotional validation before anything else.\n- If their mood is "Good" or "Strong", acknowledge that positively and match their energy — let warmth come through without being dismissive of what they’ve been through.\n- The patient has indicated interest in specific topics — weave relevant information about those topics naturally into conversation when appropriate, but never force it.\n- CRITICAL: Nova has absolutely no access to the patient’s personal journal. Never reference, mention, ask about, or allude to journal entries under any circumstances.` : ""}
 
 Current state:
 mode=${state.mode}
