@@ -108,9 +108,7 @@ export default function AvatarPage() {
     }
   };
 
-  const handleFinish = () => {
-    if (!userAvatar) return;
-
+  const saveAndAdvance = (selectedUserAvatar: { emoji: string; name: string; desc: string } | null) => {
     const finalName = isCustomName ? (customName.trim() || "Nova") : companionName;
 
     const profile: FycProfile = {
@@ -120,7 +118,7 @@ export default function AvatarPage() {
         pronouns: "they/them",
         avatar: { emoji: compAvatar.emoji, name: compAvatar.name },
       },
-      userAvatar: { emoji: userAvatar.emoji, name: userAvatar.name, desc: userAvatar.desc },
+      userAvatar: selectedUserAvatar ?? { emoji: "🫂", name: "You", desc: "" },
     };
     localStorage.setItem("fyc_profile", JSON.stringify(profile));
 
@@ -143,12 +141,19 @@ export default function AvatarPage() {
       diagnosisRange: timeline,
       onMedication, hasProvider, needsProviderHelp, wantsMedsIntro,
       emotionalIntensity, emotions, note,
-      userAvatar: { emoji: userAvatar.emoji, name: userAvatar.name, desc: userAvatar.desc },
+      userAvatar: selectedUserAvatar,
       companion: profile.companion,
     };
     localStorage.setItem("companion_context", JSON.stringify(ctx));
     router.push("/onboarding/theme");
   };
+
+  const handleFinish = () => {
+    if (!userAvatar) return;
+    saveAndAdvance({ emoji: userAvatar.emoji, name: userAvatar.name, desc: userAvatar.desc });
+  };
+
+  const handleSkip = () => saveAndAdvance(null);
 
   return (
     <div className={styles.fycRoot} style={SCREEN}>
@@ -282,6 +287,14 @@ export default function AvatarPage() {
             {userAvatar ? t.avatar_start(userAvatar.name) : t.avatar_choose}
           </button>
         </div>
+        <p style={{ textAlign: "center", marginTop: 8 }}>
+          <button
+            onClick={handleSkip}
+            style={{ background: "none", border: "none", padding: "4px 8px", cursor: "pointer", fontSize: 12, color: "rgba(245,237,224,.35)", textDecoration: "underline" }}
+          >
+            {t.skip ?? "Skip for now"}
+          </button>
+        </p>
       </div>
 
       <CrisisButton />
