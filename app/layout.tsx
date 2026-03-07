@@ -1,5 +1,6 @@
 import "./globals.css";
 import ThemeInitializer from "./ThemeInitializer";
+import FeedbackButton from "./components/FeedbackButton";
 
 export default function RootLayout({
   children,
@@ -23,6 +24,7 @@ export default function RootLayout({
       <body>
         <ThemeInitializer />
         {children}
+        <FeedbackButton />
       </body>
     </html>
   );
