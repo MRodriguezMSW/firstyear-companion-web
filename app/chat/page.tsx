@@ -34,25 +34,6 @@ const THEMES = [
 ] as const;
 
 
-// ── Relax moments ─────────────────────────────────────────────────────────────
-const RELAX_MOMENTS = [
-  {
-    id: "affirmation", emoji: "💙", name: "A word for you",
-    content: "You are doing something incredibly brave just by being here. Living with HIV in a world that still carries so much stigma takes a kind of strength that most people will never understand. But you have it. You showed up. That matters more than you know.",
-  },
-  {
-    id: "not-alone", emoji: "🤝", name: "You are not alone",
-    content: "Right now, hundreds of thousands of people around the world are living full, rich lives with HIV — working, loving, laughing, thriving. Some of them had the same thoughts you're having today. They made it through. So will you. You are not alone in this.",
-  },
-  {
-    id: "hope", emoji: "🌱", name: "A message of hope",
-    content: "This diagnosis does not define your future. Modern HIV treatment means people diagnosed today live near-normal lifespans. Relationships. Children. Careers. Dreams. All of it is still possible. This is not the end of your story. It is a new chapter — and you are the author.",
-  },
-  {
-    id: "breath", emoji: "🌬️", name: "Just breathe",
-    content: "Just breathe for a moment.\n\nIn... and out.\nIn... and out.\nIn... and out.\n\nYou don't have to figure anything out right now. You just have to be here, in this moment. That is enough.",
-  },
-];
 
 
 function chipsToMessage(chips: string[]): string {
@@ -510,7 +491,7 @@ export default function ChatPage() {
   const isLastStep = calmStep >= totalSteps - 1;
 
   // ── Relax moment helpers ──────────────────────────────────────────────────
-  const currentMoment = RELAX_MOMENTS.find(m => m.id === relaxMomentId);
+  const currentMoment = t.relax_moments.find(m => m.id === relaxMomentId);
 
   // ── Sidebar card shared style ─────────────────────────────────────────────
   const sCard: React.CSSProperties = {
@@ -674,14 +655,14 @@ export default function ChatPage() {
           <div style={popupStyle} onClick={e => e.stopPropagation()}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
               <div style={{ fontFamily: "'Lora', serif", fontSize: 18, fontWeight: 500, color: "var(--text)" }}>
-                {relaxMomentId ? `${currentMoment?.emoji} ${currentMoment?.name}` : "🌿 Give yourself a moment"}
+                {relaxMomentId ? `${currentMoment?.emoji} ${currentMoment?.name}` : t.sidebar_relax_title}
               </div>
               <button onClick={() => { setRelaxOpen(false); setRelaxMomentId(null); }} style={{ background: "transparent", border: "none", fontSize: 20, color: "color-mix(in srgb, var(--text) 50%, transparent)", cursor: "pointer", padding: "4px 8px" }}>×</button>
             </div>
 
             {!relaxMomentId ? (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {RELAX_MOMENTS.map(m => (
+                {t.relax_moments.map(m => (
                   <button key={m.id} onClick={() => setRelaxMomentId(m.id)}
                     style={{ background: "color-mix(in srgb, var(--text) 4%, transparent)", border: "1px solid color-mix(in srgb, var(--text) 10%, transparent)", borderRadius: 12, padding: "14px 16px", cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans', sans-serif", transition: "all 0.15s ease" }}>
                     <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 3 }}>{m.emoji} {m.name}</div>
@@ -695,7 +676,7 @@ export default function ChatPage() {
                     {currentMoment?.content}
                   </p>
                 </div>
-                <button onClick={() => setRelaxMomentId(null)} style={{ background: "transparent", border: "1px solid color-mix(in srgb, var(--text) 15%, transparent)", borderRadius: 10, padding: "9px 16px", fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "color-mix(in srgb, var(--text) 55%, transparent)", cursor: "pointer" }}>← Back</button>
+                <button onClick={() => setRelaxMomentId(null)} style={{ background: "transparent", border: "1px solid color-mix(in srgb, var(--text) 15%, transparent)", borderRadius: 10, padding: "9px 16px", fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "color-mix(in srgb, var(--text) 55%, transparent)", cursor: "pointer" }}>← {t.back}</button>
               </div>
             )}
           </div>
@@ -847,7 +828,7 @@ export default function ChatPage() {
         </div>
         <div style={{ flex: 1 }} />
         <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "color-mix(in srgb, var(--text) 40%, transparent)", letterSpacing: "0.03em", marginRight: 8 }}>
-          🔒 Private and confidential
+          🔒 {t.privacy}
         </div>
         <button className={styles.headerIconBtn} onClick={() => setShowThemePicker(v => !v)} title="Change theme">🎨</button>
         <button className={styles.headerIconBtn} onClick={() => router.push("/profile")} title="My profile" style={{ fontSize: 19 }}>👤</button>
@@ -1020,7 +1001,7 @@ export default function ChatPage() {
               <>
                 <div className={styles.mobileSheetTitle}>{t.sidebar_relax_title}</div>
                 <div className={styles.mobileSheetBtnGroup}>
-                  {RELAX_MOMENTS.map(m => (
+                  {t.relax_moments.map(m => (
                     <button key={m.id} className={styles.sidebarBtn} onClick={() => { setMobileSheet(null); setRelaxMomentId(m.id); setRelaxOpen(true); }}>
                       {m.emoji} {m.name}
                     </button>

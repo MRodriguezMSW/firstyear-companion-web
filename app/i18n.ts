@@ -201,6 +201,8 @@ type Strings = {
   provider_rating_label: string;
   provider_no_results: string;
   provider_error_location: string;
+  // Relax moments ("Give yourself a moment" popup)
+  relax_moments: { id: string; emoji: string; name: string; content: string }[];
   // Music tracks
   sounds: { name: string; type: string }[];
   uplift: { name: string; type: string }[];
@@ -478,6 +480,24 @@ const EN: Strings = {
     { icon: "🧪", label: "STD Testing",              prompt: "STD testing sexual health clinic" },
     { icon: "💉", label: "PrEP Provider",            prompt: "PrEP HIV prevention clinic" },
     { icon: "🏳️‍🌈", label: "LGBTQ+ Affirming Care", prompt: "LGBTQ health clinic affirming care" },
+  ],
+  relax_moments: [
+    {
+      id: "affirmation", emoji: "💙", name: "A word for you",
+      content: "You are doing something incredibly brave just by being here. Living with HIV in a world that still carries so much stigma takes a kind of strength that most people will never understand. But you have it. You showed up. That matters more than you know.",
+    },
+    {
+      id: "not-alone", emoji: "🤝", name: "You are not alone",
+      content: "Right now, hundreds of thousands of people around the world are living full, rich lives with HIV — working, loving, laughing, thriving. Some of them had the same thoughts you're having today. They made it through. So will you. You are not alone in this.",
+    },
+    {
+      id: "hope", emoji: "🌱", name: "A message of hope",
+      content: "This diagnosis does not define your future. Modern HIV treatment means people diagnosed today live near-normal lifespans. Relationships. Children. Careers. Dreams. All of it is still possible. This is not the end of your story. It is a new chapter — and you are the author.",
+    },
+    {
+      id: "breath", emoji: "🌬️", name: "Just breathe",
+      content: "Just breathe for a moment.\n\nIn... and out.\nIn... and out.\nIn... and out.\n\nYou don't have to figure anything out right now. You just have to be here, in this moment. That is enough.",
+    },
   ],
   sounds: [
     { name: "Gentle Rain", type: "rain" },
@@ -790,6 +810,24 @@ const ES: Strings = {
     { icon: "💉", label: "Proveedor de PrEP",           prompt: "PrEP HIV prevention clinic" },
     { icon: "🏳️‍🌈", label: "Atención LGBTQ+ Afirmativa", prompt: "LGBTQ health clinic affirming care" },
   ],
+  relax_moments: [
+    {
+      id: "affirmation", emoji: "💙", name: "Unas palabras para ti",
+      content: "Estás haciendo algo increíblemente valiente solo con estar aquí. Vivir con VIH en un mundo que todavía carga tanto estigma requiere un tipo de fuerza que la mayoría de las personas nunca entenderá. Pero tú la tienes. Apareciste. Eso importa más de lo que sabes.",
+    },
+    {
+      id: "not-alone", emoji: "🤝", name: "No estás solo/a",
+      content: "En este momento, cientos de miles de personas en todo el mundo viven vidas plenas y ricas con VIH — trabajando, amando, riendo, prosperando. Algunos de ellos tuvieron los mismos pensamientos que tú tienes hoy. Lo lograron. Tú también lo harás. No estás solo/a en esto.",
+    },
+    {
+      id: "hope", emoji: "🌱", name: "Un mensaje de esperanza",
+      content: "Este diagnóstico no define tu futuro. El tratamiento moderno del VIH significa que las personas diagnosticadas hoy viven una vida casi normal. Relaciones. Hijos. Carreras. Sueños. Todo sigue siendo posible. Este no es el final de tu historia. Es un nuevo capítulo — y tú eres el autor.",
+    },
+    {
+      id: "breath", emoji: "🌬️", name: "Solo respira",
+      content: "Solo respira por un momento.\n\nDentro... y fuera.\nDentro... y fuera.\nDentro... y fuera.\n\nNo tienes que resolver nada ahora mismo. Solo tienes que estar aquí, en este momento. Eso es suficiente.",
+    },
+  ],
   sounds: [
     { name: "Lluvia suave", type: "rain" },
     { name: "Olas del océano", type: "ocean" },
@@ -1088,6 +1126,24 @@ const PT_BR: Strings = {
     { icon: "💉", label: "Provedor PrEP",              prompt: "PrEP HIV prevention clinic" },
     { icon: "🏳️‍🌈", label: "Cuidado LGBTQ+",          prompt: "LGBTQ health clinic affirming care" },
   ],
+  relax_moments: [
+    {
+      id: "affirmation", emoji: "💙", name: "Uma palavra para você",
+      content: "Você está fazendo algo incrivelmente corajoso só por estar aqui. Viver com HIV em um mundo que ainda carrega tanto estigma exige um tipo de força que a maioria das pessoas nunca entenderá. Mas você a tem. Você apareceu. Isso importa mais do que você sabe.",
+    },
+    {
+      id: "not-alone", emoji: "🤝", name: "Você não está sozinho/a",
+      content: "Agora mesmo, centenas de milhares de pessoas ao redor do mundo vivem vidas plenas e ricas com HIV — trabalhando, amando, rindo, prosperando. Alguns deles tiveram os mesmos pensamentos que você tem hoje. Eles conseguiram. Você também vai conseguir. Você não está sozinho/a nisso.",
+    },
+    {
+      id: "hope", emoji: "🌱", name: "Uma mensagem de esperança",
+      content: "Este diagnóstico não define seu futuro. O tratamento moderno do HIV significa que as pessoas diagnosticadas hoje vivem uma vida quase normal. Relacionamentos. Filhos. Carreiras. Sonhos. Tudo ainda é possível. Este não é o fim da sua história. É um novo capítulo — e você é o autor.",
+    },
+    {
+      id: "breath", emoji: "🌬️", name: "Só respire",
+      content: "Só respire por um momento.\n\nDentro... e fora.\nDentro... e fora.\nDentro... e fora.\n\nVocê não precisa resolver nada agora. Você só precisa estar aqui, neste momento. Isso é suficiente.",
+    },
+  ],
   sounds: EN.sounds,
   uplift: EN.uplift,
   glossary: [
@@ -1368,6 +1424,24 @@ const FR: Strings = {
     { icon: "💉", label: "Prestataire PrEP",            prompt: "PrEP HIV prevention clinic" },
     { icon: "🏳️‍🌈", label: "Soins LGBTQ+ Affirmants",  prompt: "LGBTQ health clinic affirming care" },
   ],
+  relax_moments: [
+    {
+      id: "affirmation", emoji: "💙", name: "Un mot pour vous",
+      content: "Vous faites quelque chose d'incroyablement courageux rien qu'en étant ici. Vivre avec le VIH dans un monde qui porte encore autant de stigmates demande une force que la plupart des gens ne comprendront jamais. Mais vous l'avez. Vous avez montré votre présence. Cela compte plus que vous ne le savez.",
+    },
+    {
+      id: "not-alone", emoji: "🤝", name: "Vous n'êtes pas seul(e)",
+      content: "En ce moment, des centaines de milliers de personnes dans le monde vivent des vies pleines et riches avec le VIH — travaillant, aimant, riant, s'épanouissant. Certains d'entre eux avaient les mêmes pensées que vous avez aujourd'hui. Ils s'en sont sortis. Vous aussi. Vous n'êtes pas seul(e) dans tout cela.",
+    },
+    {
+      id: "hope", emoji: "🌱", name: "Un message d'espoir",
+      content: "Ce diagnostic ne définit pas votre avenir. Le traitement moderne du VIH signifie que les personnes diagnostiquées aujourd'hui vivent une vie presque normale. Relations. Enfants. Carrières. Rêves. Tout cela est encore possible. Ce n'est pas la fin de votre histoire. C'est un nouveau chapitre — et vous en êtes l'auteur.",
+    },
+    {
+      id: "breath", emoji: "🌬️", name: "Respirez simplement",
+      content: "Respirez simplement un instant.\n\nInspirez... et expirez.\nInspirez... et expirez.\nInspirez... et expirez.\n\nVous n'avez pas à tout comprendre maintenant. Vous devez juste être ici, dans cet instant. C'est suffisant.",
+    },
+  ],
   sounds: EN.sounds,
   uplift: EN.uplift,
   glossary: [
@@ -1642,6 +1716,24 @@ const HT: Strings = {
   journal_empty: "Pa gen antre yet. Ekri premye ou a anlè.",
   journal_delete_btn: "Efase",
   provider_cats: EN.provider_cats,
+  relax_moments: [
+    {
+      id: "affirmation", emoji: "💙", name: "Yon mo pou ou",
+      content: "Ou ap fè yon bagay ki kourajez jis paske ou la. Viv ak VIH nan yon mond ki gen anpil stigma toujou mande yon kalite fòs ke pifò moun pa janm konprann. Men ou genyen li. Ou prezante. Sa konte plis pase ou konnen.",
+    },
+    {
+      id: "not-alone", emoji: "🤝", name: "Ou pa pou kont ou",
+      content: "Kounye a, dè santèn milye moun nan lemonn ap viv lavi plen ak rich ak VIH — travay, renmen, ri, pwospere. Kèk nan yo te gen menm panse ou genyen jodi a. Yo te reyisi. Ou pral reyisi tou. Ou pa pou kont ou nan sa a.",
+    },
+    {
+      id: "hope", emoji: "🌱", name: "Yon mesaj espwa",
+      content: "Dyagnoz sa a pa defini avni ou. Tretman VIH modèn vle di moun dyagnostike jodi a ap viv lavi ki prèske nòmal. Relasyon. Pitit. Karyè. Rèv. Tout bagay posib toujou. Sa a pa fen istwa ou. Se yon nouvo chapit — epi ou se otè a.",
+    },
+    {
+      id: "breath", emoji: "🌬️", name: "Jis respire",
+      content: "Jis respire pou yon moman.\n\nAntre... ak soti.\nAntre... ak soti.\nAntre... ak soti.\n\nOu pa oblije rezoud anyen kounye a. Ou jis bezwen la, nan moman sa a. Sa ase.",
+    },
+  ],
   sounds: EN.sounds,
   uplift: EN.uplift,
   glossary: EN.glossary,
@@ -1911,6 +2003,24 @@ const ZH: Strings = {
     { icon: "🧪", label: "性病检测",       prompt: "STD testing sexual health clinic" },
     { icon: "💉", label: "PrEP服务",       prompt: "PrEP HIV prevention clinic" },
     { icon: "🏳️‍🌈", label: "LGBTQ+友好护理", prompt: "LGBTQ health clinic affirming care" },
+  ],
+  relax_moments: [
+    {
+      id: "affirmation", emoji: "💙", name: "给您的一句话",
+      content: "仅仅是在这里，您就已经在做一件非常勇敢的事。在一个仍然承载着如此多偏见的世界里带着HIV生活，需要一种大多数人永远无法理解的力量。但您拥有它。您出现了。这比您所知道的更重要。",
+    },
+    {
+      id: "not-alone", emoji: "🤝", name: "您并不孤单",
+      content: "此刻，全世界有数十万人正在与HIV共同过着充实而丰富的生活——工作、爱、笑、茁壮成长。他们中的一些人曾经有过您今天的想法。他们度过了难关。您也会的。您在这件事上并不孤单。",
+    },
+    {
+      id: "hope", emoji: "🌱", name: "一条希望的信息",
+      content: "这个诊断并不能定义您的未来。现代HIV治疗意味着今天被诊断的人能够过着接近正常的生活。关系。孩子。事业。梦想。这一切仍然是可能的。这不是您故事的结束。这是新的一章——而您是作者。",
+    },
+    {
+      id: "breath", emoji: "🌬️", name: "只是呼吸",
+      content: "只是呼吸片刻。\n\n吸气...呼气。\n吸气...呼气。\n吸气...呼气。\n\n您现在不必解决任何问题。您只需要在这里，在这一刻。这就足够了。",
+    },
   ],
   sounds: EN.sounds,
   uplift: EN.uplift,
