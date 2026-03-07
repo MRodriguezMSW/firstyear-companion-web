@@ -68,30 +68,37 @@ function buildEmailText(body: {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-
     const emailText = buildEmailText(body);
 
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey) {
-      // No key configured — log the feedback to console so it isn't silently lost
-      console.log("[Feedback received — no RESEND_API_KEY configured]\n", emailText);
+      console.log("[Feedback — no RESEND_API_KEY configured]\n", emailText);
       return NextResponse.json({ ok: true, note: "logged_only" });
     }
 
+    // FEEDBACK_EMAIL defaults to Mrodriguez0426@gmail.com.
+    // NOTE: onboarding@resend.dev can only deliver to the email used to create
+    // your Resend account. If that differs, set FEEDBACK_EMAIL in Vercel env vars
+    // to match your Resend account email, OR verify a custom domain at resend.com.
+    const toEmail = process.env.FEEDBACK_EMAIL ?? "Mrodriguez0426@gmail.com";
+
+    console.log(`[Feedback] Sending to ${toEmail} via Resend…`);
+
     const resend = new Resend(apiKey);
-    const { error } = await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from: "FirstYear Companion <onboarding@resend.dev>",
-      to: ["Mrodriguez0426@gmail.com"],
+      to: [toEmail],
       subject: "FirstYear Companion — New Feedback Received",
       text: emailText,
     });
 
     if (error) {
-      console.error("[Feedback email error]", error);
+      console.error("[Feedback email error]", JSON.stringify(error));
       return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ ok: true });
+    console.log("[Feedback] Email sent, id:", data?.id);
+    return NextResponse.json({ ok: true, id: data?.id });
   } catch (err: any) {
     console.error("[Feedback route error]", err?.message || err);
     return NextResponse.json({ ok: false, error: "Internal error" }, { status: 500 });
