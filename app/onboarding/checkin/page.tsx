@@ -63,15 +63,15 @@ export default function CheckInPage() {
 
   const lbl: React.CSSProperties = {
     display: "block", fontFamily: "'DM Sans', sans-serif",
-    fontSize: 10, fontWeight: 600, color: "rgba(216,208,192,0.5)",
-    letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 6,
+    fontSize: 13, fontWeight: 600, color: "rgba(216,208,192,0.5)",
+    letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8,
   };
 
   const pill = (active: boolean): React.CSSProperties => ({
     background: active ? "rgba(74,124,111,0.22)" : "rgba(255,255,255,0.04)",
     border: `1px solid ${active ? "rgba(74,124,111,0.65)" : "rgba(255,255,255,0.09)"}`,
-    borderRadius: 10, padding: "7px 12px",
-    fontFamily: "'DM Sans', sans-serif", fontSize: 12,
+    borderRadius: 10, padding: "9px 16px",
+    fontFamily: "'DM Sans', sans-serif", fontSize: 13,
     color: active ? "#8ecfbe" : "rgba(216,208,192,0.7)",
     cursor: "pointer", transition: "all 0.15s ease", whiteSpace: "nowrap" as const,
   });
@@ -80,8 +80,8 @@ export default function CheckInPage() {
     flex: 1,
     background: active ? "rgba(74,124,111,0.22)" : "rgba(255,255,255,0.04)",
     border: `1px solid ${active ? "rgba(74,124,111,0.65)" : "rgba(255,255,255,0.09)"}`,
-    borderRadius: 8, padding: "8px 6px",
-    fontFamily: "'DM Sans', sans-serif", fontSize: 12,
+    borderRadius: 8, padding: "11px 6px",
+    fontFamily: "'DM Sans', sans-serif", fontSize: 13,
     color: active ? "#8ecfbe" : "rgba(216,208,192,0.65)",
     cursor: "pointer", textAlign: "center" as const, transition: "all 0.15s ease",
   });
@@ -89,8 +89,8 @@ export default function CheckInPage() {
   const chip = (active: boolean): React.CSSProperties => ({
     background: active ? "rgba(74,124,111,0.22)" : "rgba(255,255,255,0.04)",
     border: `1px solid ${active ? "rgba(74,124,111,0.65)" : "rgba(255,255,255,0.09)"}`,
-    borderRadius: 16, padding: "5px 11px",
-    fontFamily: "'DM Sans', sans-serif", fontSize: 12,
+    borderRadius: 16, padding: "8px 14px",
+    fontFamily: "'DM Sans', sans-serif", fontSize: 13,
     color: active ? "#8ecfbe" : "rgba(216,208,192,0.7)",
     cursor: "pointer", whiteSpace: "nowrap" as const, transition: "all 0.15s ease",
   });
@@ -122,36 +122,36 @@ export default function CheckInPage() {
       )}
 
       {/* Scrollable content */}
-      <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", WebkitOverflowScrolling: "touch", position: "relative", zIndex: 1 }}>
-        <div style={{ maxWidth: 680, margin: "0 auto", padding: "12px 14px 16px", width: "100%" }}>
+      <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", WebkitOverflowScrolling: "touch", position: "relative", zIndex: 1, display: "flex", flexDirection: "column" }}>
+        <div style={{ maxWidth: 680, margin: "0 auto", padding: "12px 14px 16px", flex: 1, display: "flex", flexDirection: "column", width: "100%" }}>
 
-          {/* Main card */}
-          <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 20, padding: "16px 18px" }}>
+          {/* Main card — flex: 1 to fill viewport, no dark gap below */}
+          <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 20, padding: "18px 20px", flex: 1, display: "flex", flexDirection: "column" }}>
 
-            <h2 style={{ fontFamily: "'Lora', serif", fontSize: 20, fontWeight: 500, color: "var(--text)", margin: "0 0 4px" }}>{t.title}</h2>
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.55)", marginBottom: 16, lineHeight: 1.5 }}>
+            <h2 style={{ fontFamily: "'Lora', serif", fontSize: 22, fontWeight: 500, color: "var(--text)", margin: "0 0 4px" }}>{t.title}</h2>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "rgba(216,208,192,0.55)", marginBottom: 18, lineHeight: 1.5 }}>
               {t.sub}
             </p>
 
             {/* 1. Name */}
-            <div style={{ marginBottom: 12 }}>
+            <div style={{ marginBottom: 18 }}>
               <label style={lbl}>{t.name_label}</label>
               <input
                 type="text" value={name} onChange={e => setName(e.target.value)}
                 placeholder={t.name_ph}
                 style={{
-                  width: "100%", boxSizing: "border-box", height: 36,
+                  width: "100%", boxSizing: "border-box", height: 44,
                   background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)",
-                  borderRadius: 8, padding: "0 12px",
-                  fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "var(--text)", outline: "none",
+                  borderRadius: 8, padding: "0 14px",
+                  fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: "var(--text)", outline: "none",
                 }}
               />
             </div>
 
             {/* 2. Journey */}
-            <div style={{ marginBottom: 12 }}>
+            <div style={{ marginBottom: 18 }}>
               <label style={lbl}>{t.journey_label}</label>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
                 {t.journey_opts.map(opt => (
                   <button key={opt} style={pill(journey === opt)} onClick={() => setJourney(opt)}>{opt}</button>
                 ))}
@@ -159,9 +159,9 @@ export default function CheckInPage() {
             </div>
 
             {/* 3. Provider */}
-            <div style={{ marginBottom: 12 }}>
+            <div style={{ marginBottom: 18 }}>
               <label style={lbl}>{t.provider_label}</label>
-              <div style={{ display: "flex", gap: 6 }}>
+              <div style={{ display: "flex", gap: 8 }}>
                 {t.yesno.slice(0, 2).map(opt => (
                   <button key={opt} style={yn(provider === opt)} onClick={() => handleProviderSelect(opt)}>{opt}</button>
                 ))}
@@ -169,9 +169,9 @@ export default function CheckInPage() {
             </div>
 
             {/* 4. Medication */}
-            <div style={{ marginBottom: 12 }}>
+            <div style={{ marginBottom: 18 }}>
               <label style={lbl}>{t.meds_label}</label>
-              <div style={{ display: "flex", gap: 6 }}>
+              <div style={{ display: "flex", gap: 8 }}>
                 {t.yesno.slice(0, 2).map(opt => (
                   <button key={opt} style={yn(medication === opt)} onClick={() => handleMedSelect(opt)}>{opt}</button>
                 ))}
@@ -179,9 +179,9 @@ export default function CheckInPage() {
             </div>
 
             {/* 5. Pronouns */}
-            <div style={{ marginBottom: 12 }}>
+            <div style={{ marginBottom: 18 }}>
               <label style={lbl}>{t.pronouns_label}</label>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
                 {t.pronouns_opts.map(opt => (
                   <button key={opt} style={pill(pronouns === opt)} onClick={() => setPronouns(pronouns === opt ? "" : opt)}>{opt}</button>
                 ))}
@@ -189,9 +189,9 @@ export default function CheckInPage() {
             </div>
 
             {/* 6. Mood */}
-            <div style={{ marginBottom: 14 }}>
+            <div style={{ flex: 1, marginBottom: 14 }}>
               <label style={lbl}>{t.mood_label}</label>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
                 {t.mood_opts.map(opt => (
                   <button key={opt} style={chip(moods.includes(opt))} onClick={() => toggleMood(opt)}>{opt}</button>
                 ))}
@@ -199,7 +199,7 @@ export default function CheckInPage() {
             </div>
 
             {/* Footer */}
-            <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: 14, marginTop: 8, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+            <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: 14, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
               <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
                 <input type="checkbox" checked={skipFlag} onChange={e => setSkipFlag(e.target.checked)}
                   style={{ accentColor: "#c4956a", width: 13, height: 13, cursor: "pointer" }} />

@@ -92,17 +92,18 @@ export default function WelcomePage() {
         flex: 1, overflowY: "auto", overflowX: "hidden",
         position: "relative", zIndex: 1,
         WebkitOverflowScrolling: "touch",
+        display: "flex", flexDirection: "column",
       }}>
-        <div style={{ maxWidth: 680, margin: "0 auto", padding: "16px 16px 16px", width: "100%" }}>
+        <div style={{ maxWidth: 680, margin: "0 auto", padding: "16px 16px 16px", flex: 1, display: "flex", flexDirection: "column", width: "100%" }}>
 
-          {/* Full-width card */}
-          <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, padding: "24px 28px" }}>
+          {/* Full-width card — flex: 1 so it fills the viewport with no dark gap below */}
+          <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, padding: "22px 24px", flex: 1, display: "flex", flexDirection: "column" }}>
 
             {/* Top row: logo/title + language dropdown */}
-            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 6 }}>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 4 }}>
               <div>
-                <div style={{ fontSize: 28, marginBottom: 8 }}>🌱</div>
-                <h1 style={{ fontFamily: "'Lora', serif", fontSize: "clamp(20px, 3.5vw, 28px)", fontWeight: 500, color: "var(--text)", margin: 0, lineHeight: 1.2 }}>
+                <div style={{ fontSize: 32, lineHeight: 1, marginBottom: 6 }}>🌱</div>
+                <h1 style={{ fontFamily: "'Lora', serif", fontSize: "clamp(26px, 5vw, 36px)", fontWeight: 500, color: "var(--text)", margin: 0, lineHeight: 1.15 }}>
                   FirstYear Companion
                 </h1>
               </div>
@@ -154,36 +155,24 @@ export default function WelcomePage() {
               </div>
             </div>
 
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: "rgba(216,208,192,0.6)", margin: "6px 0 20px", fontWeight: 300 }}>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: "rgba(216,208,192,0.6)", margin: "8px 0 14px", fontWeight: 300, lineHeight: 1.4 }}>
               {t.tagline}
             </p>
 
-            {/* Info cards — stacked full width */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 14 }}>
-              <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "14px 16px" }}>
-                <div style={{ fontFamily: "'Lora', serif", fontSize: 13, fontWeight: 500, color: "var(--text)", marginBottom: 6 }}>{t.what_title}</div>
-                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.65)", lineHeight: 1.55 }}>{t.what_body}</div>
+            {/* Info cards — stacked full width, flex: 1 so they absorb available space */}
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 10, marginBottom: 14 }}>
+              <div style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "16px 18px" }}>
+                <div style={{ fontFamily: "'Lora', serif", fontSize: 18, fontWeight: 500, color: "var(--text)", marginBottom: 8 }}>{t.what_title}</div>
+                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: "rgba(216,208,192,0.65)", lineHeight: 1.6 }}>{t.what_body}</div>
               </div>
-              <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "14px 16px" }}>
-                <div style={{ fontFamily: "'Lora', serif", fontSize: 13, fontWeight: 500, color: "var(--text)", marginBottom: 6 }}>{t.nova_title}</div>
-                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.65)", lineHeight: 1.55 }}>{t.nova_body}</div>
+              <div style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "16px 18px" }}>
+                <div style={{ fontFamily: "'Lora', serif", fontSize: 18, fontWeight: 500, color: "var(--text)", marginBottom: 8 }}>{t.nova_title}</div>
+                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: "rgba(216,208,192,0.65)", lineHeight: 1.6 }}>{t.nova_body}</div>
               </div>
-            </div>
-
-            {/* Privacy note */}
-            <div style={{ background: "rgba(74,124,111,0.07)", border: "1px solid rgba(74,124,111,0.2)", borderRadius: 12, padding: "10px 14px", marginBottom: 16 }}>
-              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.72)", lineHeight: 1.55, margin: 0 }}>
-                🔒 {t.privacy_note}
-              </p>
-            </div>
-
-            {/* Beta notice */}
-            <div style={{ background: "rgba(196,149,106,0.08)", border: "1px solid rgba(196,149,106,0.2)", borderRadius: 10, padding: "10px 14px", marginBottom: 20, fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.82)", lineHeight: 1.5 }}>
-              {t.beta_notice}
             </div>
 
             {/* Checkboxes */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
               <label style={{
                 display: "flex", alignItems: "flex-start", gap: 10,
                 background: check1 ? "rgba(74,124,111,0.08)" : "rgba(255,255,255,0.03)",
@@ -193,7 +182,7 @@ export default function WelcomePage() {
               }}>
                 <input type="checkbox" checked={check1} onChange={e => setCheck1(e.target.checked)}
                   style={{ marginTop: 2, accentColor: "#c4956a", flexShrink: 0, width: 15, height: 15, cursor: "pointer" }} />
-                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.8)", lineHeight: 1.5 }}>
+                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "rgba(216,208,192,0.8)", lineHeight: 1.5 }}>
                   {t.check1}
                 </span>
               </label>
@@ -207,7 +196,7 @@ export default function WelcomePage() {
               }}>
                 <input type="checkbox" checked={check2} onChange={e => setCheck2(e.target.checked)}
                   style={{ marginTop: 2, accentColor: "#c4956a", flexShrink: 0, width: 15, height: 15, cursor: "pointer" }} />
-                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.8)", lineHeight: 1.5 }}>
+                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "rgba(216,208,192,0.8)", lineHeight: 1.5 }}>
                   {t.check2}
                 </span>
               </label>
@@ -221,10 +210,22 @@ export default function WelcomePage() {
               }}>
                 <input type="checkbox" checked={skipFlag} onChange={e => setSkipFlag(e.target.checked)}
                   style={{ marginTop: 2, accentColor: "#c4956a", flexShrink: 0, width: 15, height: 15, cursor: "pointer" }} />
-                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.65)", lineHeight: 1.5 }}>
+                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "rgba(216,208,192,0.65)", lineHeight: 1.5 }}>
                   {t.skip_label}
                 </span>
               </label>
+            </div>
+
+            {/* Privacy note — below checkboxes */}
+            <div style={{ background: "rgba(74,124,111,0.07)", border: "1px solid rgba(74,124,111,0.2)", borderRadius: 10, padding: "9px 13px", marginBottom: 8 }}>
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.72)", lineHeight: 1.5, margin: 0 }}>
+                🔒 {t.privacy_note}
+              </p>
+            </div>
+
+            {/* Beta notice — below privacy note */}
+            <div style={{ background: "rgba(196,149,106,0.08)", border: "1px solid rgba(196,149,106,0.2)", borderRadius: 10, padding: "9px 13px", marginBottom: 14, fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.82)", lineHeight: 1.5 }}>
+              {t.beta_notice}
             </div>
 
             {/* Continue button */}
