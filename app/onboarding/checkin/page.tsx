@@ -122,11 +122,11 @@ export default function CheckInPage() {
       )}
 
       {/* Scrollable content */}
-      <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", WebkitOverflowScrolling: "touch", position: "relative", zIndex: 1, display: "flex", flexDirection: "column" }}>
-        <div style={{ maxWidth: 680, margin: "0 auto", padding: "12px 14px 16px", flex: 1, display: "flex", flexDirection: "column" }}>
+      <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", WebkitOverflowScrolling: "touch", position: "relative", zIndex: 1 }}>
+        <div style={{ maxWidth: 680, margin: "0 auto", padding: "12px 14px 16px", width: "100%" }}>
 
           {/* Main card */}
-          <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 20, padding: "16px 18px", flex: 1, display: "flex", flexDirection: "column" }}>
+          <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 20, padding: "16px 18px" }}>
 
             <h2 style={{ fontFamily: "'Lora', serif", fontSize: 20, fontWeight: 500, color: "var(--text)", margin: "0 0 4px" }}>{t.title}</h2>
             <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.55)", marginBottom: 16, lineHeight: 1.5 }}>
@@ -199,7 +199,7 @@ export default function CheckInPage() {
             </div>
 
             {/* Footer */}
-            <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: 14, marginTop: "auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+            <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: 14, marginTop: 8, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
               <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
                 <input type="checkbox" checked={skipFlag} onChange={e => setSkipFlag(e.target.checked)}
                   style={{ accentColor: "#c4956a", width: 13, height: 13, cursor: "pointer" }} />

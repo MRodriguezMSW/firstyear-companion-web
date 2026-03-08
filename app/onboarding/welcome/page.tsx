@@ -92,12 +92,11 @@ export default function WelcomePage() {
         flex: 1, overflowY: "auto", overflowX: "hidden",
         position: "relative", zIndex: 1,
         WebkitOverflowScrolling: "touch",
-        display: "flex", flexDirection: "column",
       }}>
-        <div style={{ maxWidth: 680, margin: "0 auto", padding: "16px 16px 16px", flex: 1, display: "flex", flexDirection: "column" }}>
+        <div style={{ maxWidth: 680, margin: "0 auto", padding: "16px 16px 16px", width: "100%" }}>
 
           {/* Full-width card */}
-          <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, padding: "24px 28px", flex: 1, display: "flex", flexDirection: "column" }}>
+          <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, padding: "24px 28px" }}>
 
             {/* Top row: logo/title + language dropdown */}
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 6 }}>
@@ -159,8 +158,8 @@ export default function WelcomePage() {
               {t.tagline}
             </p>
 
-            {/* Info cards */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+            {/* Info cards — stacked full width */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 14 }}>
               <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "14px 16px" }}>
                 <div style={{ fontFamily: "'Lora', serif", fontSize: 13, fontWeight: 500, color: "var(--text)", marginBottom: 6 }}>{t.what_title}</div>
                 <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.65)", lineHeight: 1.55 }}>{t.what_body}</div>
@@ -184,7 +183,7 @@ export default function WelcomePage() {
             </div>
 
             {/* Checkboxes */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16, marginTop: "auto" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
               <label style={{
                 display: "flex", alignItems: "flex-start", gap: 10,
                 background: check1 ? "rgba(74,124,111,0.08)" : "rgba(255,255,255,0.03)",
