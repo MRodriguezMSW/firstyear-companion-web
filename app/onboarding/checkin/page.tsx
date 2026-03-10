@@ -96,7 +96,7 @@ export default function CheckInPage() {
 
   return (
     <div style={{
-      flex: 1, overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "stretch", minHeight: 0,
+      flex: 1, overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "stretch", justifyContent: "center", minHeight: 0,
       background: "var(--bg, #1A2E1E)",
     }}>
       <div className={`${styles.bgOrb} ${styles.bgOrb1}`} />
@@ -124,7 +124,7 @@ export default function CheckInPage() {
         width: "100%",
         maxWidth: "100%",
         margin: "0 auto",
-        flex: 1,
+        height: "auto",
         minHeight: 0,
         display: "flex",
         flexDirection: "column",
@@ -213,7 +213,7 @@ export default function CheckInPage() {
           alignItems: "center",
           justifyContent: "space-between",
           paddingTop: 16,
-          marginTop: "auto",
+          marginTop: 24,
           borderTop: "1px solid rgba(255,255,255,0.07)",
         }}>
           <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
