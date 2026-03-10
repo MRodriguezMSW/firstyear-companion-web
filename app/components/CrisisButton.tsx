@@ -23,33 +23,33 @@ export default function CrisisButton({ pulsing = false }: { pulsing?: boolean })
 
   return (
     <>
-      {/* Fixed bottom-right: "I am okay" above + phone icon below */}
+      {/* "I am okay" button — independently fixed above the phone icon, higher z-index */}
+      {isFlashing && (
+        <button
+          onClick={handleCalm}
+          style={{
+            position: "fixed", bottom: 90, right: 12, zIndex: 10000,
+            background: "#4CAF50",
+            border: "none",
+            borderRadius: 24,
+            padding: "10px 20px",
+            color: "#fff",
+            fontFamily: "DM Sans, sans-serif",
+            fontSize: 14, fontWeight: 700,
+            cursor: "pointer",
+            boxShadow: "0 4px 20px rgba(76,175,80,0.5)",
+            whiteSpace: "nowrap",
+          }}
+        >
+          ✓ {t.crisis_calm}
+        </button>
+      )}
+
+      {/* Phone icon — fixed bottom right, z-index 9999 */}
       <div style={{
         position: "fixed", bottom: 20, right: 20, zIndex: 9999,
-        display: "flex", flexDirection: "column", alignItems: "center", gap: 12,
+        display: "flex", flexDirection: "column", alignItems: "center",
       }}>
-        {isFlashing && (
-          <button
-            onClick={handleCalm}
-            style={{
-              background: "#4CAF50",
-              border: "none",
-              borderRadius: 14,
-              padding: "14px 20px",
-              minHeight: 48,
-              color: "#fff",
-              fontFamily: "DM Sans, sans-serif",
-              fontSize: 14, fontWeight: 700,
-              cursor: "pointer",
-              boxShadow: "0 4px 20px rgba(76,175,80,0.5)",
-              whiteSpace: "nowrap",
-              letterSpacing: "0.02em",
-            }}
-          >
-            ✓ {t.crisis_calm}
-          </button>
-        )}
-
         {/* Sonar rings — only visible when flashing */}
         {isFlashing && (
           <div style={{ position: "relative", width: 100, height: 100, flexShrink: 0 }}>

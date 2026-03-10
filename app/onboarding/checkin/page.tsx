@@ -126,7 +126,7 @@ export default function CheckInPage() {
         <div style={{ maxWidth: 680, margin: "0 auto", padding: "12px 14px 16px", flex: 1, display: "flex", flexDirection: "column", width: "100%" }}>
 
           {/* Main card — flex: 1 to fill viewport, no dark gap below */}
-          <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 20, padding: "18px 20px", flex: 1, display: "flex", flexDirection: "column" }}>
+          <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 20, padding: "18px 20px", flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
 
             <h2 style={{ fontFamily: "'Lora', serif", fontSize: 22, fontWeight: 500, color: "var(--text)", margin: "0 0 4px" }}>{t.title}</h2>
             <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "rgba(216,208,192,0.55)", marginBottom: 18, lineHeight: 1.5 }}>
