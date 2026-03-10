@@ -21,7 +21,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body>
+      <body style={{ height: "100%", width: "100%", overflow: "hidden", display: "flex", flexDirection: "column" }}>
         <ThemeInitializer />
         {children}
         <FeedbackButton />

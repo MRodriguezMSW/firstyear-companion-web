@@ -6,28 +6,32 @@
   padding: 0;
 }
 
-html {
-  height: -webkit-fill-available;
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 body {
-  height: 100vh;
-  height: -webkit-fill-available;
-  overflow: hidden;
-  overscroll-behavior: none;
-  position: fixed;
-  width: 100%;
-  top: 0;
-  left: 0;
   font-family: 'DM Sans', sans-serif;
   color: var(--text, #E8F5E2);
   background: var(--bg, #1A2E1E);
+  overscroll-behavior: none;
 }
 
 #__next {
   height: 100%;
   width: 100%;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── Prevent iOS zoom on input focus (must be >= 16px) ── */
