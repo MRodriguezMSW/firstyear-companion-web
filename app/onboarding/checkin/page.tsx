@@ -258,7 +258,7 @@ export default function CheckInPage() {
                 type="checkbox" checked={skipFlag} onChange={e => setSkipFlag(e.target.checked)}
                 style={{ accentColor: "#c4956a", width: 13, height: 13, cursor: "pointer" }}
               />
-              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 10, color: "rgba(216,208,192,0.32)" }}>
+              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "rgba(216,208,192,0.6)" }}>
                 {t.skip_label}
               </span>
             </label>
