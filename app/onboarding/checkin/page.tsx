@@ -19,7 +19,6 @@ export default function CheckInPage() {
   const [modal, setModal] = useState<"provider" | "meds" | null>(null);
 
   useEffect(() => {
-    // Lock scroll on html/body for this page
     const prevHtml = document.documentElement.style.overflow;
     document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
@@ -98,8 +97,9 @@ export default function CheckInPage() {
   return (
     <div style={{
       position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-      display: "flex", alignItems: "center", justifyContent: "center",
-      overflow: "hidden", background: "var(--bg, #1A2E1E)",
+      display: "flex", alignItems: "flex-start", justifyContent: "center",
+      overflow: "hidden", padding: 0,
+      background: "var(--bg, #1A2E1E)",
     }}>
       <div className={`${styles.bgOrb} ${styles.bgOrb1}`} />
       <div className={`${styles.bgOrb} ${styles.bgOrb2}`} />
@@ -121,95 +121,111 @@ export default function CheckInPage() {
         </div>
       )}
 
-      {/* Card — fills full viewport, edge to edge, scrollable internally */}
-      <div style={{ width: "100%", maxWidth: "100%", height: "100%", boxSizing: "border-box", background: "rgba(255,255,255,0.05)", borderRadius: 0, padding: "18px 20px", display: "flex", flexDirection: "column", justifyContent: "flex-start", overflowY: "auto", overflowX: "hidden", WebkitOverflowScrolling: "touch", position: "relative", zIndex: 1 }}>
+      {/* Card — centered, full height, max 560px wide */}
+      <div style={{
+        width: "100%", maxWidth: 560, height: "100vh",
+        display: "flex", flexDirection: "column",
+        background: "var(--bg, #1A2E1E)",
+        padding: "32px 24px 24px",
+        overflow: "hidden",
+        boxSizing: "border-box",
+        position: "relative", zIndex: 1,
+      }}>
 
+        {/* Content area — all form fields, no bottom row */}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 20, overflow: "hidden" }}>
+
+          {/* Title + subtitle grouped */}
+          <div>
             <h2 style={{ fontFamily: "'Lora', serif", fontSize: 22, fontWeight: 500, color: "var(--text)", margin: "0 0 4px" }}>{t.title}</h2>
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "rgba(216,208,192,0.55)", marginBottom: 18, lineHeight: 1.5 }}>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "rgba(216,208,192,0.55)", margin: 0, lineHeight: 1.5 }}>
               {t.sub}
             </p>
+          </div>
 
-            {/* 1. Name */}
-            <div style={{ marginBottom: 18 }}>
-              <label style={lbl}>{t.name_label}</label>
-              <input
-                type="text" value={name} onChange={e => setName(e.target.value)}
-                placeholder={t.name_ph}
-                style={{
-                  width: "100%", boxSizing: "border-box", height: 44,
-                  background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)",
-                  borderRadius: 8, padding: "0 14px",
-                  fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: "var(--text)", outline: "none",
-                }}
-              />
-            </div>
+          {/* 1. Name */}
+          <div>
+            <label style={lbl}>{t.name_label}</label>
+            <input
+              type="text" value={name} onChange={e => setName(e.target.value)}
+              placeholder={t.name_ph}
+              style={{
+                width: "100%", boxSizing: "border-box", height: 44,
+                background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)",
+                borderRadius: 8, padding: "0 14px",
+                fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: "var(--text)", outline: "none",
+              }}
+            />
+          </div>
 
-            {/* 2. Journey */}
-            <div style={{ marginBottom: 18 }}>
-              <label style={lbl}>{t.journey_label}</label>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
-                {t.journey_opts.map(opt => (
-                  <button key={opt} style={pill(journey === opt)} onClick={() => setJourney(opt)}>{opt}</button>
-                ))}
-              </div>
+          {/* 2. Journey */}
+          <div>
+            <label style={lbl}>{t.journey_label}</label>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+              {t.journey_opts.map(opt => (
+                <button key={opt} style={pill(journey === opt)} onClick={() => setJourney(opt)}>{opt}</button>
+              ))}
             </div>
+          </div>
 
-            {/* 3. Provider */}
-            <div style={{ marginBottom: 18 }}>
-              <label style={lbl}>{t.provider_label}</label>
-              <div style={{ display: "flex", gap: 8 }}>
-                {t.yesno.slice(0, 2).map(opt => (
-                  <button key={opt} style={yn(provider === opt)} onClick={() => handleProviderSelect(opt)}>{opt}</button>
-                ))}
-              </div>
+          {/* 3. Provider */}
+          <div>
+            <label style={lbl}>{t.provider_label}</label>
+            <div style={{ display: "flex", gap: 8 }}>
+              {t.yesno.slice(0, 2).map(opt => (
+                <button key={opt} style={yn(provider === opt)} onClick={() => handleProviderSelect(opt)}>{opt}</button>
+              ))}
             </div>
+          </div>
 
-            {/* 4. Medication */}
-            <div style={{ marginBottom: 18 }}>
-              <label style={lbl}>{t.meds_label}</label>
-              <div style={{ display: "flex", gap: 8 }}>
-                {t.yesno.slice(0, 2).map(opt => (
-                  <button key={opt} style={yn(medication === opt)} onClick={() => handleMedSelect(opt)}>{opt}</button>
-                ))}
-              </div>
+          {/* 4. Medication */}
+          <div>
+            <label style={lbl}>{t.meds_label}</label>
+            <div style={{ display: "flex", gap: 8 }}>
+              {t.yesno.slice(0, 2).map(opt => (
+                <button key={opt} style={yn(medication === opt)} onClick={() => handleMedSelect(opt)}>{opt}</button>
+              ))}
             </div>
+          </div>
 
-            {/* 5. Pronouns */}
-            <div style={{ marginBottom: 18 }}>
-              <label style={lbl}>{t.pronouns_label}</label>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
-                {t.pronouns_opts.map(opt => (
-                  <button key={opt} style={pill(pronouns === opt)} onClick={() => setPronouns(pronouns === opt ? "" : opt)}>{opt}</button>
-                ))}
-              </div>
+          {/* 5. Pronouns */}
+          <div>
+            <label style={lbl}>{t.pronouns_label}</label>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+              {t.pronouns_opts.map(opt => (
+                <button key={opt} style={pill(pronouns === opt)} onClick={() => setPronouns(pronouns === opt ? "" : opt)}>{opt}</button>
+              ))}
             </div>
+          </div>
 
-            {/* 6. Mood */}
-            <div style={{ marginBottom: 14 }}>
-              <label style={lbl}>{t.mood_label}</label>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
-                {t.mood_opts.map(opt => (
-                  <button key={opt} style={chip(moods.includes(opt))} onClick={() => toggleMood(opt)}>{opt}</button>
-                ))}
-              </div>
+          {/* 6. Mood */}
+          <div>
+            <label style={lbl}>{t.mood_label}</label>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+              {t.mood_opts.map(opt => (
+                <button key={opt} style={chip(moods.includes(opt))} onClick={() => toggleMood(opt)}>{opt}</button>
+              ))}
             </div>
+          </div>
 
-            {/* Footer — sits naturally below chips with 24px gap, no pushing to bottom */}
-            <div style={{ marginTop: 24, borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: 14, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
-              <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-                <input type="checkbox" checked={skipFlag} onChange={e => setSkipFlag(e.target.checked)}
-                  style={{ accentColor: "#c4956a", width: 13, height: 13, cursor: "pointer" }} />
-                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "rgba(216,208,192,0.32)" }}>{t.skip_label}</span>
-              </label>
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <button onClick={() => router.push("/chat")} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "9px 16px", fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.45)", cursor: "pointer" }}>
-                  {t.skip_btn}
-                </button>
-                <button onClick={saveAndGo} style={{ background: "linear-gradient(135deg, #c4956a 0%, #a87a52 100%)", border: "none", borderRadius: 8, padding: "9px 24px", fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500, color: "#fff", cursor: "pointer", boxShadow: "0 4px 16px rgba(196,149,106,0.3)" }}>
-                  {t.start_btn} →
-                </button>
-              </div>
-            </div>
+        </div>
+
+        {/* Bottom row — pinned, never pushed away */}
+        <div style={{ flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+            <input type="checkbox" checked={skipFlag} onChange={e => setSkipFlag(e.target.checked)}
+              style={{ accentColor: "#c4956a", width: 13, height: 13, cursor: "pointer" }} />
+            <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "rgba(216,208,192,0.32)" }}>{t.skip_label}</span>
+          </label>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <button onClick={() => router.push("/chat")} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "9px 16px", fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.45)", cursor: "pointer" }}>
+              {t.skip_btn}
+            </button>
+            <button onClick={saveAndGo} style={{ background: "linear-gradient(135deg, #c4956a 0%, #a87a52 100%)", border: "none", borderRadius: 8, padding: "9px 24px", fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500, color: "#fff", cursor: "pointer", boxShadow: "0 4px 16px rgba(196,149,106,0.3)" }}>
+              {t.start_btn} →
+            </button>
+          </div>
+        </div>
 
       </div>
 
