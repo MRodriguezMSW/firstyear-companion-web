@@ -159,15 +159,15 @@ export default function WelcomePage() {
               {t.tagline}
             </p>
 
-            {/* Info cards — stacked full width, flex: 1 so they absorb available space */}
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 10, marginBottom: 14 }}>
-              <div style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "16px 18px" }}>
-                <div style={{ fontFamily: "'Lora', serif", fontSize: 18, fontWeight: 500, color: "var(--text)", marginBottom: 8 }}>{t.what_title}</div>
-                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: "rgba(216,208,192,0.65)", lineHeight: 1.6 }}>{t.what_body}</div>
+            {/* Info cards — auto height, no flex:1 on cards to prevent phantom empty space */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 14 }}>
+              <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "16px 18px" }}>
+                <div style={{ fontFamily: "'Lora', serif", fontSize: 22, fontWeight: 500, color: "var(--text)", marginBottom: 8 }}>{t.what_title}</div>
+                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 17, color: "rgba(216,208,192,0.65)", lineHeight: 1.6 }}>{t.what_body}</div>
               </div>
-              <div style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "16px 18px" }}>
-                <div style={{ fontFamily: "'Lora', serif", fontSize: 18, fontWeight: 500, color: "var(--text)", marginBottom: 8 }}>{t.nova_title}</div>
-                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: "rgba(216,208,192,0.65)", lineHeight: 1.6 }}>{t.nova_body}</div>
+              <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "16px 18px" }}>
+                <div style={{ fontFamily: "'Lora', serif", fontSize: 22, fontWeight: 500, color: "var(--text)", marginBottom: 8 }}>{t.nova_title}</div>
+                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 17, color: "rgba(216,208,192,0.65)", lineHeight: 1.6 }}>{t.nova_body}</div>
               </div>
             </div>
 

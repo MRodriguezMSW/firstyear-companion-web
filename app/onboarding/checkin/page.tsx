@@ -189,7 +189,7 @@ export default function CheckInPage() {
             </div>
 
             {/* 6. Mood */}
-            <div style={{ flex: 1, marginBottom: 14 }}>
+            <div style={{ marginBottom: 14 }}>
               <label style={lbl}>{t.mood_label}</label>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
                 {t.mood_opts.map(opt => (
@@ -197,6 +197,9 @@ export default function CheckInPage() {
                 ))}
               </div>
             </div>
+
+            {/* Spacer — pushes footer to bottom of card without creating a visible empty box */}
+            <div style={{ flex: 1, minHeight: 0 }} />
 
             {/* Footer */}
             <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: 14, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
