@@ -96,7 +96,7 @@ export default function CheckInPage() {
 
   return (
     <div style={{
-      flex: 1, overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center",
+      flex: 1, overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", minHeight: 0,
       background: "var(--bg, #1A2E1E)",
     }}>
       <div className={`${styles.bgOrb} ${styles.bgOrb1}`} />
@@ -124,7 +124,8 @@ export default function CheckInPage() {
         width: "100%",
         maxWidth: "100%",
         margin: "0 auto",
-        height: "100%",
+        flex: 1,
+        minHeight: 0,
         display: "flex",
         flexDirection: "column",
         background: "var(--bg, #1A2E1E)",
@@ -135,7 +136,7 @@ export default function CheckInPage() {
       }}>
 
         {/* Content area — form fields only */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 16, overflow: "hidden" }}>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 16, overflow: "hidden", minHeight: 0 }}>
 
           <div>
             <h2 style={{ fontFamily: "'Lora', serif", fontSize: 22, fontWeight: 500, color: "var(--text)", margin: "0 0 4px" }}>{t.title}</h2>

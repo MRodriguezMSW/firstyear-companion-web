@@ -61,7 +61,7 @@ export default function WelcomePage() {
 
   return (
     <div style={{
-      flex: 1, overflow: "hidden", display: "flex", flexDirection: "column",
+      flex: 1, overflow: "hidden", display: "flex", flexDirection: "column", minHeight: 0,
       background: "var(--bg, #1A2E1E)",
     }}>
       {/* Ambient orbs */}
@@ -87,15 +87,15 @@ export default function WelcomePage() {
 
       {/* Scrollable content area */}
       <div style={{
-        flex: 1, overflow: "hidden",
+        flex: 1, overflow: "hidden", minHeight: 0,
         position: "relative", zIndex: 1,
         WebkitOverflowScrolling: "touch",
         display: "flex", flexDirection: "column",
       }}>
-        <div style={{ maxWidth: 680, margin: "0 auto", padding: "16px 16px 16px", flex: 1, display: "flex", flexDirection: "column", width: "100%" }}>
+        <div style={{ maxWidth: 680, margin: "0 auto", padding: "16px 16px 16px", flex: 1, display: "flex", flexDirection: "column", width: "100%", minHeight: 0 }}>
 
           {/* Full-width card — flex: 1 so it fills the viewport with no dark gap below */}
-          <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, padding: "16px 24px", flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, padding: "16px 24px", flex: 1, display: "flex", flexDirection: "column", gap: 8, minHeight: 0 }}>
 
             {/* Top row: logo/title + language dropdown */}
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 4 }}>
