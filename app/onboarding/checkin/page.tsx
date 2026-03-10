@@ -95,10 +95,11 @@ export default function CheckInPage() {
   });
 
   return (
+    /* Outer page */
     <div style={{
       position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-      display: "flex", alignItems: "flex-start", justifyContent: "center",
-      overflow: "hidden", padding: 0,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      overflow: "hidden",
       background: "var(--bg, #1A2E1E)",
     }}>
       <div className={`${styles.bgOrb} ${styles.bgOrb1}`} />
@@ -121,21 +122,23 @@ export default function CheckInPage() {
         </div>
       )}
 
-      {/* Card — centered, full height, max 560px wide */}
+      {/* Single card — content + buttons together, no separate containers */}
       <div style={{
-        width: "100%", maxWidth: 560, height: "100vh",
-        display: "flex", flexDirection: "column",
+        width: "100%",
+        maxWidth: 560,
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
         background: "var(--bg, #1A2E1E)",
         padding: "32px 24px 24px",
-        overflow: "hidden",
         boxSizing: "border-box",
-        position: "relative", zIndex: 1,
+        position: "relative",
+        zIndex: 1,
       }}>
 
-        {/* Content area — all form fields, no bottom row */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 20, overflow: "hidden" }}>
+        {/* Content area — form fields only */}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 16, overflow: "hidden" }}>
 
-          {/* Title + subtitle grouped */}
           <div>
             <h2 style={{ fontFamily: "'Lora', serif", fontSize: 22, fontWeight: 500, color: "var(--text)", margin: "0 0 4px" }}>{t.title}</h2>
             <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "rgba(216,208,192,0.55)", margin: 0, lineHeight: 1.5 }}>
@@ -143,7 +146,6 @@ export default function CheckInPage() {
             </p>
           </div>
 
-          {/* 1. Name */}
           <div>
             <label style={lbl}>{t.name_label}</label>
             <input
@@ -158,7 +160,6 @@ export default function CheckInPage() {
             />
           </div>
 
-          {/* 2. Journey */}
           <div>
             <label style={lbl}>{t.journey_label}</label>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
@@ -168,7 +169,6 @@ export default function CheckInPage() {
             </div>
           </div>
 
-          {/* 3. Provider */}
           <div>
             <label style={lbl}>{t.provider_label}</label>
             <div style={{ display: "flex", gap: 8 }}>
@@ -178,7 +178,6 @@ export default function CheckInPage() {
             </div>
           </div>
 
-          {/* 4. Medication */}
           <div>
             <label style={lbl}>{t.meds_label}</label>
             <div style={{ display: "flex", gap: 8 }}>
@@ -188,7 +187,6 @@ export default function CheckInPage() {
             </div>
           </div>
 
-          {/* 5. Pronouns */}
           <div>
             <label style={lbl}>{t.pronouns_label}</label>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
@@ -198,7 +196,6 @@ export default function CheckInPage() {
             </div>
           </div>
 
-          {/* 6. Mood */}
           <div>
             <label style={lbl}>{t.mood_label}</label>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
@@ -210,8 +207,16 @@ export default function CheckInPage() {
 
         </div>
 
-        {/* Bottom row — pinned, never pushed away */}
-        <div style={{ flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+        {/* Bottom row — inside the card, pinned to bottom */}
+        <div style={{
+          flexShrink: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          paddingTop: 16,
+          marginTop: "auto",
+          borderTop: "1px solid rgba(255,255,255,0.07)",
+        }}>
           <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
             <input type="checkbox" checked={skipFlag} onChange={e => setSkipFlag(e.target.checked)}
               style={{ accentColor: "#c4956a", width: 13, height: 13, cursor: "pointer" }} />
