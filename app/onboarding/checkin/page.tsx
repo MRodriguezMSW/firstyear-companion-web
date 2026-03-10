@@ -123,7 +123,7 @@ export default function CheckInPage() {
       <div style={{
         width: "100%",
         maxWidth: 560,
-        height: "100vh",
+        height: "100%",
         display: "flex",
         flexDirection: "column",
         background: "var(--bg, #1A2E1E)",

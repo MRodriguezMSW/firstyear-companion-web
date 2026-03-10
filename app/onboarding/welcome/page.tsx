@@ -87,7 +87,7 @@ export default function WelcomePage() {
 
       {/* Scrollable content area */}
       <div style={{
-        flex: 1, overflowY: "auto", overflowX: "hidden",
+        flex: 1, overflow: "hidden",
         position: "relative", zIndex: 1,
         WebkitOverflowScrolling: "touch",
         display: "flex", flexDirection: "column",
