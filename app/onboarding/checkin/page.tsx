@@ -96,7 +96,7 @@ export default function CheckInPage() {
 
   return (
     <div style={{
-      flex: 1, overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", minHeight: 0,
+      flex: 1, overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "stretch", minHeight: 0,
       background: "var(--bg, #1A2E1E)",
     }}>
       <div className={`${styles.bgOrb} ${styles.bgOrb1}`} />
