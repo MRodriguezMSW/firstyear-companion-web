@@ -95,7 +95,7 @@ export default function WelcomePage() {
         <div style={{ maxWidth: 680, margin: "0 auto", padding: "16px 16px 16px", flex: 1, display: "flex", flexDirection: "column", width: "100%" }}>
 
           {/* Full-width card — flex: 1 so it fills the viewport with no dark gap below */}
-          <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, padding: "22px 24px", flex: 1, display: "flex", flexDirection: "column" }}>
+          <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, padding: "16px 24px", flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
 
             {/* Top row: logo/title + language dropdown */}
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 4 }}>
@@ -159,13 +159,13 @@ export default function WelcomePage() {
 
             {/* Info cards — auto height, no flex:1 on cards to prevent phantom empty space */}
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 14 }}>
-              <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "16px 18px" }}>
-                <div style={{ fontFamily: "'Lora', serif", fontSize: 22, fontWeight: 500, color: "var(--text)", marginBottom: 8 }}>{t.what_title}</div>
-                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 17, color: "rgba(216,208,192,0.65)", lineHeight: 1.6 }}>{t.what_body}</div>
+              <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
+                <div style={{ fontFamily: "'Lora', serif", fontSize: 15, fontWeight: 500, color: "var(--text)", marginBottom: 8 }}>{t.what_title}</div>
+                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "rgba(216,208,192,0.65)", lineHeight: 1.6 }}>{t.what_body}</div>
               </div>
-              <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "16px 18px" }}>
-                <div style={{ fontFamily: "'Lora', serif", fontSize: 22, fontWeight: 500, color: "var(--text)", marginBottom: 8 }}>{t.nova_title}</div>
-                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 17, color: "rgba(216,208,192,0.65)", lineHeight: 1.6 }}>{t.nova_body}</div>
+              <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
+                <div style={{ fontFamily: "'Lora', serif", fontSize: 15, fontWeight: 500, color: "var(--text)", marginBottom: 8 }}>{t.nova_title}</div>
+                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "rgba(216,208,192,0.65)", lineHeight: 1.6 }}>{t.nova_body}</div>
               </div>
             </div>
 
@@ -175,7 +175,7 @@ export default function WelcomePage() {
                 display: "flex", alignItems: "flex-start", gap: 10,
                 background: check1 ? "rgba(74,124,111,0.08)" : "rgba(255,255,255,0.03)",
                 border: `1px solid ${check1 ? "rgba(74,124,111,0.35)" : "rgba(255,255,255,0.08)"}`,
-                borderRadius: 10, padding: "11px 13px",
+                borderRadius: 10, padding: "8px 12px",
                 cursor: "pointer", transition: "all 0.2s ease",
               }}>
                 <input type="checkbox" checked={check1} onChange={e => setCheck1(e.target.checked)}
@@ -189,7 +189,7 @@ export default function WelcomePage() {
                 display: "flex", alignItems: "flex-start", gap: 10,
                 background: check2 ? "rgba(74,124,111,0.08)" : "rgba(255,255,255,0.03)",
                 border: `1px solid ${check2 ? "rgba(74,124,111,0.35)" : "rgba(255,255,255,0.08)"}`,
-                borderRadius: 10, padding: "11px 13px",
+                borderRadius: 10, padding: "8px 12px",
                 cursor: "pointer", transition: "all 0.2s ease",
               }}>
                 <input type="checkbox" checked={check2} onChange={e => setCheck2(e.target.checked)}
@@ -203,7 +203,7 @@ export default function WelcomePage() {
                 display: "flex", alignItems: "flex-start", gap: 10,
                 background: skipFlag ? "rgba(74,124,111,0.08)" : "rgba(255,255,255,0.03)",
                 border: `1px solid ${skipFlag ? "rgba(74,124,111,0.35)" : "rgba(255,255,255,0.08)"}`,
-                borderRadius: 10, padding: "11px 13px",
+                borderRadius: 10, padding: "8px 12px",
                 cursor: "pointer", transition: "all 0.2s ease",
               }}>
                 <input type="checkbox" checked={skipFlag} onChange={e => setSkipFlag(e.target.checked)}
@@ -215,19 +215,19 @@ export default function WelcomePage() {
             </div>
 
             {/* Privacy note — below checkboxes */}
-            <div style={{ background: "rgba(74,124,111,0.07)", border: "1px solid rgba(74,124,111,0.2)", borderRadius: 10, padding: "9px 13px", marginBottom: 8 }}>
+            <div style={{ background: "rgba(74,124,111,0.07)", border: "1px solid rgba(74,124,111,0.2)", borderRadius: 10, padding: "6px 12px", marginBottom: 8 }}>
               <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.72)", lineHeight: 1.5, margin: 0 }}>
                 🔒 {t.privacy_note}
               </p>
             </div>
 
             {/* Beta notice — below privacy note */}
-            <div style={{ background: "rgba(196,149,106,0.08)", border: "1px solid rgba(196,149,106,0.2)", borderRadius: 10, padding: "9px 13px", marginBottom: 14, fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.82)", lineHeight: 1.5 }}>
+            <div style={{ background: "rgba(196,149,106,0.08)", border: "1px solid rgba(196,149,106,0.2)", borderRadius: 10, padding: "6px 12px", marginBottom: 14, fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.82)", lineHeight: 1.5 }}>
               {t.beta_notice}
             </div>
 
             {/* Continue button */}
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 8 }}>
               <button
                 className="wlc-cont"
                 onClick={handleContinue}

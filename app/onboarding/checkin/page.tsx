@@ -96,7 +96,7 @@ export default function CheckInPage() {
 
   return (
     <div style={{
-      flex: 1, overflow: "hidden", display: "flex", flexDirection: "column",
+      flex: 1, overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center",
       background: "var(--bg, #1A2E1E)",
     }}>
       <div className={`${styles.bgOrb} ${styles.bgOrb1}`} />
@@ -122,7 +122,8 @@ export default function CheckInPage() {
       {/* Single card — content + buttons together, no separate containers */}
       <div style={{
         width: "100%",
-        maxWidth: 560,
+        maxWidth: "100%",
+        margin: "0 auto",
         height: "100%",
         display: "flex",
         flexDirection: "column",
