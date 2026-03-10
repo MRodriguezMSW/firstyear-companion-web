@@ -98,7 +98,7 @@ export default function CheckInPage() {
   return (
     <div style={{
       position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-      display: "flex", flexDirection: "column",
+      display: "flex", alignItems: "center", justifyContent: "center",
       overflow: "hidden", background: "var(--bg, #1A2E1E)",
     }}>
       <div className={`${styles.bgOrb} ${styles.bgOrb1}`} />
@@ -121,12 +121,8 @@ export default function CheckInPage() {
         </div>
       )}
 
-      {/* Scrollable content */}
-      <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", WebkitOverflowScrolling: "touch", position: "relative", zIndex: 1, display: "flex", flexDirection: "column" }}>
-        <div style={{ maxWidth: 680, margin: "0 auto", padding: "12px 14px 16px", flex: 1, display: "flex", flexDirection: "column", width: "100%" }}>
-
-          {/* Main card — content flows top to bottom, no spacer pushing footer down */}
-          <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 20, padding: "18px 20px", display: "flex", flexDirection: "column", justifyContent: "flex-start" }}>
+      {/* Card — fills full viewport, edge to edge, scrollable internally */}
+      <div style={{ width: "100%", maxWidth: "100%", height: "100%", boxSizing: "border-box", background: "rgba(255,255,255,0.05)", borderRadius: 0, padding: "18px 20px", display: "flex", flexDirection: "column", justifyContent: "flex-start", overflowY: "auto", overflowX: "hidden", WebkitOverflowScrolling: "touch", position: "relative", zIndex: 1 }}>
 
             <h2 style={{ fontFamily: "'Lora', serif", fontSize: 22, fontWeight: 500, color: "var(--text)", margin: "0 0 4px" }}>{t.title}</h2>
             <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "rgba(216,208,192,0.55)", marginBottom: 18, lineHeight: 1.5 }}>
@@ -215,8 +211,6 @@ export default function CheckInPage() {
               </div>
             </div>
 
-          </div>
-        </div>
       </div>
 
       <CrisisButton />
