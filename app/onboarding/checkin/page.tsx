@@ -18,15 +18,6 @@ export default function CheckInPage() {
   const [skipFlag, setSkipFlag] = useState(false);
   const [modal, setModal] = useState<"provider" | "meds" | null>(null);
 
-  useEffect(() => {
-    const prevHtml = document.documentElement.style.overflow;
-    document.documentElement.style.overflow = "hidden";
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.documentElement.style.overflow = prevHtml;
-      document.body.style.overflow = "";
-    };
-  }, []);
 
   useEffect(() => {
     const saved = localStorage.getItem("companion_language") ?? "en-US";
@@ -96,7 +87,7 @@ export default function CheckInPage() {
 
   return (
     <div style={{
-      flex: 1, overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "stretch", justifyContent: "center", minHeight: 0,
+      minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "stretch", justifyContent: "center",
       background: "var(--bg, #1A2E1E)",
     }}>
       <div className={`${styles.bgOrb} ${styles.bgOrb1}`} />
@@ -125,7 +116,7 @@ export default function CheckInPage() {
         maxWidth: "100%",
         margin: "0 auto",
         height: "auto",
-        minHeight: 0,
+        minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
         background: "var(--bg, #1A2E1E)",
@@ -136,7 +127,7 @@ export default function CheckInPage() {
       }}>
 
         {/* Content area — form fields only */}
-        <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", gap: 16, overflow: "hidden", minHeight: 0 }}>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 16 }}>
 
           <div>
             <h2 style={{ fontFamily: "'Lora', serif", fontSize: 22, fontWeight: 500, color: "var(--text)", margin: "0 0 4px" }}>{t.title}</h2>
@@ -212,8 +203,8 @@ export default function CheckInPage() {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          paddingTop: 16,
-          marginTop: 24,
+          paddingTop: 24,
+          marginTop: "auto",
           borderTop: "1px solid rgba(255,255,255,0.07)",
         }}>
           <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>

@@ -17,15 +17,6 @@ export default function WelcomePage() {
   const t = getS1(lang);
   const currentLangLabel = LANG_TILES.find(l => l.code === lang)?.label ?? "English";
 
-  useEffect(() => {
-    const prev = document.documentElement.style.overflow;
-    document.documentElement.style.overflow = "hidden";
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.documentElement.style.overflow = prev;
-      document.body.style.overflow = "";
-    };
-  }, []);
 
   useEffect(() => {
     const saved = localStorage.getItem("companion_language");
@@ -61,7 +52,7 @@ export default function WelcomePage() {
 
   return (
     <div style={{
-      flex: 1, overflow: "hidden", display: "flex", flexDirection: "column", minHeight: 0,
+      minHeight: "100vh", display: "flex", flexDirection: "column",
       background: "var(--bg, #1A2E1E)",
     }}>
       {/* Ambient orbs */}
@@ -87,7 +78,7 @@ export default function WelcomePage() {
 
       {/* Scrollable content area */}
       <div style={{
-        flex: 1, overflow: "hidden", minHeight: 0,
+        flex: 1,
         position: "relative", zIndex: 1,
         WebkitOverflowScrolling: "touch",
         display: "flex", flexDirection: "column",
@@ -95,7 +86,7 @@ export default function WelcomePage() {
         <div style={{ maxWidth: 680, margin: "0 auto", padding: "16px 16px 16px", flex: 1, display: "flex", flexDirection: "column", width: "100%", minHeight: 0 }}>
 
           {/* Full-width card — flex: 1 so it fills the viewport with no dark gap below */}
-          <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, padding: "16px 24px", flex: 1, display: "flex", flexDirection: "column", gap: 8, minHeight: 0 }}>
+          <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, padding: "16px 24px", flex: 1, display: "flex", flexDirection: "column", gap: 8, height: "auto", minHeight: "100vh" }}>
 
             {/* Top row: logo/title + language dropdown */}
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 4 }}>
