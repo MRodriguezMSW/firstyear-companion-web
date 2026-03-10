@@ -136,7 +136,7 @@ export default function CheckInPage() {
       }}>
 
         {/* Content area — form fields only */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 16, overflow: "hidden", minHeight: 0 }}>
+        <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", gap: 16, overflow: "hidden", minHeight: 0 }}>
 
           <div>
             <h2 style={{ fontFamily: "'Lora', serif", fontSize: 22, fontWeight: 500, color: "var(--text)", margin: "0 0 4px" }}>{t.title}</h2>
