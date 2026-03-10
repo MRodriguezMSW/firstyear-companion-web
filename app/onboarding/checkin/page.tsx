@@ -18,7 +18,6 @@ export default function CheckInPage() {
   const [skipFlag, setSkipFlag] = useState(false);
   const [modal, setModal] = useState<"provider" | "meds" | null>(null);
 
-
   useEffect(() => {
     const saved = localStorage.getItem("companion_language") ?? "en-US";
     setLang(saved);
@@ -52,113 +51,157 @@ export default function CheckInPage() {
   };
 
   const lbl: React.CSSProperties = {
-    display: "block", fontFamily: "'DM Sans', sans-serif",
-    fontSize: 13, fontWeight: 600, color: "rgba(216,208,192,0.5)",
-    letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8,
+    display: "block",
+    fontFamily: "'DM Sans', sans-serif",
+    fontSize: 10,
+    fontWeight: 600,
+    color: "rgba(216,208,192,0.5)",
+    letterSpacing: "0.08em",
+    textTransform: "uppercase",
+    marginBottom: 6,
   };
 
   const pill = (active: boolean): React.CSSProperties => ({
     background: active ? "rgba(74,124,111,0.22)" : "rgba(255,255,255,0.04)",
     border: `1px solid ${active ? "rgba(74,124,111,0.65)" : "rgba(255,255,255,0.09)"}`,
-    borderRadius: 10, padding: "9px 16px",
-    fontFamily: "'DM Sans', sans-serif", fontSize: 13,
+    borderRadius: 10,
+    padding: "6px 12px",
+    fontFamily: "'DM Sans', sans-serif",
+    fontSize: 11,
     color: active ? "#8ecfbe" : "rgba(216,208,192,0.7)",
-    cursor: "pointer", transition: "all 0.15s ease", whiteSpace: "nowrap" as const,
+    cursor: "pointer",
+    transition: "all 0.15s ease",
+    whiteSpace: "nowrap" as const,
   });
 
   const yn = (active: boolean): React.CSSProperties => ({
     flex: 1,
     background: active ? "rgba(74,124,111,0.22)" : "rgba(255,255,255,0.04)",
     border: `1px solid ${active ? "rgba(74,124,111,0.65)" : "rgba(255,255,255,0.09)"}`,
-    borderRadius: 8, padding: "11px 6px",
-    fontFamily: "'DM Sans', sans-serif", fontSize: 13,
+    borderRadius: 8,
+    padding: "8px",
+    fontFamily: "'DM Sans', sans-serif",
+    fontSize: 12,
     color: active ? "#8ecfbe" : "rgba(216,208,192,0.65)",
-    cursor: "pointer", textAlign: "center" as const, transition: "all 0.15s ease",
+    cursor: "pointer",
+    textAlign: "center" as const,
+    transition: "all 0.15s ease",
   });
 
   const chip = (active: boolean): React.CSSProperties => ({
     background: active ? "rgba(74,124,111,0.22)" : "rgba(255,255,255,0.04)",
     border: `1px solid ${active ? "rgba(74,124,111,0.65)" : "rgba(255,255,255,0.09)"}`,
-    borderRadius: 16, padding: "8px 14px",
-    fontFamily: "'DM Sans', sans-serif", fontSize: 13,
+    borderRadius: 16,
+    padding: "6px 10px",
+    fontFamily: "'DM Sans', sans-serif",
+    fontSize: 11,
     color: active ? "#8ecfbe" : "rgba(216,208,192,0.7)",
-    cursor: "pointer", whiteSpace: "nowrap" as const, transition: "all 0.15s ease",
+    cursor: "pointer",
+    whiteSpace: "nowrap" as const,
+    transition: "all 0.15s ease",
   });
 
   return (
-    <div style={{
-      minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "stretch", justifyContent: "center",
-      background: "var(--bg, #1A2E1E)",
-    }}>
-      <div className={`${styles.bgOrb} ${styles.bgOrb1}`} />
-      <div className={`${styles.bgOrb} ${styles.bgOrb2}`} />
+    <>
+      <style>{`
+        @media (max-width: 479px) {
+          .checkin-card {
+            width: 100% !important;
+            border-radius: 0 !important;
+            padding: 20px 16px !important;
+            overflow-y: auto !important;
+          }
+        }
+      `}</style>
 
-      {/* Modal overlay */}
-      {modal && (
-        <div className={styles.warmModalOverlay} onClick={() => setModal(null)}>
-          <div className={styles.warmModal} onClick={e => e.stopPropagation()}>
-            <div style={{ fontFamily: "'Lora', serif", fontSize: 18, fontWeight: 500, color: "var(--text)", marginBottom: 14 }}>
-              {modal === "provider" ? "💙" : "🌱"}
-            </div>
-            <p className={styles.warmModalText}>
-              {modal === "provider" ? t.provider_modal : t.meds_modal}
-            </p>
-            <button className={styles.warmModalBtn} onClick={() => setModal(null)}>
-              {modal === "provider" ? t.provider_modal_btn : t.meds_modal_btn}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Single card — content + buttons together, no separate containers */}
+      {/* Page wrapper — fixed, centered, no scroll */}
       <div style={{
-        width: "100%",
-        maxWidth: "100%",
-        margin: "0 auto",
-        height: "auto",
-        minHeight: "100vh",
+        position: "fixed",
+        top: 0, left: 0, right: 0, bottom: 0,
         display: "flex",
-        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
         background: "var(--bg, #1A2E1E)",
-        padding: "32px 24px 24px",
-        boxSizing: "border-box",
-        position: "relative",
-        zIndex: 1,
+        overflow: "hidden",
       }}>
 
-        {/* Content area — form fields only */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 16 }}>
+        {/* Modal overlay */}
+        {modal && (
+          <div className={styles.warmModalOverlay} onClick={() => setModal(null)}>
+            <div className={styles.warmModal} onClick={e => e.stopPropagation()}>
+              <div style={{ fontFamily: "'Lora', serif", fontSize: 18, fontWeight: 500, color: "var(--text)", marginBottom: 14 }}>
+                {modal === "provider" ? "💙" : "🌱"}
+              </div>
+              <p className={styles.warmModalText}>
+                {modal === "provider" ? t.provider_modal : t.meds_modal}
+              </p>
+              <button className={styles.warmModalBtn} onClick={() => setModal(null)}>
+                {modal === "provider" ? t.provider_modal_btn : t.meds_modal_btn}
+              </button>
+            </div>
+          </div>
+        )}
 
+        {/* Card */}
+        <div
+          className="checkin-card"
+          style={{
+            width: "90%",
+            maxWidth: 480,
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(255,255,255,0.09)",
+            borderRadius: 18,
+            padding: "24px 24px 20px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 12,
+            boxSizing: "border-box",
+          }}
+        >
+
+          {/* Title */}
           <div>
-            <h2 style={{ fontFamily: "'Lora', serif", fontSize: 22, fontWeight: 500, color: "var(--text)", margin: "0 0 4px" }}>{t.title}</h2>
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "rgba(216,208,192,0.55)", margin: 0, lineHeight: 1.5 }}>
+            <h2 style={{ fontFamily: "'Lora', serif", fontSize: 18, fontWeight: 500, color: "var(--text)", margin: "0 0 3px" }}>
+              {t.title}
+            </h2>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "rgba(216,208,192,0.55)", margin: 0, lineHeight: 1.4 }}>
               {t.sub}
             </p>
           </div>
 
+          {/* Name */}
           <div>
             <label style={lbl}>{t.name_label}</label>
             <input
               type="text" value={name} onChange={e => setName(e.target.value)}
               placeholder={t.name_ph}
               style={{
-                width: "100%", boxSizing: "border-box", height: 44,
-                background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)",
-                borderRadius: 8, padding: "0 14px",
-                fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: "var(--text)", outline: "none",
+                width: "100%",
+                boxSizing: "border-box",
+                height: 36,
+                background: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.09)",
+                borderRadius: 8,
+                padding: "0 12px",
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: 12,
+                color: "var(--text)",
+                outline: "none",
               }}
             />
           </div>
 
+          {/* Journey */}
           <div>
             <label style={lbl}>{t.journey_label}</label>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {t.journey_opts.map(opt => (
                 <button key={opt} style={pill(journey === opt)} onClick={() => setJourney(opt)}>{opt}</button>
               ))}
             </div>
           </div>
 
+          {/* Provider */}
           <div>
             <label style={lbl}>{t.provider_label}</label>
             <div style={{ display: "flex", gap: 8 }}>
@@ -168,6 +211,7 @@ export default function CheckInPage() {
             </div>
           </div>
 
+          {/* Medication */}
           <div>
             <label style={lbl}>{t.meds_label}</label>
             <div style={{ display: "flex", gap: 8 }}>
@@ -177,54 +221,84 @@ export default function CheckInPage() {
             </div>
           </div>
 
+          {/* Pronouns */}
           <div>
             <label style={lbl}>{t.pronouns_label}</label>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {t.pronouns_opts.map(opt => (
                 <button key={opt} style={pill(pronouns === opt)} onClick={() => setPronouns(pronouns === opt ? "" : opt)}>{opt}</button>
               ))}
             </div>
           </div>
 
+          {/* Mood */}
           <div>
             <label style={lbl}>{t.mood_label}</label>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {t.mood_opts.map(opt => (
                 <button key={opt} style={chip(moods.includes(opt))} onClick={() => toggleMood(opt)}>{opt}</button>
               ))}
             </div>
           </div>
 
-        </div>
-
-        {/* Bottom row — inside the card, pinned to bottom */}
-        <div style={{
-          flexShrink: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          paddingTop: 24,
-          marginTop: "auto",
-          borderTop: "1px solid rgba(255,255,255,0.07)",
-        }}>
-          <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-            <input type="checkbox" checked={skipFlag} onChange={e => setSkipFlag(e.target.checked)}
-              style={{ accentColor: "#c4956a", width: 13, height: 13, cursor: "pointer" }} />
-            <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "rgba(216,208,192,0.32)" }}>{t.skip_label}</span>
-          </label>
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <button onClick={() => router.push("/chat")} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "9px 16px", fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.45)", cursor: "pointer" }}>
-              {t.skip_btn}
-            </button>
-            <button onClick={saveAndGo} style={{ background: "linear-gradient(135deg, #c4956a 0%, #a87a52 100%)", border: "none", borderRadius: 8, padding: "9px 24px", fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500, color: "#fff", cursor: "pointer", boxShadow: "0 4px 16px rgba(196,149,106,0.3)" }}>
-              {t.start_btn} →
-            </button>
+          {/* Bottom row — inside card, no marginTop auto */}
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            paddingTop: 12,
+            borderTop: "1px solid rgba(255,255,255,0.07)",
+            flexShrink: 0,
+          }}>
+            <label style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer" }}>
+              <input
+                type="checkbox" checked={skipFlag} onChange={e => setSkipFlag(e.target.checked)}
+                style={{ accentColor: "#c4956a", width: 13, height: 13, cursor: "pointer" }}
+              />
+              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 10, color: "rgba(216,208,192,0.32)" }}>
+                {t.skip_label}
+              </span>
+            </label>
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <button
+                onClick={() => router.push("/chat")}
+                style={{
+                  background: "transparent",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: 8,
+                  padding: "7px 14px",
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: 11,
+                  color: "rgba(216,208,192,0.45)",
+                  cursor: "pointer",
+                }}
+              >
+                {t.skip_btn}
+              </button>
+              <button
+                onClick={saveAndGo}
+                style={{
+                  background: "linear-gradient(135deg, #c4956a 0%, #a87a52 100%)",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "7px 14px",
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: 11,
+                  fontWeight: 500,
+                  color: "#fff",
+                  cursor: "pointer",
+                  boxShadow: "0 4px 16px rgba(196,149,106,0.3)",
+                }}
+              >
+                {t.start_btn} →
+              </button>
+            </div>
           </div>
-        </div>
 
+        </div>
       </div>
 
       <CrisisButton />
-    </div>
+    </>
   );
 }
