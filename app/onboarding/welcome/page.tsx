@@ -83,7 +83,7 @@ export default function WelcomePage() {
         WebkitOverflowScrolling: "touch",
         display: "flex", flexDirection: "column",
       }}>
-        <div style={{ maxWidth: 680, margin: "0 auto", padding: "16px 16px 16px", flex: 1, display: "flex", flexDirection: "column", width: "100%", minHeight: 0 }}>
+        <div style={{ maxWidth: 680, margin: "0 auto", padding: "16px 16px 16px", flex: 1, display: "flex", flexDirection: "column", width: "100%" }}>
 
           {/* Full-width card — flex: 1 so it fills the viewport with no dark gap below */}
           <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, padding: "16px 24px", flex: 1, display: "flex", flexDirection: "column", gap: 8, height: "auto", minHeight: "100vh" }}>
