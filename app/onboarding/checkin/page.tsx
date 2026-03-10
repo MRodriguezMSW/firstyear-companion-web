@@ -119,10 +119,11 @@ export default function CheckInPage() {
         position: "fixed",
         top: 0, left: 0, right: 0, bottom: 0,
         display: "flex",
-        alignItems: "center",
+        alignItems: "stretch",
         justifyContent: "center",
         background: "var(--bg, #1A2E1E)",
         overflow: "hidden",
+        padding: "24px 0",
       }}>
 
         {/* Modal overlay */}
@@ -148,12 +149,14 @@ export default function CheckInPage() {
           style={{
             width: "90%",
             maxWidth: 760,
+            minHeight: "calc(100vh - 48px)",
             background: "rgba(255,255,255,0.04)",
             border: "1px solid rgba(255,255,255,0.09)",
             borderRadius: 18,
             padding: "24px 24px 20px",
             display: "flex",
             flexDirection: "column",
+            justifyContent: "space-between",
             gap: 12,
             boxSizing: "border-box",
           }}
