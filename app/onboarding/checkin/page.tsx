@@ -125,8 +125,8 @@ export default function CheckInPage() {
       <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", WebkitOverflowScrolling: "touch", position: "relative", zIndex: 1, display: "flex", flexDirection: "column" }}>
         <div style={{ maxWidth: 680, margin: "0 auto", padding: "12px 14px 16px", flex: 1, display: "flex", flexDirection: "column", width: "100%" }}>
 
-          {/* Main card — flex: 1 to fill viewport, no dark gap below */}
-          <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 20, padding: "18px 20px", flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          {/* Main card — content flows top to bottom, no spacer pushing footer down */}
+          <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 20, padding: "18px 20px", display: "flex", flexDirection: "column", justifyContent: "flex-start" }}>
 
             <h2 style={{ fontFamily: "'Lora', serif", fontSize: 22, fontWeight: 500, color: "var(--text)", margin: "0 0 4px" }}>{t.title}</h2>
             <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "rgba(216,208,192,0.55)", marginBottom: 18, lineHeight: 1.5 }}>
@@ -198,11 +198,8 @@ export default function CheckInPage() {
               </div>
             </div>
 
-            {/* Spacer — pushes footer to bottom of card without creating a visible empty box */}
-            <div style={{ flex: 1, minHeight: 0 }} />
-
-            {/* Footer */}
-            <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: 14, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+            {/* Footer — sits naturally below chips with 24px gap, no pushing to bottom */}
+            <div style={{ marginTop: 24, borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: 14, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
               <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
                 <input type="checkbox" checked={skipFlag} onChange={e => setSkipFlag(e.target.checked)}
                   style={{ accentColor: "#c4956a", width: 13, height: 13, cursor: "pointer" }} />
