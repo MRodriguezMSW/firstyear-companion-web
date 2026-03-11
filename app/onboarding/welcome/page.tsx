@@ -92,9 +92,13 @@ export default function WelcomePage() {
 
   return (
     <div style={{
-      minHeight: "100vh", display: "flex", flexDirection: "column",
       background: "var(--bg, #1A2E1E)",
-      paddingTop: 40, paddingBottom: 40,
+      minHeight: "100vh",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      paddingTop: "32px",
+      paddingBottom: "32px",
     }}>
       {/* Ambient orbs */}
       <div aria-hidden style={{
@@ -119,7 +123,7 @@ export default function WelcomePage() {
       `}</style>
 
       {/* Content area */}
-      <div style={{ position: "relative", zIndex: 1, maxWidth: 680, margin: "0 auto", padding: "0 16px", width: "100%" }}>
+      <div style={{ position: "relative", zIndex: 1, maxWidth: 680, width: "100%", padding: "0 16px" }}>
 
           {/* Card — height auto, floats in page */}
           <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, padding: "16px 24px", display: "flex", flexDirection: "column", height: "auto" }}>
