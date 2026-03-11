@@ -4,6 +4,19 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 import { LANGUAGE_OPTIONS, getStrings, readLang } from "../i18n";
 
+// ── Themes ────────────────────────────────────────────────────────────────────
+const THEMES = [
+  { id: "calm-sea",       name: "Calm Sea",       swatch: "#88BDF2" },
+  { id: "quiet-grove",    name: "Quiet Grove",    swatch: "#BAC095" },
+  { id: "lavender-night", name: "Lavender Night", swatch: "#8686AC" },
+  { id: "sage-stone",     name: "Sage & Stone",   swatch: "#B2AC88" },
+  { id: "warm-clay",      name: "Warm Clay",      swatch: "#BF7587" },
+  { id: "deep-teal",      name: "Deep Teal",      swatch: "#4F7C82" },
+  { id: "painted-iris",   name: "Painted Iris",   swatch: "#B298E7" },
+  { id: "desert-bloom",   name: "Desert Bloom",   swatch: "#9988A1" },
+  { id: "meadow-mist",    name: "Meadow Mist",    swatch: "#68BA7F" },
+];
+
 // ── Constants (English keys — stored in profile for AI context) ────────────────
 const PRONOUN_KEYS = ["She/Her", "He/Him", "They/Them", "Ze/Zir", "Prefer not to say", "Other"];
 const AGE_RANGE_KEYS = ["Under 18", "18–24", "25–34", "35–44", "45–54", "55+", "Prefer not to say"];
@@ -426,12 +439,14 @@ export default function ProfilePage() {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [langCode, setLangCode] = useState("en-US");
+  const [activeTheme, setActiveTheme] = useState("calm-sea");
   const t = getStrings(langCode);
 
   // Apply theme + language from localStorage
   useEffect(() => {
-    const theme = localStorage.getItem("companion_theme") || "grounded";
+    const theme = localStorage.getItem("companion_theme") || "calm-sea";
     document.documentElement.setAttribute("data-theme", theme);
+    setActiveTheme(theme);
     setLangCode(readLang());
   }, []);
 
@@ -601,6 +616,39 @@ export default function ProfilePage() {
                   <option key={l.code} value={l.code}>{l.flag} {l.label}</option>
                 ))}
               </select>
+            </div>
+
+            {/* Theme */}
+            <div style={S.section}>
+              <div style={S.label}>Color Theme</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                {THEMES.map(th => (
+                  <div key={th.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5 }}>
+                    <button
+                      onClick={() => {
+                        setActiveTheme(th.id);
+                        localStorage.setItem("companion_theme", th.id);
+                        document.documentElement.setAttribute("data-theme", th.id);
+                      }}
+                      style={{
+                        width: 28, height: 28, borderRadius: "50%",
+                        background: th.swatch, border: "none",
+                        cursor: "pointer", padding: 0,
+                        outline: activeTheme === th.id ? "2px solid #fff" : "2px solid transparent",
+                        outlineOffset: 2,
+                        transition: "outline 0.15s ease",
+                      }}
+                    />
+                    <span style={{
+                      fontFamily: "'DM Sans', sans-serif", fontSize: 9,
+                      color: "color-mix(in srgb, var(--text) 50%, transparent)",
+                      textAlign: "center", maxWidth: 52, lineHeight: 1.2,
+                    }}>
+                      {th.name}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Mood */}

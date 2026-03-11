@@ -5,6 +5,18 @@ import { useRouter } from "next/navigation";
 import { LANG_TILES, S1_STRINGS, getS1, type LangCode6 } from "../translations";
 import CrisisButton from "../../components/CrisisButton";
 
+const THEMES = [
+  { id: "calm-sea",       name: "Calm Sea",       swatch: "#88BDF2" },
+  { id: "quiet-grove",    name: "Quiet Grove",    swatch: "#BAC095" },
+  { id: "lavender-night", name: "Lavender Night", swatch: "#8686AC" },
+  { id: "sage-stone",     name: "Sage & Stone",   swatch: "#B2AC88" },
+  { id: "warm-clay",      name: "Warm Clay",      swatch: "#BF7587" },
+  { id: "deep-teal",      name: "Deep Teal",      swatch: "#4F7C82" },
+  { id: "painted-iris",   name: "Painted Iris",   swatch: "#B298E7" },
+  { id: "desert-bloom",   name: "Desert Bloom",   swatch: "#9988A1" },
+  { id: "meadow-mist",    name: "Meadow Mist",    swatch: "#68BA7F" },
+];
+
 export default function WelcomePage() {
   const router = useRouter();
   const [lang, setLang] = useState<LangCode6>("en-US");
@@ -12,6 +24,8 @@ export default function WelcomePage() {
   const [check2, setCheck2] = useState(false);
   const [skipFlag, setSkipFlag] = useState(false);
   const [langDropOpen, setLangDropOpen] = useState(false);
+  const [theme, setTheme] = useState("calm-sea");
+  const [hoveredTheme, setHoveredTheme] = useState<string | null>(null);
   const dropRef = useRef<HTMLDivElement>(null);
 
   const t = getS1(lang);
@@ -22,6 +36,9 @@ export default function WelcomePage() {
     const saved = localStorage.getItem("companion_language");
     const validCodes = Object.keys(S1_STRINGS);
     if (saved && validCodes.includes(saved)) setLang(saved as LangCode6);
+    const savedTheme = localStorage.getItem("companion_theme") || "calm-sea";
+    setTheme(savedTheme);
+    document.documentElement.setAttribute("data-theme", savedTheme);
   }, []);
 
   // Close dropdown when clicking outside
@@ -39,6 +56,12 @@ export default function WelcomePage() {
     setLang(code);
     localStorage.setItem("companion_language", code);
     setLangDropOpen(false);
+  };
+
+  const handleTheme = (id: string) => {
+    setTheme(id);
+    localStorage.setItem("companion_theme", id);
+    document.documentElement.setAttribute("data-theme", id);
   };
 
   const handleContinue = () => {
@@ -97,8 +120,45 @@ export default function WelcomePage() {
                 </h1>
               </div>
 
+              {/* Theme picker + language dropdown */}
+              <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0, marginLeft: 12 }}>
+
+              {/* Theme swatches */}
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 4, maxWidth: 108, position: "relative" }}>
+                {THEMES.map(th => (
+                  <div key={th.id} style={{ position: "relative" }}>
+                    <button
+                      onClick={() => handleTheme(th.id)}
+                      onMouseEnter={() => setHoveredTheme(th.id)}
+                      onMouseLeave={() => setHoveredTheme(null)}
+                      title={th.name}
+                      style={{
+                        width: 20, height: 20, borderRadius: "50%",
+                        background: th.swatch, border: "none",
+                        cursor: "pointer", padding: 0, flexShrink: 0,
+                        outline: theme === th.id ? "2px solid #fff" : "2px solid transparent",
+                        outlineOffset: 2,
+                        transition: "outline 0.15s ease",
+                      }}
+                    />
+                    {hoveredTheme === th.id && (
+                      <div style={{
+                        position: "absolute", top: "calc(100% + 5px)", left: "50%",
+                        transform: "translateX(-50%)",
+                        background: "rgba(0,0,0,0.75)", color: "#fff",
+                        fontSize: 10, fontFamily: "'DM Sans', sans-serif",
+                        padding: "3px 6px", borderRadius: 5, whiteSpace: "nowrap",
+                        pointerEvents: "none", zIndex: 200,
+                      }}>
+                        {th.name}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
               {/* Language dropdown pill */}
-              <div ref={dropRef} style={{ position: "relative", flexShrink: 0, marginLeft: 12 }}>
+              <div ref={dropRef} style={{ position: "relative", flexShrink: 0 }}>
                 <button
                   onClick={() => setLangDropOpen(v => !v)}
                   style={{
@@ -142,6 +202,7 @@ export default function WelcomePage() {
                   </div>
                 )}
               </div>
+              </div>{/* end theme+lang wrapper */}
             </div>
 
             <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: "rgba(216,208,192,0.6)", margin: "8px 0 14px", fontWeight: 300, lineHeight: 1.4 }}>
