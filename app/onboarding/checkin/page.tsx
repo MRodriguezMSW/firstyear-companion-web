@@ -55,7 +55,7 @@ export default function CheckInPage() {
     fontFamily: "'DM Sans', sans-serif",
     fontSize: 13,
     fontWeight: 600,
-    color: "rgba(216,208,192,0.5)",
+    color: "color-mix(in srgb, var(--text) 55%, transparent)",
     letterSpacing: "0.08em",
     textTransform: "uppercase",
     marginBottom: 6,
@@ -63,12 +63,12 @@ export default function CheckInPage() {
 
   const pill = (active: boolean): React.CSSProperties => ({
     background: active ? "rgba(74,124,111,0.22)" : "rgba(255,255,255,0.04)",
-    border: `1px solid ${active ? "rgba(74,124,111,0.65)" : "rgba(255,255,255,0.09)"}`,
+    border: `1px solid ${active ? "rgba(74,124,111,0.65)" : "rgba(255,255,255,0.3)"}`,
     borderRadius: 10,
     padding: "6px 12px",
     fontFamily: "'DM Sans', sans-serif",
     fontSize: 12,
-    color: active ? "#8ecfbe" : "rgba(216,208,192,0.7)",
+    color: active ? "#8ecfbe" : "var(--text)",
     cursor: "pointer",
     transition: "all 0.15s ease",
     whiteSpace: "nowrap" as const,
@@ -77,12 +77,12 @@ export default function CheckInPage() {
   const yn = (active: boolean): React.CSSProperties => ({
     flex: 1,
     background: active ? "rgba(74,124,111,0.22)" : "rgba(255,255,255,0.04)",
-    border: `1px solid ${active ? "rgba(74,124,111,0.65)" : "rgba(255,255,255,0.09)"}`,
+    border: `1px solid ${active ? "rgba(74,124,111,0.65)" : "rgba(255,255,255,0.3)"}`,
     borderRadius: 8,
     padding: "8px",
     fontFamily: "'DM Sans', sans-serif",
     fontSize: 13,
-    color: active ? "#8ecfbe" : "rgba(216,208,192,0.65)",
+    color: active ? "#8ecfbe" : "var(--text)",
     cursor: "pointer",
     textAlign: "center" as const,
     transition: "all 0.15s ease",
@@ -90,12 +90,12 @@ export default function CheckInPage() {
 
   const chip = (active: boolean): React.CSSProperties => ({
     background: active ? "rgba(74,124,111,0.22)" : "rgba(255,255,255,0.04)",
-    border: `1px solid ${active ? "rgba(74,124,111,0.65)" : "rgba(255,255,255,0.09)"}`,
+    border: `1px solid ${active ? "rgba(74,124,111,0.65)" : "rgba(255,255,255,0.3)"}`,
     borderRadius: 16,
     padding: "6px 10px",
     fontFamily: "'DM Sans', sans-serif",
     fontSize: 12,
-    color: active ? "#8ecfbe" : "rgba(216,208,192,0.7)",
+    color: active ? "#8ecfbe" : "var(--text)",
     cursor: "pointer",
     whiteSpace: "nowrap" as const,
     transition: "all 0.15s ease",
@@ -122,6 +122,7 @@ export default function CheckInPage() {
         alignItems: "stretch",
         justifyContent: "center",
         background: "var(--bg, #1A2E1E)",
+        color: "var(--text)",
         overflow: "hidden",
         padding: "24px 0",
       }}>
@@ -167,7 +168,7 @@ export default function CheckInPage() {
             <h2 style={{ fontFamily: "'Lora', serif", fontSize: 18, fontWeight: 500, color: "var(--text)", margin: "0 0 3px" }}>
               {t.title}
             </h2>
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "rgba(216,208,192,0.55)", margin: 0, lineHeight: 1.4 }}>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "var(--subtext)", margin: 0, lineHeight: 1.4 }}>
               {t.sub}
             </p>
           </div>
@@ -182,8 +183,8 @@ export default function CheckInPage() {
                 width: "100%",
                 boxSizing: "border-box",
                 height: 36,
-                background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.09)",
+                background: "rgba(255,255,255,0.1)",
+                border: "1px solid rgba(255,255,255,0.2)",
                 borderRadius: 8,
                 padding: "0 12px",
                 fontFamily: "'DM Sans', sans-serif",
@@ -258,7 +259,7 @@ export default function CheckInPage() {
                 type="checkbox" checked={skipFlag} onChange={e => setSkipFlag(e.target.checked)}
                 style={{ accentColor: "#c4956a", width: 13, height: 13, cursor: "pointer" }}
               />
-              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "rgba(216,208,192,0.6)" }}>
+              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "var(--text)" }}>
                 {t.skip_label}
               </span>
             </label>
@@ -272,7 +273,7 @@ export default function CheckInPage() {
                   padding: "7px 14px",
                   fontFamily: "'DM Sans', sans-serif",
                   fontSize: 12,
-                  color: "rgba(216,208,192,0.45)",
+                  color: "var(--text)",
                   cursor: "pointer",
                 }}
               >
