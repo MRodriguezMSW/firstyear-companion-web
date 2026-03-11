@@ -94,6 +94,7 @@ export default function WelcomePage() {
     <div style={{
       minHeight: "100vh", display: "flex", flexDirection: "column",
       background: "var(--bg, #1A2E1E)",
+      paddingTop: 40, paddingBottom: 40,
     }}>
       {/* Ambient orbs */}
       <div aria-hidden style={{
@@ -117,22 +118,16 @@ export default function WelcomePage() {
         .wlc-theme-opt:hover { background: rgba(255,255,255,0.07) !important; }
       `}</style>
 
-      {/* Scrollable content area */}
-      <div style={{
-        flex: 1,
-        position: "relative", zIndex: 1,
-        WebkitOverflowScrolling: "touch",
-        display: "flex", flexDirection: "column",
-      }}>
-        <div style={{ maxWidth: 680, margin: "0 auto", padding: "16px 16px 16px", flex: 1, display: "flex", flexDirection: "column", width: "100%" }}>
+      {/* Content area */}
+      <div style={{ position: "relative", zIndex: 1, maxWidth: 680, margin: "0 auto", padding: "0 16px", width: "100%" }}>
 
-          {/* Full-width card */}
-          <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, padding: "16px 24px", flex: 1, display: "flex", flexDirection: "column", gap: 8, height: "auto", minHeight: "100vh", justifyContent: "space-between" }}>
+          {/* Card — height auto, floats in page */}
+          <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, padding: "16px 24px", display: "flex", flexDirection: "column", height: "auto" }}>
 
             {/* Top row: logo/title + dropdowns */}
-            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 4 }}>
-              <div>
-                <div style={{ fontSize: 32, lineHeight: 1, marginBottom: 6 }}>🌱</div>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 0 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 32, lineHeight: 1 }}>🌱</span>
                 <h1 style={{ fontFamily: "'Lora', serif", fontSize: "clamp(26px, 5vw, 36px)", fontWeight: 500, color: "var(--text)", margin: 0, lineHeight: 1.15 }}>
                   FirstYear Companion
                 </h1>
@@ -261,12 +256,12 @@ export default function WelcomePage() {
               </div>{/* end theme+lang wrapper */}
             </div>
 
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: "rgba(216,208,192,0.6)", margin: "8px 0 14px", fontWeight: 300, lineHeight: 1.4 }}>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: "rgba(216,208,192,0.6)", margin: "8px 0 16px", fontWeight: 300, lineHeight: 1.4 }}>
               {t.tagline}
             </p>
 
             {/* Info cards */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 14 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 16 }}>
               <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
                 <div style={{ fontFamily: "'Lora', serif", fontSize: 15, fontWeight: 500, color: "var(--text)", marginBottom: 8 }}>{t.what_title}</div>
                 <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "rgba(216,208,192,0.65)", lineHeight: 1.6 }}>{t.what_body}</div>
@@ -278,7 +273,7 @@ export default function WelcomePage() {
             </div>
 
             {/* Checkboxes */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12, marginTop: 0 }}>
               <label style={{
                 display: "flex", alignItems: "flex-start", gap: 10,
                 background: check1 ? "rgba(74,124,111,0.08)" : "rgba(255,255,255,0.03)",
@@ -323,14 +318,14 @@ export default function WelcomePage() {
             </div>
 
             {/* Privacy note */}
-            <div style={{ background: "rgba(74,124,111,0.07)", border: "1px solid rgba(74,124,111,0.2)", borderRadius: 10, padding: "6px 12px", marginBottom: 8 }}>
+            <div style={{ background: "rgba(74,124,111,0.07)", border: "1px solid rgba(74,124,111,0.2)", borderRadius: 10, padding: "6px 12px", marginBottom: 8, marginTop: 0 }}>
               <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.72)", lineHeight: 1.5, margin: 0 }}>
                 🔒 {t.privacy_note}
               </p>
             </div>
 
             {/* Beta notice */}
-            <div style={{ background: "rgba(196,149,106,0.08)", border: "1px solid rgba(196,149,106,0.2)", borderRadius: 10, padding: "6px 12px", marginBottom: 14, fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.82)", lineHeight: 1.5 }}>
+            <div style={{ background: "rgba(196,149,106,0.08)", border: "1px solid rgba(196,149,106,0.2)", borderRadius: 10, padding: "6px 12px", marginBottom: 16, fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.82)", lineHeight: 1.5 }}>
               {t.beta_notice}
             </div>
 
@@ -354,7 +349,6 @@ export default function WelcomePage() {
             </div>
 
           </div>
-        </div>
       </div>
 
       <CrisisButton />
