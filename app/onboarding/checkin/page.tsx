@@ -17,6 +17,11 @@ export default function CheckInPage() {
   const [moods, setMoods] = useState<string[]>([]);
   const [skipFlag, setSkipFlag] = useState(false);
   const [modal, setModal] = useState<"provider" | "meds" | null>(null);
+  const [companionName, setCompanionName] = useState("Nova");
+  const [customCompanionName, setCustomCompanionName] = useState("");
+
+  const COMPANION_NAMES = ["Nova", "Luna", "Sage", "Mia", "Lea", "Aria", "Ember", "Wren", "Ivy", "Rio"];
+  const isCustom = companionName === "__custom__";
 
   useEffect(() => {
     const saved = localStorage.getItem("companion_language") ?? "en-US";
@@ -39,7 +44,11 @@ export default function CheckInPage() {
   };
 
   const saveAndGo = () => {
-    if (name.trim())  localStorage.setItem("companion_name", name.trim());
+    if (name.trim())  localStorage.setItem("user_name", name.trim());
+    const finalCompanionName = isCustom
+      ? (customCompanionName.trim() || "Nova")
+      : companionName;
+    localStorage.setItem("companion_name", finalCompanionName);
     if (journey)      localStorage.setItem("companion_journey", journey);
     if (provider)     localStorage.setItem("companion_provider", provider);
     if (medication)   localStorage.setItem("companion_medication", medication);
@@ -193,6 +202,39 @@ export default function CheckInPage() {
                 outline: "none",
               }}
             />
+          </div>
+
+          {/* Companion Name */}
+          <div>
+            <label style={lbl}>WHAT WOULD YOU LIKE TO CALL YOUR COMPANION?</label>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {COMPANION_NAMES.map(opt => (
+                <button key={opt} style={pill(companionName === opt)} onClick={() => setCompanionName(opt)}>{opt}</button>
+              ))}
+              <button style={pill(isCustom)} onClick={() => setCompanionName("__custom__")}>Let me name my own</button>
+            </div>
+            {isCustom && (
+              <input
+                type="text"
+                value={customCompanionName}
+                onChange={e => setCustomCompanionName(e.target.value)}
+                placeholder="Give your companion a name"
+                style={{
+                  marginTop: 8,
+                  width: "100%",
+                  boxSizing: "border-box",
+                  height: 36,
+                  background: "rgba(255,255,255,0.1)",
+                  border: "1px solid rgba(255,255,255,0.2)",
+                  borderRadius: 8,
+                  padding: "0 12px",
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: 13,
+                  color: "var(--text)",
+                  outline: "none",
+                }}
+              />
+            )}
           </div>
 
           {/* Journey */}

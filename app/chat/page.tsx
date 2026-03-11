@@ -118,7 +118,7 @@ export default function ChatPage() {
   const [state, setState] = useState({ mode: "companion" as "companion" | "guide", topic: "start", stage: "start:v1" });
 
   // ── Profile ──────────────────────────────────────────────────────────────
-  const [companionName] = useState("Nova");
+  const [companionName, setCompanionName] = useState("Nova");
   const [companionEmoji] = useState("🌱");
   const [userEmoji, setUserEmoji] = useState("");
   const [userName, setUserName] = useState<string>("");
@@ -194,7 +194,9 @@ export default function ChatPage() {
     setLangCode(savedLang);
 
     // Try NEW onboarding format first (from Screen 2 check-in)
-    const newName      = localStorage.getItem("companion_name") || "";
+    const savedCompanionName = localStorage.getItem("companion_name") || "Nova";
+    setCompanionName(savedCompanionName);
+    const newName      = localStorage.getItem("user_name") || "";
     const newJourney   = localStorage.getItem("companion_journey") || "";
     const newProvider  = localStorage.getItem("companion_provider") || "";
     const newMedication = localStorage.getItem("companion_medication") || "";
@@ -463,7 +465,7 @@ export default function ChatPage() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: nextMessages, state, onboarding: onboardingContext, language: langCode, profile: profileContext }),
+        body: JSON.stringify({ messages: nextMessages, state, onboarding: onboardingContext, language: langCode, profile: profileContext, companionName }),
       });
       const data = await res.json();
       const elapsed = Date.now() - start;
