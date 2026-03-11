@@ -120,6 +120,9 @@ export default function WelcomePage() {
         .wlc-cont:active:not(:disabled) { transform: translateY(0); }
         .wlc-lang-opt:hover { background: rgba(74,124,111,0.15) !important; }
         .wlc-theme-opt:hover { background: rgba(255,255,255,0.07) !important; }
+        @media (max-width: 767px) {
+          .wlc-cont-row { margin-bottom: 80px !important; }
+        }
       `}</style>
 
       {/* Card wrapper — scrolls internally if card taller than viewport */}
@@ -342,7 +345,7 @@ export default function WelcomePage() {
             </div>
 
             {/* Continue button */}
-            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 8 }}>
+            <div className="wlc-cont-row" style={{ display: "flex", justifyContent: "flex-end", marginTop: 8 }}>
               <button
                 className="wlc-cont"
                 onClick={handleContinue}

@@ -46,7 +46,7 @@ export default function CrisisButton({ pulsing = false }: { pulsing?: boolean })
       )}
 
       {/* Phone icon — fixed bottom right, z-index 9999 */}
-      <div style={{
+      <div className="crisis-btn-wrap" style={{
         position: "fixed", bottom: 20, right: 20, zIndex: 9999,
         display: "flex", flexDirection: "column", alignItems: "center",
       }}>
@@ -204,6 +204,9 @@ export default function CrisisButton({ pulsing = false }: { pulsing?: boolean })
       )}
 
       <style>{`
+        @media (max-width: 767px) {
+          .crisis-btn-wrap { bottom: 90px !important; right: 16px !important; }
+        }
         @keyframes crisisPulse {
           0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,107,0.7), 0 4px 20px rgba(255,107,107,0.4); }
           50%       { box-shadow: 0 0 0 14px rgba(255,107,107,0), 0 4px 24px rgba(255,107,107,0.7); }

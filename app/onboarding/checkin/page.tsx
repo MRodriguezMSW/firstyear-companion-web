@@ -121,6 +121,9 @@ export default function CheckInPage() {
             overflow-y: auto !important;
           }
         }
+        @media (max-width: 767px) {
+          .checkin-bottom-row { padding-bottom: 80px !important; }
+        }
       `}</style>
 
       {/* Page wrapper — fixed, centered, no scroll */}
@@ -288,7 +291,7 @@ export default function CheckInPage() {
           </div>
 
           {/* Bottom row — inside card, no marginTop auto */}
-          <div style={{
+          <div className="checkin-bottom-row" style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",

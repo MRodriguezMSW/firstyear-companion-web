@@ -220,8 +220,14 @@ export default function FeedbackButton() {
   return (
     <>
       {/* ── Fixed pill button bottom-left ── */}
+      <style>{`
+        @media (max-width: 767px) {
+          .feedback-pill { bottom: 90px !important; left: 16px !important; }
+        }
+      `}</style>
       <button
         onClick={openModal}
+        className="feedback-pill"
         style={{
           position: "fixed",
           bottom: 20,

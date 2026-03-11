@@ -45,7 +45,7 @@
   .chatPanel    { flex: 1; }
   .wellnessSidebar { display: none; }
   .mobileWellnessBar { display: flex !important; }
-  .inputArea { padding-bottom: max(14px, env(safe-area-inset-bottom)); }
+  .inputArea { padding-bottom: 80px; }
   .messages { padding-bottom: 8px; }
 }
 
