@@ -6,15 +6,27 @@ import { LANGUAGE_OPTIONS, getStrings, readLang } from "../i18n";
 
 // ── Themes ────────────────────────────────────────────────────────────────────
 const THEMES = [
-  { id: "calm-sea",       name: "Calm Sea",       swatch: "#88BDF2" },
-  { id: "quiet-grove",    name: "Quiet Grove",    swatch: "#BAC095" },
-  { id: "lavender-night", name: "Lavender Night", swatch: "#8686AC" },
-  { id: "sage-stone",     name: "Sage & Stone",   swatch: "#B2AC88" },
-  { id: "warm-clay",      name: "Warm Clay",      swatch: "#BF7587" },
-  { id: "deep-teal",      name: "Deep Teal",      swatch: "#4F7C82" },
-  { id: "painted-iris",   name: "Painted Iris",   swatch: "#B298E7" },
-  { id: "desert-bloom",   name: "Desert Bloom",   swatch: "#9988A1" },
-  { id: "meadow-mist",    name: "Meadow Mist",    swatch: "#68BA7F" },
+  { id: "calm-sea",       name: "Calm Sea",       swatches: ["#6A89A7","#BDDDFC","#88BDF2","#384959"] },
+  { id: "quiet-grove",    name: "Quiet Grove",    swatches: ["#636B2F","#BAC095","#D4DE95","#3D4127"] },
+  { id: "lavender-night", name: "Lavender Night", swatches: ["#272757","#8686AC","#505081","#0F0E47"] },
+  { id: "meadow-mist",    name: "Meadow Mist",    swatches: ["#2E6F40","#CFFFDC","#68BA7F","#253D2C"] },
+  { id: "charcoal-sky",   name: "Charcoal Sky",   swatches: ["#4A4A4A","#CBCBCB","#FFFFE3","#6D8196"] },
+  { id: "warm-clay",      name: "Warm Clay",      swatches: ["#A2574F","#E68057","#BF7587","#993A8B"] },
+  { id: "rose-dusk",      name: "Rose Dusk",      swatches: ["#DCA1A1","#996666","#8E4585","#4A4A4A"] },
+  { id: "desert-bloom",   name: "Desert Bloom",   swatches: ["#E35336","#FFD3AC","#9988A1","#8A2B0E"] },
+  { id: "harvest",        name: "Harvest",        swatches: ["#BE5103","#FFCE1B","#069494","#B7410E"] },
+  { id: "soft-candy",     name: "Soft Candy",     swatches: ["#B298E7","#B8E3E9","#F5B8D5","#F9BEDD"] },
+  { id: "hot-sunset",     name: "Hot Sunset",     swatches: ["#FD3DB5","#FFB8DC","#FB6A2C","#8C1946"] },
+  { id: "citrus-pop",     name: "Citrus Pop",     swatches: ["#FF8243","#FFC0CB","#FCE883","#069494"] },
+  { id: "ocean-deep",     name: "Ocean Deep",     swatches: ["#0047AB","#000080","#82C8E5","#6D8196"] },
+  { id: "emerald-pride",  name: "Emerald Pride",  swatches: ["#50C878","#0F52BA","#9966CC","#CFB53B"] },
+  { id: "linen-moss",     name: "Linen & Moss",   swatches: ["#EDE8D0","#6E632E","#DBD1ED","#ABBEED"] },
+  { id: "periwinkle",     name: "Periwinkle",     swatches: ["#CCCCFF","#A3A3CC","#5C5C99","#292966"] },
+  { id: "blue-violet",    name: "Blue Violet",    swatches: ["#B5C7EB","#9EF0FF","#A4A5F5","#8E70CF"] },
+  { id: "teal-earth",     name: "Teal Earth",     swatches: ["#81D8D0","#D99E82","#D7D982","#AE82D9"] },
+  { id: "garden-fresh",   name: "Garden Fresh",   swatches: ["#93C572","#89CFF0","#F5F5DC","#82C8E5"] },
+  { id: "sage-stone",     name: "Sage & Stone",   swatches: ["#B2AC88","#898989","#F2F0EF","#4B6E48"] },
+  { id: "deep-teal",      name: "Deep Teal",      swatches: ["#B8E3E9","#93B1B5","#4F7C82","#0B2E33"] },
 ];
 
 // ── Constants (English keys — stored in profile for AI context) ────────────────
@@ -621,32 +633,38 @@ export default function ProfilePage() {
             {/* Theme */}
             <div style={S.section}>
               <div style={S.label}>Color Theme</div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                 {THEMES.map(th => (
-                  <div key={th.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5 }}>
-                    <button
-                      onClick={() => {
-                        setActiveTheme(th.id);
-                        localStorage.setItem("companion_theme", th.id);
-                        document.documentElement.setAttribute("data-theme", th.id);
-                      }}
-                      style={{
-                        width: 28, height: 28, borderRadius: "50%",
-                        background: th.swatch, border: "none",
-                        cursor: "pointer", padding: 0,
-                        outline: activeTheme === th.id ? "2px solid #fff" : "2px solid transparent",
-                        outlineOffset: 2,
-                        transition: "outline 0.15s ease",
-                      }}
-                    />
+                  <button
+                    key={th.id}
+                    onClick={() => {
+                      setActiveTheme(th.id);
+                      localStorage.setItem("companion_theme", th.id);
+                      document.documentElement.setAttribute("data-theme", th.id);
+                    }}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 8,
+                      background: activeTheme === th.id ? "color-mix(in srgb, var(--text) 8%, transparent)" : "transparent",
+                      border: activeTheme === th.id ? "1px solid color-mix(in srgb, var(--text) 18%, transparent)" : "1px solid transparent",
+                      borderRadius: 8, padding: "7px 10px",
+                      cursor: "pointer", transition: "all 0.12s ease", width: "100%",
+                    }}
+                  >
+                    <div style={{ display: "flex", flexShrink: 0 }}>
+                      {th.swatches.map((c, i) => (
+                        <div key={i} style={{ width: 14, height: 18, background: c }} />
+                      ))}
+                    </div>
                     <span style={{
-                      fontFamily: "'DM Sans', sans-serif", fontSize: 9,
-                      color: "color-mix(in srgb, var(--text) 50%, transparent)",
-                      textAlign: "center", maxWidth: 52, lineHeight: 1.2,
+                      fontFamily: "'DM Sans', sans-serif", fontSize: 12, flex: 1, textAlign: "left",
+                      color: "color-mix(in srgb, var(--text) 80%, transparent)",
                     }}>
                       {th.name}
                     </span>
-                  </div>
+                    {activeTheme === th.id && (
+                      <span style={{ fontSize: 11, color: "color-mix(in srgb, var(--text) 50%, transparent)", flexShrink: 0 }}>✓</span>
+                    )}
+                  </button>
                 ))}
               </div>
             </div>

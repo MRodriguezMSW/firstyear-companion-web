@@ -6,15 +6,27 @@ import { LANG_TILES, S1_STRINGS, getS1, type LangCode6 } from "../translations";
 import CrisisButton from "../../components/CrisisButton";
 
 const THEMES = [
-  { id: "calm-sea",       name: "Calm Sea",       swatch: "#88BDF2" },
-  { id: "quiet-grove",    name: "Quiet Grove",    swatch: "#BAC095" },
-  { id: "lavender-night", name: "Lavender Night", swatch: "#8686AC" },
-  { id: "sage-stone",     name: "Sage & Stone",   swatch: "#B2AC88" },
-  { id: "warm-clay",      name: "Warm Clay",      swatch: "#BF7587" },
-  { id: "deep-teal",      name: "Deep Teal",      swatch: "#4F7C82" },
-  { id: "painted-iris",   name: "Painted Iris",   swatch: "#B298E7" },
-  { id: "desert-bloom",   name: "Desert Bloom",   swatch: "#9988A1" },
-  { id: "meadow-mist",    name: "Meadow Mist",    swatch: "#68BA7F" },
+  { id: "calm-sea",       name: "Calm Sea",       swatches: ["#6A89A7","#BDDDFC","#88BDF2","#384959"] },
+  { id: "quiet-grove",    name: "Quiet Grove",    swatches: ["#636B2F","#BAC095","#D4DE95","#3D4127"] },
+  { id: "lavender-night", name: "Lavender Night", swatches: ["#272757","#8686AC","#505081","#0F0E47"] },
+  { id: "meadow-mist",    name: "Meadow Mist",    swatches: ["#2E6F40","#CFFFDC","#68BA7F","#253D2C"] },
+  { id: "charcoal-sky",   name: "Charcoal Sky",   swatches: ["#4A4A4A","#CBCBCB","#FFFFE3","#6D8196"] },
+  { id: "warm-clay",      name: "Warm Clay",      swatches: ["#A2574F","#E68057","#BF7587","#993A8B"] },
+  { id: "rose-dusk",      name: "Rose Dusk",      swatches: ["#DCA1A1","#996666","#8E4585","#4A4A4A"] },
+  { id: "desert-bloom",   name: "Desert Bloom",   swatches: ["#E35336","#FFD3AC","#9988A1","#8A2B0E"] },
+  { id: "harvest",        name: "Harvest",        swatches: ["#BE5103","#FFCE1B","#069494","#B7410E"] },
+  { id: "soft-candy",     name: "Soft Candy",     swatches: ["#B298E7","#B8E3E9","#F5B8D5","#F9BEDD"] },
+  { id: "hot-sunset",     name: "Hot Sunset",     swatches: ["#FD3DB5","#FFB8DC","#FB6A2C","#8C1946"] },
+  { id: "citrus-pop",     name: "Citrus Pop",     swatches: ["#FF8243","#FFC0CB","#FCE883","#069494"] },
+  { id: "ocean-deep",     name: "Ocean Deep",     swatches: ["#0047AB","#000080","#82C8E5","#6D8196"] },
+  { id: "emerald-pride",  name: "Emerald Pride",  swatches: ["#50C878","#0F52BA","#9966CC","#CFB53B"] },
+  { id: "linen-moss",     name: "Linen & Moss",   swatches: ["#EDE8D0","#6E632E","#DBD1ED","#ABBEED"] },
+  { id: "periwinkle",     name: "Periwinkle",     swatches: ["#CCCCFF","#A3A3CC","#5C5C99","#292966"] },
+  { id: "blue-violet",    name: "Blue Violet",    swatches: ["#B5C7EB","#9EF0FF","#A4A5F5","#8E70CF"] },
+  { id: "teal-earth",     name: "Teal Earth",     swatches: ["#81D8D0","#D99E82","#D7D982","#AE82D9"] },
+  { id: "garden-fresh",   name: "Garden Fresh",   swatches: ["#93C572","#89CFF0","#F5F5DC","#82C8E5"] },
+  { id: "sage-stone",     name: "Sage & Stone",   swatches: ["#B2AC88","#898989","#F2F0EF","#4B6E48"] },
+  { id: "deep-teal",      name: "Deep Teal",      swatches: ["#B8E3E9","#93B1B5","#4F7C82","#0B2E33"] },
 ];
 
 export default function WelcomePage() {
@@ -24,13 +36,14 @@ export default function WelcomePage() {
   const [check2, setCheck2] = useState(false);
   const [skipFlag, setSkipFlag] = useState(false);
   const [langDropOpen, setLangDropOpen] = useState(false);
+  const [themeDropOpen, setThemeDropOpen] = useState(false);
   const [theme, setTheme] = useState("calm-sea");
-  const [hoveredTheme, setHoveredTheme] = useState<string | null>(null);
-  const dropRef = useRef<HTMLDivElement>(null);
+  const langDropRef = useRef<HTMLDivElement>(null);
+  const themeDropRef = useRef<HTMLDivElement>(null);
 
   const t = getS1(lang);
   const currentLangLabel = LANG_TILES.find(l => l.code === lang)?.label ?? "English";
-
+  const currentTheme = THEMES.find(th => th.id === theme) ?? THEMES[0];
 
   useEffect(() => {
     const saved = localStorage.getItem("companion_language");
@@ -41,11 +54,14 @@ export default function WelcomePage() {
     document.documentElement.setAttribute("data-theme", savedTheme);
   }, []);
 
-  // Close dropdown when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (dropRef.current && !dropRef.current.contains(e.target as Node)) {
+      if (langDropRef.current && !langDropRef.current.contains(e.target as Node)) {
         setLangDropOpen(false);
+      }
+      if (themeDropRef.current && !themeDropRef.current.contains(e.target as Node)) {
+        setThemeDropOpen(false);
       }
     };
     document.addEventListener("mousedown", handler);
@@ -62,6 +78,7 @@ export default function WelcomePage() {
     setTheme(id);
     localStorage.setItem("companion_theme", id);
     document.documentElement.setAttribute("data-theme", id);
+    setThemeDropOpen(false);
   };
 
   const handleContinue = () => {
@@ -97,6 +114,7 @@ export default function WelcomePage() {
         .wlc-cont:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(196,149,106,0.45) !important; }
         .wlc-cont:active:not(:disabled) { transform: translateY(0); }
         .wlc-lang-opt:hover { background: rgba(74,124,111,0.15) !important; }
+        .wlc-theme-opt:hover { background: rgba(255,255,255,0.07) !important; }
       `}</style>
 
       {/* Scrollable content area */}
@@ -108,10 +126,10 @@ export default function WelcomePage() {
       }}>
         <div style={{ maxWidth: 680, margin: "0 auto", padding: "16px 16px 16px", flex: 1, display: "flex", flexDirection: "column", width: "100%" }}>
 
-          {/* Full-width card — flex: 1 so it fills the viewport with no dark gap below */}
+          {/* Full-width card */}
           <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, padding: "16px 24px", flex: 1, display: "flex", flexDirection: "column", gap: 8, height: "auto", minHeight: "100vh" }}>
 
-            {/* Top row: logo/title + language dropdown */}
+            {/* Top row: logo/title + dropdowns */}
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 4 }}>
               <div>
                 <div style={{ fontSize: 32, lineHeight: 1, marginBottom: 6 }}>🌱</div>
@@ -121,87 +139,118 @@ export default function WelcomePage() {
               </div>
 
               {/* Theme picker + language dropdown */}
-              <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0, marginLeft: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0, marginLeft: 12 }}>
 
-              {/* Theme swatches */}
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 4, maxWidth: 108, position: "relative" }}>
-                {THEMES.map(th => (
-                  <div key={th.id} style={{ position: "relative" }}>
-                    <button
-                      onClick={() => handleTheme(th.id)}
-                      onMouseEnter={() => setHoveredTheme(th.id)}
-                      onMouseLeave={() => setHoveredTheme(null)}
-                      title={th.name}
-                      style={{
-                        width: 20, height: 20, borderRadius: "50%",
-                        background: th.swatch, border: "none",
-                        cursor: "pointer", padding: 0, flexShrink: 0,
-                        outline: theme === th.id ? "2px solid #fff" : "2px solid transparent",
-                        outlineOffset: 2,
-                        transition: "outline 0.15s ease",
-                      }}
-                    />
-                    {hoveredTheme === th.id && (
-                      <div style={{
-                        position: "absolute", top: "calc(100% + 5px)", left: "50%",
-                        transform: "translateX(-50%)",
-                        background: "rgba(0,0,0,0.75)", color: "#fff",
-                        fontSize: 10, fontFamily: "'DM Sans', sans-serif",
-                        padding: "3px 6px", borderRadius: 5, whiteSpace: "nowrap",
-                        pointerEvents: "none", zIndex: 200,
-                      }}>
-                        {th.name}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+                {/* Theme dropdown */}
+                <div ref={themeDropRef} style={{ position: "relative", flexShrink: 0 }}>
+                  <button
+                    onClick={() => { setThemeDropOpen(v => !v); setLangDropOpen(false); }}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 6,
+                      background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
+                      borderRadius: 20, padding: "6px 10px",
+                      cursor: "pointer", transition: "all 0.15s ease",
+                    }}
+                  >
+                    {/* 4-swatch preview */}
+                    <div style={{ display: "flex", overflow: "hidden", borderRadius: 3 }}>
+                      {currentTheme.swatches.map((c, i) => (
+                        <div key={i} style={{ width: 10, height: 16, background: c }} />
+                      ))}
+                    </div>
+                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, fontWeight: 500, color: "rgba(216,208,192,0.8)", whiteSpace: "nowrap" }}>
+                      {themeDropOpen ? "▴" : "▾"}
+                    </span>
+                  </button>
 
-              {/* Language dropdown pill */}
-              <div ref={dropRef} style={{ position: "relative", flexShrink: 0 }}>
-                <button
-                  onClick={() => setLangDropOpen(v => !v)}
-                  style={{
-                    display: "flex", alignItems: "center", gap: 6,
-                    background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
-                    borderRadius: 20, padding: "6px 12px",
-                    fontFamily: "'DM Sans', sans-serif", fontSize: 12, fontWeight: 500,
-                    color: "rgba(216,208,192,0.8)", cursor: "pointer", whiteSpace: "nowrap",
-                    transition: "all 0.15s ease",
-                  }}
-                >
-                  🌐 {currentLangLabel} {langDropOpen ? "▴" : "▾"}
-                </button>
-                {langDropOpen && (
-                  <div style={{
-                    position: "absolute", top: "calc(100% + 6px)", right: 0,
-                    background: "rgba(26,46,30,0.97)", border: "1px solid rgba(255,255,255,0.12)",
-                    borderRadius: 12, padding: "6px", zIndex: 100,
-                    minWidth: 160, boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
-                  }}>
-                    {LANG_TILES.map(l => (
-                      <button
-                        key={l.code}
-                        className="wlc-lang-opt"
-                        onClick={() => handleLang(l.code)}
-                        style={{
-                          display: "flex", alignItems: "center", justifyContent: "space-between",
-                          width: "100%", background: lang === l.code ? "rgba(74,124,111,0.2)" : "transparent",
-                          border: "none", borderRadius: 8, padding: "8px 10px",
-                          fontFamily: "'DM Sans', sans-serif", fontSize: 13,
-                          color: lang === l.code ? "#8ecfbe" : "rgba(216,208,192,0.8)",
-                          cursor: "pointer", textAlign: "left",
-                          fontWeight: lang === l.code ? 600 : 400,
-                          transition: "all 0.12s ease",
-                        }}
-                      >
-                        <span>{l.label}</span>
-                        {lang === l.code && <span style={{ fontSize: 11 }}>✓</span>}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+                  {themeDropOpen && (
+                    <div style={{
+                      position: "absolute", top: "calc(100% + 6px)", right: 0,
+                      background: "rgba(20,20,30,0.97)", border: "1px solid rgba(255,255,255,0.12)",
+                      borderRadius: 12, padding: "6px", zIndex: 200,
+                      minWidth: 200, maxHeight: 280, overflowY: "auto",
+                      boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
+                    }}>
+                      {THEMES.map(th => (
+                        <button
+                          key={th.id}
+                          className="wlc-theme-opt"
+                          onClick={() => handleTheme(th.id)}
+                          style={{
+                            display: "flex", alignItems: "center", gap: 8,
+                            width: "100%", background: theme === th.id ? "rgba(255,255,255,0.1)" : "transparent",
+                            border: "none", borderRadius: 8, padding: "7px 10px",
+                            cursor: "pointer", transition: "background 0.12s ease",
+                          }}
+                        >
+                          {/* 4 color squares — no gap, no border-radius */}
+                          <div style={{ display: "flex", flexShrink: 0 }}>
+                            {th.swatches.map((c, i) => (
+                              <div key={i} style={{ width: 14, height: 18, background: c }} />
+                            ))}
+                          </div>
+                          <span style={{
+                            fontFamily: "'DM Sans', sans-serif", fontSize: 12,
+                            color: "rgba(216,208,192,0.85)", flex: 1, textAlign: "left",
+                            whiteSpace: "nowrap",
+                          }}>
+                            {th.name}
+                          </span>
+                          {theme === th.id && (
+                            <span style={{ fontSize: 11, color: "rgba(216,208,192,0.6)", flexShrink: 0 }}>✓</span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Language dropdown pill */}
+                <div ref={langDropRef} style={{ position: "relative", flexShrink: 0 }}>
+                  <button
+                    onClick={() => { setLangDropOpen(v => !v); setThemeDropOpen(false); }}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 6,
+                      background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
+                      borderRadius: 20, padding: "6px 12px",
+                      fontFamily: "'DM Sans', sans-serif", fontSize: 12, fontWeight: 500,
+                      color: "rgba(216,208,192,0.8)", cursor: "pointer", whiteSpace: "nowrap",
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    🌐 {currentLangLabel} {langDropOpen ? "▴" : "▾"}
+                  </button>
+                  {langDropOpen && (
+                    <div style={{
+                      position: "absolute", top: "calc(100% + 6px)", right: 0,
+                      background: "rgba(26,46,30,0.97)", border: "1px solid rgba(255,255,255,0.12)",
+                      borderRadius: 12, padding: "6px", zIndex: 100,
+                      minWidth: 160, boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+                    }}>
+                      {LANG_TILES.map(l => (
+                        <button
+                          key={l.code}
+                          className="wlc-lang-opt"
+                          onClick={() => handleLang(l.code)}
+                          style={{
+                            display: "flex", alignItems: "center", justifyContent: "space-between",
+                            width: "100%", background: lang === l.code ? "rgba(74,124,111,0.2)" : "transparent",
+                            border: "none", borderRadius: 8, padding: "8px 10px",
+                            fontFamily: "'DM Sans', sans-serif", fontSize: 13,
+                            color: lang === l.code ? "#8ecfbe" : "rgba(216,208,192,0.8)",
+                            cursor: "pointer", textAlign: "left",
+                            fontWeight: lang === l.code ? 600 : 400,
+                            transition: "all 0.12s ease",
+                          }}
+                        >
+                          <span>{l.label}</span>
+                          {lang === l.code && <span style={{ fontSize: 11 }}>✓</span>}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
               </div>{/* end theme+lang wrapper */}
             </div>
 
@@ -209,7 +258,7 @@ export default function WelcomePage() {
               {t.tagline}
             </p>
 
-            {/* Info cards — auto height, no flex:1 on cards to prevent phantom empty space */}
+            {/* Info cards */}
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 14 }}>
               <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
                 <div style={{ fontFamily: "'Lora', serif", fontSize: 15, fontWeight: 500, color: "var(--text)", marginBottom: 8 }}>{t.what_title}</div>
@@ -266,14 +315,14 @@ export default function WelcomePage() {
               </label>
             </div>
 
-            {/* Privacy note — below checkboxes */}
+            {/* Privacy note */}
             <div style={{ background: "rgba(74,124,111,0.07)", border: "1px solid rgba(74,124,111,0.2)", borderRadius: 10, padding: "6px 12px", marginBottom: 8 }}>
               <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.72)", lineHeight: 1.5, margin: 0 }}>
                 🔒 {t.privacy_note}
               </p>
             </div>
 
-            {/* Beta notice — below privacy note */}
+            {/* Beta notice */}
             <div style={{ background: "rgba(196,149,106,0.08)", border: "1px solid rgba(196,149,106,0.2)", borderRadius: 10, padding: "6px 12px", marginBottom: 14, fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.82)", lineHeight: 1.5 }}>
               {t.beta_notice}
             </div>
