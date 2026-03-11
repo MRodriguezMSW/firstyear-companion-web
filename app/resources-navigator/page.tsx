@@ -343,6 +343,256 @@ function NoStatePlaceholder() {
   );
 }
 
+// ── Shared input style ────────────────────────────────────────────────────
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  background: "rgba(255,255,255,0.07)",
+  border: "1px solid rgba(255,255,255,0.12)",
+  borderRadius: 8,
+  padding: "9px 12px",
+  fontFamily: "'DM Sans', sans-serif",
+  fontSize: 14,
+  color: "var(--text)",
+  outline: "none",
+  boxSizing: "border-box",
+};
+
+const textareaStyle: React.CSSProperties = {
+  ...inputStyle,
+  resize: "vertical" as const,
+  lineHeight: 1.6,
+  minHeight: 80,
+};
+
+const labelStyle: React.CSSProperties = {
+  fontFamily: "'DM Sans', sans-serif",
+  fontSize: 12,
+  fontWeight: 600,
+  color: "color-mix(in srgb, var(--text) 60%, transparent)",
+  letterSpacing: "0.04em",
+  display: "block",
+  marginBottom: 4,
+};
+
+// ── Submission forms ───────────────────────────────────────────────────────
+function CorrectionForm({ state }: { state: string }) {
+  const [open, setOpen] = useState(false);
+  const [resourceName, setResourceName] = useState("");
+  const [correction, setCorrection] = useState("");
+  const [submitterName, setSubmitterName] = useState("");
+  const [submitterEmail, setSubmitterEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+
+  const submit = async () => {
+    if (!resourceName.trim() || !correction.trim()) return;
+    setStatus("sending");
+    try {
+      const res = await fetch("/api/resource-submission", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "correction",
+          fields: { resourceName, state, correction, submitterName, submitterEmail },
+          timestamp: new Date().toISOString(),
+        }),
+      });
+      const data = await res.json();
+      setStatus(data.ok ? "success" : "error");
+    } catch {
+      setStatus("error");
+    }
+  };
+
+  return (
+    <div style={{ ...card }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }} onClick={() => setOpen(v => !v)}>
+        <div>
+          <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 600, color: "var(--text)" }}>✏️ Something look wrong?</div>
+          {!open && <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "color-mix(in srgb, var(--text) 45%, transparent)", marginTop: 2 }}>Help us keep these resources accurate for your community.</div>}
+        </div>
+        <span style={{ fontSize: 20, color: "color-mix(in srgb, var(--accent) 70%, transparent)", flexShrink: 0, marginLeft: 12, transition: "transform 0.2s", transform: open ? "rotate(45deg)" : "none" }}>+</span>
+      </div>
+
+      {open && (
+        <div style={{ marginTop: 16 }}>
+          {status === "success" ? (
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: "var(--subtext)", lineHeight: 1.65, margin: 0, padding: "12px 0" }}>
+              💙 Thank you. Your submission helps people in {state} find the support they need.
+            </p>
+          ) : (
+            <>
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "var(--subtext)", lineHeight: 1.6, margin: "0 0 16px" }}>
+                Help us keep these resources accurate for your community.
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <div>
+                  <label style={labelStyle}>Name of the incorrect resource *</label>
+                  <input style={inputStyle} value={resourceName} onChange={e => setResourceName(e.target.value)} placeholder="e.g. Pennsylvania ADAP" />
+                </div>
+                <div>
+                  <label style={labelStyle}>State</label>
+                  <input style={{ ...inputStyle, opacity: 0.55, cursor: "not-allowed" }} value={state} readOnly />
+                </div>
+                <div>
+                  <label style={labelStyle}>What needs to be corrected *</label>
+                  <textarea style={textareaStyle} value={correction} onChange={e => setCorrection(e.target.value)} placeholder="Tell us what's wrong and what the correct information should be" />
+                </div>
+                <div>
+                  <label style={labelStyle}>Your name</label>
+                  <input style={inputStyle} value={submitterName} onChange={e => setSubmitterName(e.target.value)} placeholder="Optional — only if you'd like us to follow up" />
+                </div>
+                <div>
+                  <label style={labelStyle}>Your email</label>
+                  <input style={inputStyle} type="email" value={submitterEmail} onChange={e => setSubmitterEmail(e.target.value)} placeholder="Optional — only if you'd like us to follow up" />
+                </div>
+                {status === "error" && (
+                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "#f9a8a8", margin: 0 }}>
+                    Something didn't go through. Please try again or email us directly at miguelr@novusacs.com
+                  </p>
+                )}
+                <button
+                  onClick={submit}
+                  disabled={status === "sending" || !resourceName.trim() || !correction.trim()}
+                  style={{ background: "color-mix(in srgb, var(--accent) 22%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 45%, transparent)", borderRadius: 10, padding: "10px 20px", fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 600, color: "var(--accent)", cursor: status === "sending" ? "not-allowed" : "pointer", opacity: (status === "sending" || !resourceName.trim() || !correction.trim()) ? 0.5 : 1, transition: "opacity 0.2s" }}
+                >
+                  {status === "sending" ? "Sending…" : "Submit Correction"}
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ResourceForm({ state }: { state: string }) {
+  const [open, setOpen] = useState(false);
+  const [resourceName, setResourceName] = useState("");
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [zip, setZip] = useState("");
+  const [phone, setPhone] = useState("");
+  const [fax, setFax] = useState("");
+  const [website, setWebsite] = useState("");
+  const [description, setDescription] = useState("");
+  const [submitterName, setSubmitterName] = useState("");
+  const [submitterEmail, setSubmitterEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+
+  const canSubmit = resourceName.trim() && address.trim() && city.trim() && zip.trim() && description.trim();
+
+  const submit = async () => {
+    if (!canSubmit) return;
+    setStatus("sending");
+    try {
+      const res = await fetch("/api/resource-submission", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "resource",
+          fields: { resourceName, address, city, state, zip, phone, fax, website, description, submitterName, submitterEmail },
+          timestamp: new Date().toISOString(),
+        }),
+      });
+      const data = await res.json();
+      setStatus(data.ok ? "success" : "error");
+    } catch {
+      setStatus("error");
+    }
+  };
+
+  return (
+    <div style={{ ...card }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }} onClick={() => setOpen(v => !v)}>
+        <div>
+          <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 600, color: "var(--text)" }}>➕ Know a resource we're missing?</div>
+          {!open && <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "color-mix(in srgb, var(--text) 45%, transparent)", marginTop: 2 }}>Help other people in your state find the support they need.</div>}
+        </div>
+        <span style={{ fontSize: 20, color: "color-mix(in srgb, var(--accent) 70%, transparent)", flexShrink: 0, marginLeft: 12, transition: "transform 0.2s", transform: open ? "rotate(45deg)" : "none" }}>+</span>
+      </div>
+
+      {open && (
+        <div style={{ marginTop: 16 }}>
+          {status === "success" ? (
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: "var(--subtext)", lineHeight: 1.65, margin: 0, padding: "12px 0" }}>
+              💙 Thank you. Your submission helps people in {state} find the support they need.
+            </p>
+          ) : (
+            <>
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "var(--subtext)", lineHeight: 1.6, margin: "0 0 16px" }}>
+                Help other people in your state find the support they need.
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <div>
+                  <label style={labelStyle}>Name of the resource *</label>
+                  <input style={inputStyle} value={resourceName} onChange={e => setResourceName(e.target.value)} placeholder="Organization or program name" />
+                </div>
+                <div>
+                  <label style={labelStyle}>Address *</label>
+                  <input style={inputStyle} value={address} onChange={e => setAddress(e.target.value)} placeholder="Street address" />
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                  <div>
+                    <label style={labelStyle}>City *</label>
+                    <input style={inputStyle} value={city} onChange={e => setCity(e.target.value)} placeholder="City" />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Zip code *</label>
+                    <input style={inputStyle} value={zip} onChange={e => setZip(e.target.value)} placeholder="Zip" />
+                  </div>
+                </div>
+                <div>
+                  <label style={labelStyle}>State</label>
+                  <input style={{ ...inputStyle, opacity: 0.55, cursor: "not-allowed" }} value={state} readOnly />
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                  <div>
+                    <label style={labelStyle}>Phone</label>
+                    <input style={inputStyle} value={phone} onChange={e => setPhone(e.target.value)} placeholder="Optional" />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Fax</label>
+                    <input style={inputStyle} value={fax} onChange={e => setFax(e.target.value)} placeholder="Optional" />
+                  </div>
+                </div>
+                <div>
+                  <label style={labelStyle}>Website</label>
+                  <input style={inputStyle} value={website} onChange={e => setWebsite(e.target.value)} placeholder="https://" />
+                </div>
+                <div>
+                  <label style={labelStyle}>Resources provided *</label>
+                  <textarea style={textareaStyle} value={description} onChange={e => setDescription(e.target.value)} placeholder="Describe what this resource offers — medications, food, legal help, mental health, housing, etc." />
+                </div>
+                <div>
+                  <label style={labelStyle}>Your name</label>
+                  <input style={inputStyle} value={submitterName} onChange={e => setSubmitterName(e.target.value)} placeholder="Optional" />
+                </div>
+                <div>
+                  <label style={labelStyle}>Your email</label>
+                  <input style={inputStyle} type="email" value={submitterEmail} onChange={e => setSubmitterEmail(e.target.value)} placeholder="Optional" />
+                </div>
+                {status === "error" && (
+                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "#f9a8a8", margin: 0 }}>
+                    Something didn't go through. Please try again or email us directly at miguelr@novusacs.com
+                  </p>
+                )}
+                <button
+                  onClick={submit}
+                  disabled={status === "sending" || !canSubmit}
+                  style={{ background: "color-mix(in srgb, var(--accent) 22%, transparent)", border: "1px solid color-mix(in srgb, var(--accent) 45%, transparent)", borderRadius: 10, padding: "10px 20px", fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 600, color: "var(--accent)", cursor: (status === "sending" || !canSubmit) ? "not-allowed" : "pointer", opacity: (status === "sending" || !canSubmit) ? 0.5 : 1, transition: "opacity 0.2s" }}
+                >
+                  {status === "sending" ? "Sending…" : "Submit Resource"}
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────
 export default function ResourceNavigatorPage() {
   const router = useRouter();
@@ -527,6 +777,18 @@ export default function ResourceNavigatorPage() {
             <NoStatePlaceholder />
           )}
         </section>
+
+        {/* ── Community Submission Forms ── */}
+        {selectedState && (
+          <section style={{ marginBottom: 44 }}>
+            <div style={sectionTitle}>Help Us Improve</div>
+            <p style={sectionSub}>You know your community better than we do.</p>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 14 }}>
+              <CorrectionForm state={selectedState} />
+              <ResourceForm state={selectedState} />
+            </div>
+          </section>
+        )}
 
         {/* ── Case Manager ── */}
         <section style={{ marginBottom: 44 }}>
