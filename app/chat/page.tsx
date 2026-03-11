@@ -22,16 +22,28 @@ function detectCrisis(text: string) { return CRISIS_PATTERNS.some(p => p.test(te
 
 // ── Themes ────────────────────────────────────────────────────────────────────
 const THEMES = [
-  { id: "grounded", label: "🌲 Grounded", bg: "#1A2E1E" },
-  { id: "ocean",    label: "🌊 Ocean",    bg: "#0D2233" },
-  { id: "ember",    label: "🍂 Ember",    bg: "#2E1A0E" },
-  { id: "midnight", label: "🌙 Midnight", bg: "#1A1A2E" },
-  { id: "burgundy", label: "🍷 Burgundy", bg: "#2E0E1A" },
-  { id: "walnut",   label: "🪵 Walnut",   bg: "#2E2010" },
-  { id: "sage",     label: "🌿 Sage",     bg: "#1A2E26" },
-  { id: "volcanic", label: "🌋 Volcanic", bg: "#2E1A1A" },
-  { id: "dusk",     label: "🐚 Dusk",     bg: "#2A2035" },
-] as const;
+  { id: "calm-sea",       name: "Calm Sea",       swatches: ["#6A89A7","#BDDDFC","#88BDF2","#384959"] },
+  { id: "quiet-grove",    name: "Quiet Grove",    swatches: ["#636B2F","#BAC095","#D4DE95","#3D4127"] },
+  { id: "lavender-night", name: "Lavender Night", swatches: ["#272757","#8686AC","#505081","#0F0E47"] },
+  { id: "meadow-mist",    name: "Meadow Mist",    swatches: ["#2E6F40","#CFFFDC","#68BA7F","#253D2C"] },
+  { id: "charcoal-sky",   name: "Charcoal Sky",   swatches: ["#4A4A4A","#CBCBCB","#FFFFE3","#6D8196"] },
+  { id: "warm-clay",      name: "Warm Clay",      swatches: ["#A2574F","#E68057","#BF7587","#993A8B"] },
+  { id: "rose-dusk",      name: "Rose Dusk",      swatches: ["#DCA1A1","#996666","#8E4585","#4A4A4A"] },
+  { id: "desert-bloom",   name: "Desert Bloom",   swatches: ["#E35336","#FFD3AC","#9988A1","#8A2B0E"] },
+  { id: "harvest",        name: "Harvest",        swatches: ["#BE5103","#FFCE1B","#069494","#B7410E"] },
+  { id: "soft-candy",     name: "Soft Candy",     swatches: ["#B298E7","#B8E3E9","#F5B8D5","#F9BEDD"] },
+  { id: "hot-sunset",     name: "Hot Sunset",     swatches: ["#FD3DB5","#FFB8DC","#FB6A2C","#8C1946"] },
+  { id: "citrus-pop",     name: "Citrus Pop",     swatches: ["#FF8243","#FFC0CB","#FCE883","#069494"] },
+  { id: "ocean-deep",     name: "Ocean Deep",     swatches: ["#0047AB","#000080","#82C8E5","#6D8196"] },
+  { id: "emerald-pride",  name: "Emerald Pride",  swatches: ["#50C878","#0F52BA","#9966CC","#CFB53B"] },
+  { id: "linen-moss",     name: "Linen & Moss",   swatches: ["#EDE8D0","#6E632E","#DBD1ED","#ABBEED"] },
+  { id: "periwinkle",     name: "Periwinkle",     swatches: ["#CCCCFF","#A3A3CC","#5C5C99","#292966"] },
+  { id: "blue-violet",    name: "Blue Violet",    swatches: ["#B5C7EB","#9EF0FF","#A4A5F5","#8E70CF"] },
+  { id: "teal-earth",     name: "Teal Earth",     swatches: ["#81D8D0","#D99E82","#D7D982","#AE82D9"] },
+  { id: "garden-fresh",   name: "Garden Fresh",   swatches: ["#93C572","#89CFF0","#F5F5DC","#82C8E5"] },
+  { id: "sage-stone",     name: "Sage & Stone",   swatches: ["#B2AC88","#898989","#F2F0EF","#4B6E48"] },
+  { id: "deep-teal",      name: "Deep Teal",      swatches: ["#B8E3E9","#93B1B5","#4F7C82","#0B2E33"] },
+];
 
 
 
@@ -119,6 +131,9 @@ export default function ChatPage() {
   const [affirmationIdx, setAffirmationIdx] = useState(0);
   const [placeholderIdx, setPlaceholderIdx] = useState(0);
   const [showThemePicker, setShowThemePicker] = useState(false);
+  const [activeTheme, setActiveTheme] = useState("calm-sea");
+  const [themeDropOpen, setThemeDropOpen] = useState(false);
+  const themeDropRef = useRef<HTMLDivElement | null>(null);
   const [glossaryTerm, setGlossaryTerm] = useState<GlossaryEntry | null>(null);
   const [crisisDetected, setCrisisDetected] = useState(false);
   const [mobileSheet, setMobileSheet] = useState<"calm" | "relax" | "terms" | "provider" | null>(null);
@@ -290,14 +305,28 @@ export default function ChatPage() {
   }, []);
 
   useEffect(() => {
-    const theme = localStorage.getItem("companion_theme") ?? "grounded";
+    const theme = localStorage.getItem("companion_theme") ?? "calm-sea";
     document.documentElement.setAttribute("data-theme", theme);
+    setActiveTheme(theme);
+  }, []);
+
+  // Close theme dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (themeDropRef.current && !themeDropRef.current.contains(e.target as Node)) {
+        setThemeDropOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
   }, []);
 
   const applyTheme = (id: string) => {
     localStorage.setItem("companion_theme", id);
     document.documentElement.setAttribute("data-theme", id);
+    setActiveTheme(id);
     setShowThemePicker(false);
+    setThemeDropOpen(false);
   };
 
   // ── Load Google Maps script lazily ────────────────────────────────────────
@@ -550,22 +579,6 @@ export default function ChatPage() {
         </div>
       )}
 
-      {/* ── Theme picker ── */}
-      {showThemePicker && (
-        <div className={styles.themeOverlay} onClick={() => setShowThemePicker(false)}>
-          <div className={styles.themePanel} onClick={e => e.stopPropagation()}>
-            <div className={styles.themePanelTitle}>Choose your space</div>
-            <div className={styles.themePanelGrid}>
-              {THEMES.map(th => (
-                <button key={th.id} className={styles.themePanelSwatch} onClick={() => applyTheme(th.id)}>
-                  <div className={styles.themePanelBg} style={{ background: th.bg }} />
-                  <span className={styles.themePanelLabel}>{th.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ── Daily mood check-in ── */}
       {showMoodCheckin && (
@@ -830,8 +843,7 @@ export default function ChatPage() {
         <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "color-mix(in srgb, var(--text) 40%, transparent)", letterSpacing: "0.03em", marginRight: 8 }}>
           🔒 {t.privacy}
         </div>
-        <button className={styles.headerIconBtn} onClick={() => setShowThemePicker(v => !v)} title="Change theme">🎨</button>
-        <button className={styles.headerIconBtn} onClick={() => router.push("/profile")} title="My profile" style={{ fontSize: 19 }}>👤</button>
+<button className={styles.headerIconBtn} onClick={() => router.push("/profile")} title="My profile" style={{ fontSize: 19 }}>👤</button>
         {userEmoji && <div className={styles.headerUserAvatar}>{userEmoji}</div>}
       </div>
 
@@ -975,6 +987,75 @@ export default function ChatPage() {
             <button onClick={() => router.push("/profile")} style={{ marginTop: 12, background: "rgba(74,124,111,0.12)", border: "1px solid rgba(74,124,111,0.3)", borderRadius: 9, padding: "7px 14px", fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "#8ecfbe", cursor: "pointer", width: "100%" }}>
               {t.sidebar_go_profile}
             </button>
+          </div>
+
+          {/* Card 4: Theme picker */}
+          <div style={sCard} ref={themeDropRef}>
+            <div style={sTitle}>🎨 Theme</div>
+            <div style={{ position: "relative" }}>
+              {/* Trigger button showing current theme's 4 swatches */}
+              <button
+                onClick={() => setThemeDropOpen(v => !v)}
+                style={{
+                  width: "100%", display: "flex", alignItems: "center", gap: 8,
+                  background: "color-mix(in srgb, var(--text) 5%, transparent)",
+                  border: "1px solid color-mix(in srgb, var(--text) 12%, transparent)",
+                  borderRadius: 9, padding: "7px 10px", cursor: "pointer",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                <div style={{ display: "flex", flexShrink: 0 }}>
+                  {(THEMES.find(th => th.id === activeTheme) ?? THEMES[0]).swatches.map((c, i) => (
+                    <div key={i} style={{ width: 12, height: 16, background: c }} />
+                  ))}
+                </div>
+                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "color-mix(in srgb, var(--text) 75%, transparent)", flex: 1, textAlign: "left" }}>
+                  {(THEMES.find(th => th.id === activeTheme) ?? THEMES[0]).name}
+                </span>
+                <span style={{ fontSize: 10, color: "color-mix(in srgb, var(--text) 40%, transparent)" }}>
+                  {themeDropOpen ? "▴" : "▾"}
+                </span>
+              </button>
+
+              {themeDropOpen && (
+                <div style={{
+                  position: "absolute", bottom: "calc(100% + 6px)", left: 0, right: 0,
+                  background: "color-mix(in srgb, var(--bg) 97%, #000)",
+                  border: "1px solid color-mix(in srgb, var(--text) 15%, transparent)",
+                  borderRadius: 10, padding: "4px", zIndex: 300,
+                  maxHeight: 240, overflowY: "auto",
+                  boxShadow: "0 -6px 20px rgba(0,0,0,0.4)",
+                }}>
+                  <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 10, fontWeight: 600, color: "color-mix(in srgb, var(--text) 40%, transparent)", letterSpacing: "0.08em", textTransform: "uppercase", padding: "4px 8px 6px" }}>
+                    Select your theme
+                  </div>
+                  {THEMES.map(th => (
+                    <button
+                      key={th.id}
+                      onClick={() => applyTheme(th.id)}
+                      style={{
+                        display: "flex", alignItems: "center", gap: 8, width: "100%",
+                        background: activeTheme === th.id ? "color-mix(in srgb, var(--text) 10%, transparent)" : "transparent",
+                        border: "none", borderRadius: 7, padding: "6px 8px",
+                        cursor: "pointer", transition: "background 0.12s ease",
+                      }}
+                    >
+                      <div style={{ display: "flex", flexShrink: 0 }}>
+                        {th.swatches.map((c, i) => (
+                          <div key={i} style={{ width: 14, height: 18, background: c }} />
+                        ))}
+                      </div>
+                      <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "color-mix(in srgb, var(--text) 85%, transparent)", flex: 1, textAlign: "left", whiteSpace: "nowrap" }}>
+                        {th.name}
+                      </span>
+                      {activeTheme === th.id && (
+                        <span style={{ fontSize: 10, color: "color-mix(in srgb, var(--text) 50%, transparent)" }}>✓</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
         </div>
