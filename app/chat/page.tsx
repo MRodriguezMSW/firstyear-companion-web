@@ -92,12 +92,12 @@ type Message = { role: "assistant" | "user"; content: string };
 type GlossaryEntry = { term: string; def: string };
 
 const MOOD_OPTIONS = [
-  { emoji: "😔", label: "Struggling" },
-  { emoji: "😟", label: "Anxious" },
-  { emoji: "😐", label: "Numb" },
+  { emoji: "😨", label: "Scared" },
+  { emoji: "😩", label: "Overwhelmed" },
   { emoji: "🙂", label: "Okay" },
-  { emoji: "😊", label: "Good" },
-  { emoji: "💪", label: "Strong" },
+  { emoji: "🌱", label: "Hopeful" },
+  { emoji: "😐", label: "Numb" },
+  { emoji: "😢", label: "Sad" },
 ];
 
 export default function ChatPage() {
@@ -301,6 +301,14 @@ export default function ChatPage() {
         }
       } catch { /* ignore */ }
     }
+
+    // 24h visit-based mood check-in
+    const today = new Date().toISOString().slice(0, 10);
+    const lastVisit = localStorage.getItem("last_visit_date");
+    if (!lastVisit || lastVisit !== today) {
+      setShowMoodCheckin(true);
+    }
+    localStorage.setItem("last_visit_date", today);
 
     setChips(getStrings(savedLang).initial_chips);
     setMessages([{ role: "assistant", content: getStrings(savedLang).welcome_bubble }]);
@@ -587,10 +595,10 @@ export default function ChatPage() {
         <div style={{ position: "fixed", inset: 0, zIndex: 600, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
           <div style={{ background: "var(--bg)", border: "1px solid color-mix(in srgb, var(--accent) 30%, transparent)", borderRadius: 24, padding: "28px 24px", maxWidth: 360, width: "100%" }}>
             <div style={{ fontFamily: "'Lora', serif", fontSize: 19, fontWeight: 500, color: "var(--text)", marginBottom: 6, lineHeight: 1.35 }}>
-              How are you feeling today{checkinName ? `, ${checkinName}` : ""}?
+              Welcome back. How are you feeling today?
             </div>
             <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "color-mix(in srgb, var(--text) 50%, transparent)", marginBottom: 20, lineHeight: 1.6 }}>
-              Take a moment to check in with yourself.
+              This helps your companion meet you where you are.
             </p>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 16 }}>
               {MOOD_OPTIONS.map(m => (
@@ -599,6 +607,11 @@ export default function ChatPage() {
                   const today = new Date().toISOString().slice(0, 10);
                   const existing = raw ? (() => { try { return JSON.parse(raw); } catch { return {}; } })() : {};
                   localStorage.setItem(PROFILE_KEY, JSON.stringify({ ...existing, mood: m.label, moodEmoji: m.emoji, lastMoodDate: today }));
+                  // Append to daily_mood_log
+                  const logRaw = localStorage.getItem("daily_mood_log");
+                  const log = logRaw ? (() => { try { return JSON.parse(logRaw); } catch { return []; } })() : [];
+                  log.push({ mood: m.label, emoji: m.emoji, timestamp: new Date().toISOString() });
+                  localStorage.setItem("daily_mood_log", JSON.stringify(log));
                   setProfileContext(prev => {
                     const lines = prev.split("\n").filter(l => !l.startsWith("Mood today:"));
                     return [...lines, `Mood today: ${m.emoji} ${m.label}`].join("\n");
@@ -978,6 +991,9 @@ export default function ChatPage() {
                 {cat.icon} {cat.label}
               </button>
             ))}
+            <button style={sBtn()} onClick={() => router.push("/resources-navigator")}>
+              🗺️ Resource Navigator
+            </button>
           </div>
 
           {/* Card 3: Personalize Later */}
