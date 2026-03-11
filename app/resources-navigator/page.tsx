@@ -748,7 +748,7 @@ export default function ResourceNavigatorPage() {
                 Find a food bank near you →
               </a>
               <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "var(--subtext)", lineHeight: 1.6, margin: 0 }}>
-                Many local AIDS service organizations in {selectedState} also provide food assistance, grocery cards, and meal delivery programs for people living with HIV. Your Ryan White case manager can connect you with what's available in your area.
+                Many local service organizations in {selectedState} also provide food assistance, grocery cards, and meal delivery programs for people living with HIV. Your Ryan White case manager can connect you with what's available in your area.
               </p>
             </div>
           ) : (
