@@ -127,7 +127,7 @@ export default function WelcomePage() {
         <div style={{ maxWidth: 680, margin: "0 auto", padding: "16px 16px 16px", flex: 1, display: "flex", flexDirection: "column", width: "100%" }}>
 
           {/* Full-width card */}
-          <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, padding: "16px 24px", flex: 1, display: "flex", flexDirection: "column", gap: 8, height: "auto", minHeight: "100vh" }}>
+          <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, padding: "16px 24px", flex: 1, display: "flex", flexDirection: "column", gap: 8, height: "auto", minHeight: "100vh", justifyContent: "space-between" }}>
 
             {/* Top row: logo/title + dropdowns */}
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 4 }}>
