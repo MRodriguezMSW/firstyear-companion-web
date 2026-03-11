@@ -171,6 +171,13 @@ export default function WelcomePage() {
                       minWidth: 200, maxHeight: 280, overflowY: "auto",
                       boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
                     }}>
+                      <div style={{
+                        fontFamily: "'DM Sans', sans-serif", fontSize: 11, fontWeight: 600,
+                        color: "rgba(216,208,192,0.45)", letterSpacing: "0.08em",
+                        textTransform: "uppercase", padding: "4px 10px 8px",
+                      }}>
+                        Select your theme
+                      </div>
                       {THEMES.map(th => (
                         <button
                           key={th.id}
