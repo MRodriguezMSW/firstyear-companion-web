@@ -93,12 +93,10 @@ export default function WelcomePage() {
   return (
     <div style={{
       background: "var(--bg, #1A2E1E)",
-      minHeight: "100vh",
+      height: "100vh",
+      overflow: "hidden",
       display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      paddingTop: "32px",
-      paddingBottom: "32px",
+      flexDirection: "column",
     }}>
       {/* Ambient orbs */}
       <div aria-hidden style={{
@@ -122,8 +120,14 @@ export default function WelcomePage() {
         .wlc-theme-opt:hover { background: rgba(255,255,255,0.07) !important; }
       `}</style>
 
-      {/* Content area */}
-      <div style={{ position: "relative", zIndex: 1, maxWidth: 680, width: "100%", padding: "0 16px" }}>
+      {/* Content area — scrollable internally, centered */}
+      <div style={{
+        flex: 1, overflowY: "auto", display: "flex",
+        alignItems: "center", justifyContent: "center",
+        paddingTop: "32px", paddingBottom: "32px",
+        position: "relative", zIndex: 1,
+      }}>
+      <div style={{ maxWidth: 680, width: "100%", padding: "0 16px" }}>
 
           {/* Card — height auto, floats in page */}
           <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, padding: "16px 24px", display: "flex", flexDirection: "column", height: "auto" }}>
@@ -260,7 +264,7 @@ export default function WelcomePage() {
               </div>{/* end theme+lang wrapper */}
             </div>
 
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: "rgba(216,208,192,0.6)", margin: "8px 0 16px", fontWeight: 300, lineHeight: 1.4 }}>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: "color-mix(in srgb, var(--text) 65%, transparent)", margin: "8px 0 16px", fontWeight: 300, lineHeight: 1.4 }}>
               {t.tagline}
             </p>
 
@@ -268,11 +272,11 @@ export default function WelcomePage() {
             <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 16 }}>
               <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
                 <div style={{ fontFamily: "'Lora', serif", fontSize: 15, fontWeight: 500, color: "var(--text)", marginBottom: 8 }}>{t.what_title}</div>
-                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "rgba(216,208,192,0.65)", lineHeight: 1.6 }}>{t.what_body}</div>
+                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "color-mix(in srgb, var(--text) 70%, transparent)", lineHeight: 1.6 }}>{t.what_body}</div>
               </div>
               <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "12px 14px" }}>
                 <div style={{ fontFamily: "'Lora', serif", fontSize: 15, fontWeight: 500, color: "var(--text)", marginBottom: 8 }}>{t.nova_title}</div>
-                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "rgba(216,208,192,0.65)", lineHeight: 1.6 }}>{t.nova_body}</div>
+                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "color-mix(in srgb, var(--text) 70%, transparent)", lineHeight: 1.6 }}>{t.nova_body}</div>
               </div>
             </div>
 
@@ -287,7 +291,7 @@ export default function WelcomePage() {
               }}>
                 <input type="checkbox" checked={check1} onChange={e => setCheck1(e.target.checked)}
                   style={{ marginTop: 2, accentColor: "#c4956a", flexShrink: 0, width: 15, height: 15, cursor: "pointer" }} />
-                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "rgba(216,208,192,0.8)", lineHeight: 1.5 }}>
+                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "color-mix(in srgb, var(--text) 85%, transparent)", lineHeight: 1.5 }}>
                   {t.check1}
                 </span>
               </label>
@@ -301,7 +305,7 @@ export default function WelcomePage() {
               }}>
                 <input type="checkbox" checked={check2} onChange={e => setCheck2(e.target.checked)}
                   style={{ marginTop: 2, accentColor: "#c4956a", flexShrink: 0, width: 15, height: 15, cursor: "pointer" }} />
-                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "rgba(216,208,192,0.8)", lineHeight: 1.5 }}>
+                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "color-mix(in srgb, var(--text) 85%, transparent)", lineHeight: 1.5 }}>
                   {t.check2}
                 </span>
               </label>
@@ -315,7 +319,7 @@ export default function WelcomePage() {
               }}>
                 <input type="checkbox" checked={skipFlag} onChange={e => setSkipFlag(e.target.checked)}
                   style={{ marginTop: 2, accentColor: "#c4956a", flexShrink: 0, width: 15, height: 15, cursor: "pointer" }} />
-                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "rgba(216,208,192,0.65)", lineHeight: 1.5 }}>
+                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "color-mix(in srgb, var(--text) 70%, transparent)", lineHeight: 1.5 }}>
                   {t.skip_label}
                 </span>
               </label>
@@ -323,13 +327,13 @@ export default function WelcomePage() {
 
             {/* Privacy note */}
             <div style={{ background: "rgba(74,124,111,0.07)", border: "1px solid rgba(74,124,111,0.2)", borderRadius: 10, padding: "6px 12px", marginBottom: 8, marginTop: 0 }}>
-              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.72)", lineHeight: 1.5, margin: 0 }}>
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "color-mix(in srgb, var(--text) 75%, transparent)", lineHeight: 1.5, margin: 0 }}>
                 🔒 {t.privacy_note}
               </p>
             </div>
 
             {/* Beta notice */}
-            <div style={{ background: "rgba(196,149,106,0.08)", border: "1px solid rgba(196,149,106,0.2)", borderRadius: 10, padding: "6px 12px", marginBottom: 16, fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "rgba(216,208,192,0.82)", lineHeight: 1.5 }}>
+            <div style={{ background: "rgba(196,149,106,0.08)", border: "1px solid rgba(196,149,106,0.2)", borderRadius: 10, padding: "6px 12px", marginBottom: 16, fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "color-mix(in srgb, var(--text) 85%, transparent)", lineHeight: 1.5 }}>
               {t.beta_notice}
             </div>
 
@@ -353,7 +357,8 @@ export default function WelcomePage() {
             </div>
 
           </div>
-      </div>
+      </div>{/* end maxWidth */}
+      </div>{/* end scrollable content area */}
 
       <CrisisButton />
     </div>

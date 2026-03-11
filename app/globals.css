@@ -40,7 +40,7 @@ input, textarea, select {
 [data-theme="quiet-grove"]   { --bg:#3D4127; --text:#D4DE95; --accent:#BAC095; }
 [data-theme="lavender-night"]{ --bg:#272757; --text:#CCCCFF; --accent:#8686AC; }
 [data-theme="meadow-mist"]   { --bg:#253D2C; --text:#CFFFDC; --accent:#68BA7F; }
-[data-theme="charcoal-sky"]  { --bg:#4A4A4A; --text:#FFFFE3; --accent:#6D8196; }
+[data-theme="charcoal-sky"]  { --bg:#4A4A4A; --text:#1a1a1a; --accent:#6D8196; }
 [data-theme="warm-clay"]     { --bg:#7A3020; --text:#FFD3AC; --accent:#BF7587; }
 [data-theme="rose-dusk"]     { --bg:#4A2A2A; --text:#DCA1A1; --accent:#8E4585; }
 [data-theme="desert-bloom"]  { --bg:#8A2B0E; --text:#FFD3AC; --accent:#9988A1; }
@@ -50,10 +50,10 @@ input, textarea, select {
 [data-theme="citrus-pop"]    { --bg:#1A3A2A; --text:#FCE883; --accent:#FF8243; }
 [data-theme="ocean-deep"]    { --bg:#000080; --text:#82C8E5; --accent:#0047AB; }
 [data-theme="emerald-pride"] { --bg:#1A3A2A; --text:#CFFFDC; --accent:#50C878; }
-[data-theme="linen-moss"]    { --bg:#4A4220; --text:#EDE8D0; --accent:#DBD1ED; }
+[data-theme="linen-moss"]    { --bg:#4A4220; --text:#1a1a1a; --accent:#DBD1ED; }
 [data-theme="periwinkle"]    { --bg:#292966; --text:#CCCCFF; --accent:#A3A3CC; }
 [data-theme="blue-violet"]   { --bg:#2A2A5A; --text:#B5C7EB; --accent:#A4A5F5; }
 [data-theme="teal-earth"]    { --bg:#2A3A2A; --text:#81D8D0; --accent:#AE82D9; }
-[data-theme="garden-fresh"]  { --bg:#2A3A1A; --text:#F5F5DC; --accent:#93C572; }
-[data-theme="sage-stone"]    { --bg:#4B6E48; --text:#F2F0EF; --accent:#B2AC88; }
+[data-theme="garden-fresh"]  { --bg:#2A3A1A; --text:#1a1a1a; --accent:#93C572; }
+[data-theme="sage-stone"]    { --bg:#4B6E48; --text:#1a1a1a; --accent:#B2AC88; }
 [data-theme="deep-teal"]     { --bg:#0B2E33; --text:#B8E3E9; --accent:#4F7C82; }
