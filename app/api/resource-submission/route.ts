@@ -1,7 +1,7 @@
 import { Resend } from "resend";
 import { NextResponse } from "next/server";
 
-const TO_EMAIL = "modriguez0426@gmail.com";
+const TO_EMAIL = "mrodriguez0426@gmail.com";
 
 function buildCorrectionText(f: Record<string, string>, timestamp: string): string {
   const date = new Date(timestamp).toLocaleString("en-US", {
@@ -72,6 +72,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true, note: "logged_only" });
     }
 
+    console.log(`[Resource submission] Sending to ${TO_EMAIL} via Resend…`);
+
     const resend = new Resend(apiKey);
     const replyTo = fields.submitterEmail?.trim() || undefined;
     const { data, error } = await resend.emails.send({
@@ -83,10 +85,11 @@ export async function POST(req: Request) {
     });
 
     if (error) {
-      console.error("[Resource submission email error]", JSON.stringify(error));
+      console.error("[Resource submission email error — full response]", JSON.stringify(error, null, 2));
       return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
     }
 
+    console.log("[Resource submission] Email sent, id:", data?.id);
     return NextResponse.json({ ok: true, id: data?.id });
   } catch (err: any) {
     console.error("[Resource submission route error]", err?.message || err);

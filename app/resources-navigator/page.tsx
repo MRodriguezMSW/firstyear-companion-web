@@ -447,7 +447,7 @@ function CorrectionForm({ state }: { state: string }) {
                 </div>
                 {status === "error" && (
                   <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "#f9a8a8", margin: 0 }}>
-                    Something didn't go through. Please try again or email us directly at miguelr@novusacs.com
+                    Something didn't go through. Please try again or email us directly at mrodriguez0426@gmail.com
                   </p>
                 )}
                 <button
@@ -574,7 +574,7 @@ function ResourceForm({ state }: { state: string }) {
                 </div>
                 {status === "error" && (
                   <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "#f9a8a8", margin: 0 }}>
-                    Something didn't go through. Please try again or email us directly at miguelr@novusacs.com
+                    Something didn't go through. Please try again or email us directly at mrodriguez0426@gmail.com
                   </p>
                 )}
                 <button
