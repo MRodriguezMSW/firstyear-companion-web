@@ -1,31 +1,26 @@
 import { Resend } from "resend";
 import { NextResponse } from "next/server";
 
-const TO_EMAIL = "miguelr@novusacs.com";
+const TO_EMAIL = "modriguez0426@gmail.com";
 
 function buildCorrectionText(f: Record<string, string>, timestamp: string): string {
   const date = new Date(timestamp).toLocaleString("en-US", {
     dateStyle: "full", timeStyle: "short", timeZone: "America/New_York",
   });
+  const submitter = f.submitterName?.trim() || "Anonymous";
+  const email = f.submitterEmail?.trim() || "(not provided)";
   return [
-    "Resource Correction Submission",
+    `Resource Correction — ${f.state || "Unknown State"}`,
     "",
     `Date: ${date}`,
+    "",
+    `Resource Name: ${f.resourceName || "(not provided)"}`,
     `State: ${f.state || "(not provided)"}`,
-    "",
-    "────────────────────────────────────",
-    "",
-    `Resource name: ${f.resourceName || "(not provided)"}`,
     "",
     `What needs to be corrected:`,
     f.correction || "(not provided)",
     "",
-    "────────────────────────────────────",
-    "",
-    `Submitted by: ${f.submitterName?.trim() || "Anonymous"}`,
-    `Contact email: ${f.submitterEmail?.trim() || "(not provided)"}`,
-    "",
-    "Sent from FirstYear Companion — Resource Navigator",
+    `Submitted by: ${submitter} (${email})`,
   ].join("\n");
 }
 
@@ -33,32 +28,24 @@ function buildResourceText(f: Record<string, string>, timestamp: string): string
   const date = new Date(timestamp).toLocaleString("en-US", {
     dateStyle: "full", timeStyle: "short", timeZone: "America/New_York",
   });
+  const submitter = f.submitterName?.trim() || "Anonymous";
+  const email = f.submitterEmail?.trim() || "(not provided)";
   return [
-    "New Resource Submission",
+    `New Resource Submission — ${f.state || "Unknown State"}`,
     "",
     `Date: ${date}`,
-    `State: ${f.state || "(not provided)"}`,
     "",
-    "────────────────────────────────────",
-    "",
-    `Resource name: ${f.resourceName || "(not provided)"}`,
+    `Resource Name: ${f.resourceName || "(not provided)"}`,
     `Address: ${f.address || "(not provided)"}`,
     `City: ${f.city || "(not provided)"}`,
     `State: ${f.state || "(not provided)"}`,
-    `Zip code: ${f.zip || "(not provided)"}`,
+    `Zip: ${f.zip || "(not provided)"}`,
     `Phone: ${f.phone?.trim() || "(not provided)"}`,
     `Fax: ${f.fax?.trim() || "(not provided)"}`,
     `Website: ${f.website?.trim() || "(not provided)"}`,
+    `Resources Provided: ${f.description || "(not provided)"}`,
     "",
-    "Resources provided:",
-    f.description || "(not provided)",
-    "",
-    "────────────────────────────────────",
-    "",
-    `Submitted by: ${f.submitterName?.trim() || "Anonymous"}`,
-    `Contact email: ${f.submitterEmail?.trim() || "(not provided)"}`,
-    "",
-    "Sent from FirstYear Companion — Resource Navigator",
+    `Submitted by: ${submitter} (${email})`,
   ].join("\n");
 }
 
@@ -86,9 +73,11 @@ export async function POST(req: Request) {
     }
 
     const resend = new Resend(apiKey);
+    const replyTo = fields.submitterEmail?.trim() || undefined;
     const { data, error } = await resend.emails.send({
       from: "FirstYear Companion <onboarding@resend.dev>",
       to: [TO_EMAIL],
+      ...(replyTo && { replyTo }),
       subject,
       text,
     });
