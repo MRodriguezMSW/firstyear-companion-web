@@ -232,7 +232,7 @@ export default function WelcomePage() {
         /* Responsive */
         @media (max-width: 768px) {
           .wlc-card { padding: 20px !important; }
-          .wlc-headline { font-size: 26px !important; }
+          ..wlc-headline { font-size: 18px !important; }
         }
       `}</style>
 
@@ -303,7 +303,7 @@ export default function WelcomePage() {
             position: "relative",
             overflow: "visible",
             zIndex: 1,
-            maxWidth: 720,
+            maxWidth: 900,
             width: "92%",
             boxSizing: "border-box" as const,
           }}
@@ -318,17 +318,21 @@ export default function WelcomePage() {
 
             {/* ── Top row ── z-index 10 so dropdowns clear inner cards */}
             <div style={{
-              display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
+              display: "grid", gridTemplateColumns: "1fr auto 1fr",
+              alignItems: "center",
               position: "relative", zIndex: 10, overflow: "visible",
             }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              {/* Left — empty spacer */}
+              <div />
+              {/* Center — logo */}
+              <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
                 <Sprout size={18} color="#22C55E" strokeWidth={2.2} />
-                <span style={{ fontFamily: F_HEADING, fontSize: 26, fontWeight: 700, color: "#fff", lineHeight: 1 }}>
+                <span style={{ fontFamily: F_HEADING, fontSize: "1.5rem", fontWeight: 700, color: "#fff", lineHeight: 1 }}>
                   FirstYear Companion
                 </span>
               </div>
-
-              <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0, overflow: "visible" }}>
+              {/* Right — pills */}
+              <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "flex-end", flexShrink: 0, overflow: "visible" }}>
 
                 {/* Language pill */}
                 <div ref={langDropRef} className="wlc-drop-anchor">
@@ -429,14 +433,14 @@ export default function WelcomePage() {
             <div style={{ textAlign: "center", marginTop: 28, position: "relative", zIndex: 1 }}>
               <p
                 className="wlc-headline"
-                style={{ fontFamily: F_HEADING, fontSize: 34, fontWeight: 600, color: "#fff", margin: "0 0 10px" }}
+                style={{ fontFamily: F_HEADING, fontSize: "1.25rem", fontWeight: 700, color: "#fff", margin: "0 0 10px" }}
               >
                 {t.tagline}
               </p>
-              <p style={{ fontFamily: F_BODY, fontSize: 16, color: "#ffffff", margin: "0 0 4px" }}>
+              <p style={{ fontFamily: F_BODY, fontSize: 13, color: "#ffffff", margin: "0 0 4px" }}>
                 {t.subtitle1}
               </p>
-              <p style={{ fontFamily: F_BODY, fontSize: 16, color: "#ffffff", margin: 0 }}>
+              <p style={{ fontFamily: F_BODY, fontSize: 13, color: "#ffffff", margin: 0 }}>
                 {t.subtitle2}
               </p>
             </div>
