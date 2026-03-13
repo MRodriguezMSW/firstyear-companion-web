@@ -32,6 +32,14 @@ export type S1 = {
   check2: string;
   skip_label: string;
   continue_btn: string;
+  beginCheckin: string;
+  subtitle1: string;
+  subtitle2: string;
+  companionSubtitle: string;
+  feature1: string;
+  feature2: string;
+  feature3: string;
+  feature4: string;
   page_label: string;
   page_sub: string;
 };
@@ -86,6 +94,14 @@ const S1_EN: S1 = {
   check2: "I understand that this app does not replace professional medical care or mental health treatment.",
   skip_label: "Do not show this page next time I open the app",
   continue_btn: "Continue",
+  beginCheckin: "Begin your check-in",
+  subtitle1: "A safe place for people newly diagnosed with HIV.",
+  subtitle2: "Ask questions, find resources, or just talk.",
+  companionSubtitle: "Your AI companion for the first year after diagnosis.",
+  feature1: "Answer HIV questions",
+  feature2: "Help you process emotions",
+  feature3: "Guide you to resources",
+  feature4: "Stay with you when things feel overwhelming",
   page_label: "Page 1 of 3",
   page_sub: "Language + welcome",
 };
@@ -110,6 +126,14 @@ const S1_ES: S1 = {
   check2: "Entiendo que esta aplicación no reemplaza la atención médica profesional ni el tratamiento de salud mental.",
   skip_label: "No mostrar esta página la próxima vez que abra la aplicación",
   continue_btn: "Continuar",
+  beginCheckin: "Comenzar tu registro",
+  subtitle1: "Un lugar seguro para personas recién diagnosticadas con VIH.",
+  subtitle2: "Haz preguntas, encuentra recursos o simplemente habla.",
+  companionSubtitle: "Tu compañera de IA en el primer año tras el diagnóstico.",
+  feature1: "Responder preguntas sobre el VIH",
+  feature2: "Ayudarte a procesar emociones",
+  feature3: "Orientarte hacia recursos",
+  feature4: "Estar contigo cuando todo se sienta abrumador",
   page_label: "Página 1 de 3",
   page_sub: "Idioma + bienvenida",
 };
@@ -134,6 +158,14 @@ const S1_FR: S1 = {
   check2: "Je comprends que cette application ne remplace pas les soins médicaux professionnels ni le traitement de santé mentale.",
   skip_label: "Ne plus afficher cette page à l'ouverture de l'application",
   continue_btn: "Continuer",
+  beginCheckin: "Commencer votre bilan",
+  subtitle1: "Un endroit sûr pour les personnes récemment diagnostiquées avec le VIH.",
+  subtitle2: "Posez des questions, trouvez des ressources ou parlez simplement.",
+  companionSubtitle: "Votre compagne IA pour la première année après le diagnostic.",
+  feature1: "Répondre aux questions sur le VIH",
+  feature2: "Vous aider à traiter vos émotions",
+  feature3: "Vous orienter vers des ressources",
+  feature4: "Être là pour vous quand les choses semblent difficiles",
   page_label: "Page 1 sur 3",
   page_sub: "Langue + bienvenue",
 };
@@ -158,6 +190,14 @@ const S1_PT: S1 = {
   check2: "Entendo que este aplicativo não substitui cuidados médicos profissionais ou tratamento de saúde mental.",
   skip_label: "Não mostrar esta página na próxima vez que abrir o aplicativo",
   continue_btn: "Continuar",
+  beginCheckin: "Iniciar seu check-in",
+  subtitle1: "Um lugar seguro para pessoas recém-diagnosticadas com HIV.",
+  subtitle2: "Faça perguntas, encontre recursos ou apenas converse.",
+  companionSubtitle: "Sua companheira de IA no primeiro ano após o diagnóstico.",
+  feature1: "Responder perguntas sobre HIV",
+  feature2: "Ajudar a processar emoções",
+  feature3: "Orientar para recursos",
+  feature4: "Estar com você quando as coisas parecerem difíceis",
   page_label: "Página 1 de 3",
   page_sub: "Idioma + boas-vindas",
 };
@@ -182,6 +222,14 @@ const S1_HT: S1 = {
   check2: "Mwen konprann ke aplikasyon sa a pa ranplase swen medikal pwofesyonèl oswa tretman sante mantal.",
   skip_label: "Pa montre paj sa a pwochen fwa mwen ouvri aplikasyon an",
   continue_btn: "Kontinye",
+  beginCheckin: "Kòmanse tchèk ou",
+  subtitle1: "Yon kote an sekirite pou moun ki fèk dyagnostike ak VIH.",
+  subtitle2: "Poze kesyon, jwenn resous oswa jis pale.",
+  companionSubtitle: "Konpayon IA ou pou premye ane apre dyagnostik la.",
+  feature1: "Repon kesyon sou VIH",
+  feature2: "Ede ou trete emosyon ou",
+  feature3: "Gide ou vè resous",
+  feature4: "Rete avèk ou lè bagay yo sanble difisil",
   page_label: "Paj 1 sou 3",
   page_sub: "Lang + Byenveni",
 };
@@ -206,6 +254,14 @@ const S1_ZH: S1 = {
   check2: "我了解此应用程序不能取代专业医疗护理或心理健康治疗。",
   skip_label: "下次打开应用时不再显示此页面",
   continue_btn: "继续",
+  beginCheckin: "开始您的签到",
+  subtitle1: "为近期被诊断为艾滋病毒的人提供的安全空间。",
+  subtitle2: "提问、查找资源或只是倾诉。",
+  companionSubtitle: "您在诊断后第一年的AI伴侣。",
+  feature1: "回答艾滋病毒问题",
+  feature2: "帮助您处理情绪",
+  feature3: "引导您找到资源",
+  feature4: "当事情感到难以承受时陪伴您",
   page_label: "第1页，共3页",
   page_sub: "语言 + 欢迎",
 };

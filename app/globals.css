@@ -12,6 +12,8 @@ html, body {
   margin: 0;
   padding: 0;
   overscroll-behavior: none;
+  background: #0d1f2d;
+  min-height: 100%;
 }
 
 body {
