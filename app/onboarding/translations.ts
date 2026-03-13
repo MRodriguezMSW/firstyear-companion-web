@@ -42,6 +42,7 @@ export type S1 = {
   feature4: string;
   page_label: string;
   page_sub: string;
+  disclaimer: string;
 };
 
 // ── Screen 2 type ─────────────────────────────────────────────────────────────
@@ -104,6 +105,7 @@ const S1_EN: S1 = {
   feature4: "Stay with you when things feel overwhelming",
   page_label: "Page 1 of 3",
   page_sub: "Language + welcome",
+  disclaimer: "Beta version. This tool is still evolving and is not a clinical service. If you are in crisis, call 988 or emergency services.",
 };
 
 const S1_ES: S1 = {
@@ -136,6 +138,7 @@ const S1_ES: S1 = {
   feature4: "Estar contigo cuando todo se sienta abrumador",
   page_label: "Página 1 de 3",
   page_sub: "Idioma + bienvenida",
+  disclaimer: "Versión beta. Esta herramienta aún está evolucionando y no es un servicio clínico. Si estás en crisis, llama al 988 o a los servicios de emergencia.",
 };
 
 const S1_FR: S1 = {
@@ -168,6 +171,7 @@ const S1_FR: S1 = {
   feature4: "Être là pour vous quand les choses semblent difficiles",
   page_label: "Page 1 sur 3",
   page_sub: "Langue + bienvenue",
+  disclaimer: "Version bêta. Cet outil est en cours d'évolution et n'est pas un service clinique. Si vous êtes en crise, appelez le 3114 ou les services d'urgence.",
 };
 
 const S1_PT: S1 = {
@@ -200,6 +204,7 @@ const S1_PT: S1 = {
   feature4: "Estar com você quando as coisas parecerem difíceis",
   page_label: "Página 1 de 3",
   page_sub: "Idioma + boas-vindas",
+  disclaimer: "Versão beta. Esta ferramenta ainda está evoluindo e não é um serviço clínico. Se você estiver em crise, ligue para 188 ou para os serviços de emergência.",
 };
 
 const S1_HT: S1 = {
@@ -232,6 +237,7 @@ const S1_HT: S1 = {
   feature4: "Rete avèk ou lè bagay yo sanble difisil",
   page_label: "Paj 1 sou 3",
   page_sub: "Lang + Byenveni",
+  disclaimer: "Vèsyon bèta. Zouti sa a ap evolye toujou e se pa yon sèvis klinik. Si ou nan kriz, rele 988 oswa sèvis ijans.",
 };
 
 const S1_ZH: S1 = {
@@ -264,6 +270,7 @@ const S1_ZH: S1 = {
   feature4: "当事情感到难以承受时陪伴您",
   page_label: "第1页，共3页",
   page_sub: "语言 + 欢迎",
+  disclaimer: "测试版本。此工具仍在持续改进中，不是临床服务。如果您处于危机中，请拨打988或紧急服务。",
 };
 
 export const S1_STRINGS: Record<LangCode6, S1> = {

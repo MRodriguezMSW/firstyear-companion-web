@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Sprout, Globe, Palette, ChevronDown, Bot,
-  CheckCircle2, Shield, ArrowRight, Lock,
+  CheckCircle2, ArrowRight, Lock,
 } from "lucide-react";
 import { LANG_TILES, S1_STRINGS, getS1, type LangCode6 } from "../translations";
 import CrisisButton from "../../components/CrisisButton";
@@ -374,68 +374,65 @@ export default function WelcomePage() {
               </p>
             </div>
 
-            {/* ── Meet companion inner card ── */}
+            {/* ── Two-column meet layout ── */}
             <div style={{
-              background: "transparent",
-              backdropFilter: "none",
-              WebkitBackdropFilter: "none",
-              border: "1px solid rgba(255,255,255,0.10)",
-              borderRadius: 16,
-              padding: "20px 24px",
-              boxShadow: "none",
-              position: "relative",
+              display: "grid",
+              gridTemplateColumns: "80px 1fr",
+              gap: 20,
+              alignItems: "flex-start",
               marginTop: 24,
+              position: "relative",
               zIndex: 1,
             }}>
-                {/* inner glass highlight */}
-                <div aria-hidden style={{
-                  position: "absolute", inset: 0, borderRadius: 16,
-                  background: "linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%)",
-                  pointerEvents: "none",
-                }} />
+              {/* LEFT — avatar col */}
+              <div>
+                {!avatarError ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src="/avatars/nova.png"
+                    alt={companionName}
+                    width={80}
+                    height={80}
+                    style={{
+                      width: 80, height: 80,
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                      filter: "drop-shadow(0 4px 16px rgba(34,197,94,0.55))",
+                      display: "block",
+                    }}
+                    onError={() => setAvatarError(true)}
+                  />
+                ) : (
+                  <div style={{
+                    width: 80, height: 80, borderRadius: "50%",
+                    background: "linear-gradient(135deg, #22C55E, #14B8A6)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    filter: "drop-shadow(0 4px 16px rgba(34,197,94,0.55))",
+                  }}>
+                    <Bot size={32} color="white" strokeWidth={1.8} />
+                  </div>
+                )}
+              </div>
 
-                <div style={{ display: "flex", alignItems: "center", gap: 16, position: "relative" }}>
-                  {/* Avatar — 80 px, no circle bg, green drop-shadow */}
-                  <div style={{ flexShrink: 0 }}>
-                    {!avatarError ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src="/avatars/nova.png"
-                        alt={companionName}
-                        width={80}
-                        height={80}
-                        style={{
-                          width: 80, height: 80,
-                          borderRadius: "50%",
-                          objectFit: "cover",
-                          filter: "drop-shadow(0 4px 16px rgba(34,197,94,0.55))",
-                          display: "block",
-                        }}
-                        onError={() => setAvatarError(true)}
-                      />
-                    ) : (
-                      <div style={{
-                        width: 80, height: 80, borderRadius: "50%",
-                        background: "linear-gradient(135deg, #22C55E, #14B8A6)",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        filter: "drop-shadow(0 4px 16px rgba(34,197,94,0.55))",
-                      }}>
-                        <Bot size={32} color="white" strokeWidth={1.8} />
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <div style={{ fontFamily: F_HEADING, fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 4 }}>
-                      Meet Nova
-                    </div>
-                    <div style={{ fontFamily: F_BODY, fontSize: 14, color: "#94A3B8", lineHeight: 1.5 }}>
-                      {t.companionSubtitle}
-                    </div>
-                  </div>
+              {/* RIGHT — content col */}
+              <div>
+                <div style={{ fontFamily: F_HEADING, fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 4 }}>
+                  Meet Nova
+                </div>
+                <div style={{ fontFamily: F_BODY, fontSize: 14, color: "#94A3B8", lineHeight: 1.5 }}>
+                  {t.companionSubtitle}
                 </div>
 
-                {/* Feature list — vertical */}
-                <div className="wlc-features" style={{ position: "relative" }}>
+                {/* Features card */}
+                <div style={{
+                  border: "1px solid rgba(255,255,255,0.10)",
+                  borderRadius: 12,
+                  padding: 16,
+                  marginTop: 12,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 8,
+                }}>
                   {[t.feature1, t.feature2, t.feature3, t.feature4].map((feature, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
                       <CheckCircle2 size={16} color="#22C55E" strokeWidth={2} style={{ flexShrink: 0, marginTop: 1 }} />
@@ -445,62 +442,51 @@ export default function WelcomePage() {
                     </div>
                   ))}
                 </div>
-            </div>
 
-            {/* ── Before we begin inner card ── */}
-            <div style={{
-              background: "transparent",
-              backdropFilter: "none",
-              WebkitBackdropFilter: "none",
-              border: "1px solid rgba(255,255,255,0.10)",
-              borderRadius: 16,
-              padding: "20px 24px",
-              boxShadow: "none",
-              position: "relative",
-              marginTop: 16,
-              zIndex: 1,
-            }}>
-                <div aria-hidden style={{
-                  position: "absolute", inset: 0, borderRadius: 16,
-                  background: "linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%)",
-                  pointerEvents: "none",
-                }} />
+                {/* Before we begin card */}
+                <div style={{
+                  border: "1px solid rgba(255,255,255,0.10)",
+                  borderRadius: 12,
+                  padding: 16,
+                  marginTop: 12,
+                }}>
+                  <div style={{ marginBottom: 12 }}>
+                    <span style={{ fontFamily: F_BODY, fontSize: 16, fontWeight: 600, color: "#CBD5E1" }}>
+                      Before we begin
+                    </span>
+                  </div>
 
-                <div style={{ marginBottom: 12, position: "relative" }}>
-                  <span style={{ fontFamily: F_BODY, fontSize: 16, fontWeight: 600, color: "#CBD5E1" }}>
-                    Before we begin
-                  </span>
+                  {/* Checkbox 1 */}
+                  <label className="wlc-chk-row" style={{ marginBottom: 4 }}>
+                    <div className={`wlc-chk-box${check1 ? " on" : ""}`} onClick={() => setCheck1(v => !v)}>
+                      {check1 && (
+                        <svg width="11" height="9" viewBox="0 0 11 9" fill="none">
+                          <path d="M1 4.5L4 7.5L10 1.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                    </div>
+                    <input type="checkbox" checked={check1} onChange={e => setCheck1(e.target.checked)} style={{ display: "none" }} />
+                    <span style={{ fontFamily: F_BODY, fontSize: 15, color: "#F8FAFC", lineHeight: 1.5 }}>
+                      {t.check1}
+                    </span>
+                  </label>
+
+                  {/* Checkbox 2 */}
+                  <label className="wlc-chk-row">
+                    <div className={`wlc-chk-box${check2 ? " on" : ""}`} onClick={() => setCheck2(v => !v)}>
+                      {check2 && (
+                        <svg width="11" height="9" viewBox="0 0 11 9" fill="none">
+                          <path d="M1 4.5L4 7.5L10 1.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                    </div>
+                    <input type="checkbox" checked={check2} onChange={e => setCheck2(e.target.checked)} style={{ display: "none" }} />
+                    <span style={{ fontFamily: F_BODY, fontSize: 15, color: "#F8FAFC", lineHeight: 1.5 }}>
+                      {t.check2}
+                    </span>
+                  </label>
                 </div>
-
-                {/* Checkbox 1 — t.check1 translates with lang */}
-                <label className="wlc-chk-row" style={{ marginBottom: 4, position: "relative" }}>
-                  <div className={`wlc-chk-box${check1 ? " on" : ""}`} onClick={() => setCheck1(v => !v)}>
-                    {check1 && (
-                      <svg width="11" height="9" viewBox="0 0 11 9" fill="none">
-                        <path d="M1 4.5L4 7.5L10 1.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    )}
-                  </div>
-                  <input type="checkbox" checked={check1} onChange={e => setCheck1(e.target.checked)} style={{ display: "none" }} />
-                  <span style={{ fontFamily: F_BODY, fontSize: 15, color: "#F8FAFC", lineHeight: 1.5 }}>
-                    {t.check1}
-                  </span>
-                </label>
-
-                {/* Checkbox 2 — t.check2 translates with lang */}
-                <label className="wlc-chk-row" style={{ position: "relative" }}>
-                  <div className={`wlc-chk-box${check2 ? " on" : ""}`} onClick={() => setCheck2(v => !v)}>
-                    {check2 && (
-                      <svg width="11" height="9" viewBox="0 0 11 9" fill="none">
-                        <path d="M1 4.5L4 7.5L10 1.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    )}
-                  </div>
-                  <input type="checkbox" checked={check2} onChange={e => setCheck2(e.target.checked)} style={{ display: "none" }} />
-                  <span style={{ fontFamily: F_BODY, fontSize: 15, color: "#F8FAFC", lineHeight: 1.5 }}>
-                    {t.check2}
-                  </span>
-                </label>
+              </div>
             </div>
 
             {/* ── CTA — t.continue_btn translates with lang ── */}
@@ -518,7 +504,7 @@ export default function WelcomePage() {
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "center", gap: 6, marginTop: 16, position: "relative", zIndex: 1 }}>
               <Lock size={11} color="#94A3B8" strokeWidth={2} style={{ flexShrink: 0, marginTop: 2 }} />
               <span style={{ fontFamily: F_BODY, fontSize: 12, color: "#94A3B8", lineHeight: 1.5, textAlign: "center" }}>
-                Beta version. This tool is still evolving and is not a clinical service. If you are in crisis, call 988 or emergency services.
+                {t.disclaimer}
               </span>
             </div>
 
