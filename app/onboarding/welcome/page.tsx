@@ -3,35 +3,32 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Sprout, Globe, Palette, ChevronDown, Bot,
+  Sprout, Globe, ChevronDown, Bot, Camera,
   CheckCircle2, ArrowRight, Lock,
 } from "lucide-react";
 import { LANG_TILES, S1_STRINGS, getS1, type LangCode6 } from "../translations";
 import CrisisButton from "../../components/CrisisButton";
 
-const THEMES = [
-  { id: "calm-sea",       name: "Calm Sea",       swatches: ["#6A89A7","#BDDDFC","#88BDF2","#384959"] },
-  { id: "quiet-grove",    name: "Quiet Grove",    swatches: ["#636B2F","#BAC095","#D4DE95","#3D4127"] },
-  { id: "lavender-night", name: "Lavender Night", swatches: ["#272757","#8686AC","#505081","#0F0E47"] },
-  { id: "meadow-mist",    name: "Meadow Mist",    swatches: ["#2E6F40","#CFFFDC","#68BA7F","#253D2C"] },
-  { id: "charcoal-sky",   name: "Charcoal Sky",   swatches: ["#4A4A4A","#CBCBCB","#FFFFE3","#6D8196"] },
-  { id: "warm-clay",      name: "Warm Clay",      swatches: ["#A2574F","#E68057","#BF7587","#993A8B"] },
-  { id: "rose-dusk",      name: "Rose Dusk",      swatches: ["#DCA1A1","#996666","#8E4585","#4A4A4A"] },
-  { id: "desert-bloom",   name: "Desert Bloom",   swatches: ["#E35336","#FFD3AC","#9988A1","#8A2B0E"] },
-  { id: "harvest",        name: "Harvest",        swatches: ["#BE5103","#FFCE1B","#069494","#B7410E"] },
-  { id: "soft-candy",     name: "Soft Candy",     swatches: ["#B298E7","#B8E3E9","#F5B8D5","#F9BEDD"] },
-  { id: "hot-sunset",     name: "Hot Sunset",     swatches: ["#FD3DB5","#FFB8DC","#FB6A2C","#8C1946"] },
-  { id: "citrus-pop",     name: "Citrus Pop",     swatches: ["#FF8243","#FFC0CB","#FCE883","#069494"] },
-  { id: "ocean-deep",     name: "Ocean Deep",     swatches: ["#0047AB","#000080","#82C8E5","#6D8196"] },
-  { id: "emerald-pride",  name: "Emerald Pride",  swatches: ["#50C878","#0F52BA","#9966CC","#CFB53B"] },
-  { id: "linen-moss",     name: "Linen & Moss",   swatches: ["#EDE8D0","#6E632E","#DBD1ED","#ABBEED"] },
-  { id: "periwinkle",     name: "Periwinkle",     swatches: ["#CCCCFF","#A3A3CC","#5C5C99","#292966"] },
-  { id: "blue-violet",    name: "Blue Violet",    swatches: ["#B5C7EB","#9EF0FF","#A4A5F5","#8E70CF"] },
-  { id: "teal-earth",     name: "Teal Earth",     swatches: ["#81D8D0","#D99E82","#D7D982","#AE82D9"] },
-  { id: "garden-fresh",   name: "Garden Fresh",   swatches: ["#93C572","#89CFF0","#F5F5DC","#82C8E5"] },
-  { id: "sage-stone",     name: "Sage & Stone",   swatches: ["#B2AC88","#898989","#F2F0EF","#4B6E48"] },
-  { id: "deep-teal",      name: "Deep Teal",      swatches: ["#B8E3E9","#93B1B5","#4F7C82","#0B2E33"] },
+const AVATARS = [
+  { id: "nova",  name: "Nova",  theme: "calm-sea",    accent: "#88BDF2", swatches: ["#384959","#BDDDFC","#88BDF2"] },
+  { id: "luna",  name: "Luna",  theme: "periwinkle",  accent: "#CCCCFF", swatches: ["#292966","#CCCCFF","#A3A3CC"] },
+  { id: "sage",  name: "Sage",  theme: "quiet-grove", accent: "#BAC095", swatches: ["#3D4127","#D4DE95","#BAC095"] },
+  { id: "ember", name: "Ember", theme: "hot-sunset",  accent: "#FB6A2C", swatches: ["#8C1946","#FFB8DC","#FB6A2C"] },
+  { id: "rio",   name: "Rio",   theme: "deep-teal",   accent: "#4F7C82", swatches: ["#0B2E33","#B8E3E9","#4F7C82"] },
+  { id: "kai",   name: "Kai",   theme: "ocean-deep",  accent: "#82C8E5", swatches: ["#000080","#82C8E5","#0047AB"] },
+  { id: "wren",  name: "Wren",  theme: "linen-moss",  accent: "#DBD1ED", swatches: ["#4A4220","#EDE8D0","#DBD1ED"] },
+  { id: "lea",   name: "Lea",   theme: "rose-dusk",   accent: "#DCA1A1", swatches: ["#4A2A2A","#DCA1A1","#8E4585"] },
+  { id: "milo",  name: "Milo",  theme: "harvest",     accent: "#FFCE1B", swatches: ["#7A3200","#FFCE1B","#069494"] },
+  { id: "aria",  name: "Aria",  theme: "blue-violet", accent: "#A4A5F5", swatches: ["#2A2A5A","#B5C7EB","#A4A5F5"] },
+  { id: "zeke",  name: "Zeke",  theme: "meadow-mist", accent: "#68BA7F", swatches: ["#253D2C","#CFFFDC","#68BA7F"] },
+  { id: "ivy",   name: "Ivy",   theme: "garden-fresh",accent: "#93C572", swatches: ["#2A3A1A","#F5F5DC","#93C572"] },
+  { id: "rex",   name: "Rex",   theme: "teal-earth",  accent: "#81D8D0", swatches: ["#2A3A2A","#81D8D0","#AE82D9"] },
+  { id: "mia",   name: "Mia",   theme: "warm-clay",   accent: "#E68057", swatches: ["#7A3020","#FFD3AC","#BF7587"] },
+  { id: "finn",  name: "Finn",  theme: "charcoal-sky",accent: "#CBCBCB", swatches: ["#4A4A4A","#FFFFE3","#6D8196"] },
 ];
+
+// Theme dot colors for custom photo picker (one per theme, same order as AVATARS)
+const CUSTOM_THEME_DOTS = AVATARS.map(av => ({ theme: av.theme, color: av.accent }));
 
 // Deterministic starfield — no Math.random() (avoids hydration mismatch)
 // 150 small (1–2 px) + 40 large bright (3 px, glowing)
@@ -66,16 +63,19 @@ export default function WelcomePage() {
   const [lang, setLang]                   = useState<LangCode6>("en-US");
   const [check1, setCheck1]               = useState(false);
   const [check2, setCheck2]               = useState(false);
-  const [langDropOpen, setLangDropOpen]   = useState(false);
-  const [themeDropOpen, setThemeDropOpen] = useState(false);
-  const [theme, setTheme]                 = useState("calm-sea");
-  const [companionName, setCompanionName] = useState("Nova");
-  const [avatarError, setAvatarError]     = useState(false);
-  const langDropRef  = useRef<HTMLDivElement>(null);
-  const themeDropRef = useRef<HTMLDivElement>(null);
+  const [langDropOpen, setLangDropOpen]     = useState(false);
+  const [avatarDropOpen, setAvatarDropOpen] = useState(false);
+  const [companionName, setCompanionName]   = useState("Nova");
+  const [avatarError, setAvatarError]       = useState(false);
+  const [selectedAvatar, setSelectedAvatar] = useState("nova");
+  const [customAvatarSrc, setCustomAvatarSrc] = useState("");
+  const [showThemePicker, setShowThemePicker] = useState(false);
+  const [selectedTheme, setSelectedTheme]   = useState("calm-sea");
+  const langDropRef   = useRef<HTMLDivElement>(null);
+  const avatarDropRef = useRef<HTMLDivElement>(null);
+  const fileInputRef  = useRef<HTMLInputElement>(null);
 
   const currentLangLabel = LANG_TILES.find(l => l.code === lang)?.label ?? "English";
-  const currentTheme     = THEMES.find(th => th.id === theme) ?? THEMES[0];
   const canContinue      = check1 && check2;
 
   // ── Translation: re-derived on every render when `lang` changes ──
@@ -85,16 +85,23 @@ export default function WelcomePage() {
     const savedLang = localStorage.getItem("companion_language") || localStorage.getItem("firstyear_language");
     if (savedLang && Object.keys(S1_STRINGS).includes(savedLang))
       setLang(savedLang as LangCode6);
+    const savedAvatarId = localStorage.getItem("companion_avatar_id") || "nova";
+    setSelectedAvatar(savedAvatarId);
+    if (savedAvatarId === "custom") {
+      setShowThemePicker(true);
+      const savedCustom = localStorage.getItem("companion_custom_avatar");
+      if (savedCustom) setCustomAvatarSrc(savedCustom);
+    }
     const savedTheme = localStorage.getItem("companion_theme") || "calm-sea";
-    setTheme(savedTheme);
+    setSelectedTheme(savedTheme);
     document.documentElement.setAttribute("data-theme", savedTheme);
     setCompanionName(localStorage.getItem("companion_name") || "Nova");
   }, []);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (langDropRef.current  && !langDropRef.current.contains(e.target  as Node)) setLangDropOpen(false);
-      if (themeDropRef.current && !themeDropRef.current.contains(e.target as Node)) setThemeDropOpen(false);
+      if (langDropRef.current   && !langDropRef.current.contains(e.target   as Node)) setLangDropOpen(false);
+      if (avatarDropRef.current && !avatarDropRef.current.contains(e.target as Node)) setAvatarDropOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -107,11 +114,38 @@ export default function WelcomePage() {
     setLangDropOpen(false);
   };
 
-  const handleTheme = (id: string) => {
-    setTheme(id);
-    localStorage.setItem("companion_theme", id);
-    document.documentElement.setAttribute("data-theme", id);
-    setThemeDropOpen(false);
+  const handleAvatarSelect = (av: typeof AVATARS[0]) => {
+    setSelectedAvatar(av.id);
+    setSelectedTheme(av.theme);
+    setCompanionName(av.name);
+    setShowThemePicker(false);
+    setAvatarError(false);
+    setAvatarDropOpen(false);
+    localStorage.setItem("companion_avatar_id", av.id);
+    localStorage.setItem("companion_name", av.name);
+    localStorage.setItem("companion_theme", av.theme);
+    document.documentElement.setAttribute("data-theme", av.theme);
+  };
+
+  const handleCustomPhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const src = ev.target?.result as string;
+      setCustomAvatarSrc(src);
+      setSelectedAvatar("custom");
+      setShowThemePicker(true);
+      localStorage.setItem("companion_avatar_id", "custom");
+      localStorage.setItem("companion_custom_avatar", src);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleThemeSelect = (themeId: string) => {
+    setSelectedTheme(themeId);
+    localStorage.setItem("companion_theme", themeId);
+    document.documentElement.setAttribute("data-theme", themeId);
   };
 
   const handleContinue = () => {
@@ -135,7 +169,7 @@ export default function WelcomePage() {
           background: rgba(255,255,255,0.08);
           border: 1px solid rgba(255,255,255,0.15);
           border-radius: 20px; padding: 6px 12px;
-          font-family: ${F_BODY}; font-size: 13px; color: #CBD5E1;
+          font-family: ${F_BODY}; font-size: 13px; color: #ffffff;
           cursor: pointer; white-space: nowrap; transition: background 0.15s;
         }
         .wlc-pill:hover { background: rgba(255,255,255,0.14); }
@@ -157,7 +191,7 @@ export default function WelcomePage() {
           font-family: ${F_BODY}; font-size: 13px;
           transition: background 0.12s;
         }
-        .wlc-drop-opt:hover { background: rgba(34,197,94,0.12) !important; }
+        .wlc-drop-opt:hover { background: color-mix(in srgb, var(--accent) 12%, transparent) !important; }
 
         /* Checkboxes */
         .wlc-chk-row {
@@ -177,17 +211,17 @@ export default function WelcomePage() {
         /* CTA button */
         .wlc-btn {
           width: 100%; margin-top: 24px;
-          background: linear-gradient(135deg, #22C55E 0%, #10B981 55%, #14B8A6 100%);
+          background: var(--accent);
           color: #fff; font-family: ${F_HEADING}; font-weight: 600; font-size: 17px;
           border: 1px solid rgba(255,255,255,0.14); border-radius: 16px;
           padding: 16px 22px;
-          box-shadow: 0 8px 28px rgba(16,185,129,0.35);
+          box-shadow: 0 8px 28px color-mix(in srgb, var(--accent) 35%, transparent);
           cursor: pointer; transition: all 0.2s;
           display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         .wlc-btn:hover:not(:disabled) {
           transform: translateY(-1px);
-          box-shadow: 0 14px 36px rgba(16,185,129,0.5);
+          box-shadow: 0 14px 36px color-mix(in srgb, var(--accent) 50%, transparent);
         }
         .wlc-btn:active:not(:disabled) { transform: translateY(0); }
         .wlc-btn:disabled { opacity: 0.38; cursor: not-allowed; box-shadow: none; }
@@ -220,17 +254,17 @@ export default function WelcomePage() {
         background: "transparent",
       }}>
 
-        {/* Deep space base */}
-        <div aria-hidden style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none", background: "#0d1f2d" }} />
+        {/* Deep space base — reacts to theme via var(--bg) */}
+        <div aria-hidden style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none", background: "var(--bg)" }} />
 
-        {/* Green aurora sweep — bright luminous sage */}
+        {/* Aurora sweep — uses theme accent colour */}
         <div aria-hidden style={{ position:"fixed", inset:0, zIndex:0, pointerEvents:"none",
-          background:"radial-gradient(ellipse 110% 65% at 25% 65%, rgba(100,200,140,0.68) 0%, rgba(60,180,120,0.42) 35%, rgba(34,197,94,0.15) 62%, transparent 80%)",
+          background:"radial-gradient(ellipse 110% 65% at 25% 65%, color-mix(in srgb, var(--accent) 68%, transparent) 0%, color-mix(in srgb, var(--accent) 42%, transparent) 35%, color-mix(in srgb, var(--accent) 15%, transparent) 62%, transparent 80%)",
           filter:"blur(45px)" }} />
 
-        {/* Teal upper accent */}
+        {/* Upper accent — uses theme subtext colour */}
         <div aria-hidden style={{ position:"fixed", inset:0, zIndex:0, pointerEvents:"none",
-          background:"radial-gradient(ellipse 70% 45% at 75% 35%, rgba(20,184,166,0.32) 0%, transparent 65%)",
+          background:"radial-gradient(ellipse 70% 45% at 75% 35%, color-mix(in srgb, var(--subtext) 32%, transparent) 0%, transparent 65%)",
           filter:"blur(40px)" }} />
 
         {/* Vignette — dark edges, light center */}
@@ -247,7 +281,7 @@ export default function WelcomePage() {
               left: s.left, top: s.top,
               width: s.size, height: s.size,
               borderRadius: "50%",
-              background: "white",
+              background: "var(--text)",
               opacity: s.opacity,
               display: "block",
               boxShadow: s.size >= 3 ? "0 0 5px 2px rgba(255,255,255,0.7)" : "none",
@@ -295,9 +329,10 @@ export default function WelcomePage() {
               </div>
 
               <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0, overflow: "visible" }}>
+
                 {/* Language pill */}
                 <div ref={langDropRef} className="wlc-drop-anchor">
-                  <button className="wlc-pill" onClick={() => { setLangDropOpen(v => !v); setThemeDropOpen(false); }}>
+                  <button className="wlc-pill" onClick={() => { setLangDropOpen(v => !v); setAvatarDropOpen(false); }}>
                     <Globe size={13} strokeWidth={2} />
                     {currentLangLabel}
                     <ChevronDown size={12} strokeWidth={2} style={{ transform: langDropOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }} />
@@ -305,60 +340,92 @@ export default function WelcomePage() {
                   {langDropOpen && (
                     <div className="wlc-drop" style={{ minWidth: 165 }}>
                       {LANG_TILES.map(l => (
-                        <button
-                          key={l.code}
-                          className="wlc-drop-opt"
-                          onClick={() => handleLang(l.code)}
-                          style={{
-                            background:  lang === l.code ? "rgba(34,197,94,0.16)" : "transparent",
-                            color:       lang === l.code ? "#22C55E" : "#CBD5E1",
-                            fontWeight:  lang === l.code ? 600 : 400,
-                          }}
+                        <button key={l.code} className="wlc-drop-opt" onClick={() => handleLang(l.code)}
+                          style={{ background: lang === l.code ? "color-mix(in srgb, var(--accent) 16%, transparent)" : "transparent", color: lang === l.code ? "var(--accent)" : "#ffffff", fontWeight: lang === l.code ? 600 : 400 }}
                         >
                           <span style={{ flex: 1 }}>{l.label}</span>
-                          {lang === l.code && <span style={{ fontSize: 11, color: "#22C55E" }}>✓</span>}
+                          {lang === l.code && <span style={{ fontSize: 11, color: "var(--accent)" }}>✓</span>}
                         </button>
                       ))}
                     </div>
                   )}
                 </div>
 
-                {/* Theme pill */}
-                <div ref={themeDropRef} className="wlc-drop-anchor">
-                  <button className="wlc-pill" onClick={() => { setThemeDropOpen(v => !v); setLangDropOpen(false); }}>
-                    <Palette size={13} strokeWidth={2} />
-                    {currentTheme.name}
-                    <ChevronDown size={12} strokeWidth={2} style={{ transform: themeDropOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }} />
+                {/* Avatar / companion pill */}
+                <div ref={avatarDropRef} className="wlc-drop-anchor">
+                  <button className="wlc-pill" onClick={() => { setAvatarDropOpen(v => !v); setLangDropOpen(false); }}>
+                    {selectedAvatar === "custom" && customAvatarSrc ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={customAvatarSrc} alt="" style={{ width: 16, height: 16, borderRadius: "50%", objectFit: "cover" }} />
+                    ) : (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={`/avatars/${selectedAvatar}.png`} alt="" style={{ width: 16, height: 16, borderRadius: "50%", objectFit: "cover" }} onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                    )}
+                    {companionName}
+                    <ChevronDown size={12} strokeWidth={2} style={{ transform: avatarDropOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }} />
                   </button>
-                  {themeDropOpen && (
-                    <div className="wlc-drop" style={{ minWidth: 215, maxHeight: 290, overflowY: "auto" }}>
+                  {avatarDropOpen && (
+                    <div className="wlc-drop" style={{ minWidth: 215, maxHeight: 320, overflowY: "auto" }}>
                       <div style={{ fontFamily: F_BODY, fontSize: 11, fontWeight: 600, color: "rgba(203,213,225,0.45)", letterSpacing: "0.08em", textTransform: "uppercase", padding: "4px 10px 8px" }}>
-                        Select theme
+                        Choose companion
                       </div>
-                      {THEMES.map(th => (
-                        <button
-                          key={th.id}
-                          className="wlc-drop-opt"
-                          onClick={() => handleTheme(th.id)}
-                          style={{
-                            background: theme === th.id ? "rgba(255,255,255,0.1)" : "transparent",
-                            color: "#CBD5E1",
-                          }}
+                      {AVATARS.map(av => (
+                        <button key={av.id} className="wlc-drop-opt" onClick={() => handleAvatarSelect(av)}
+                          style={{ background: selectedAvatar === av.id ? "rgba(255,255,255,0.08)" : "transparent", color: "#ffffff" }}
                         >
+                          {/* 3-color swatch strip */}
                           <div style={{ display: "flex", flexShrink: 0, overflow: "hidden", borderRadius: 2 }}>
-                            {th.swatches.map((c, j) => <div key={j} style={{ width: 13, height: 16, background: c }} />)}
+                            {av.swatches.map((c, j) => <div key={j} style={{ width: 10, height: 16, background: c }} />)}
                           </div>
-                          <span style={{ flex: 1, whiteSpace: "nowrap" }}>{th.name}</span>
-                          {theme === th.id && <span style={{ fontSize: 11, color: "#CBD5E1" }}>✓</span>}
+                          {/* Avatar image */}
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={`/avatars/${av.id}.png`} alt={av.name} style={{ width: 22, height: 22, borderRadius: "50%", objectFit: "cover", flexShrink: 0,
+                            boxShadow: selectedAvatar === av.id ? `0 0 0 2px ${av.accent}` : "none" }} />
+                          <span style={{ flex: 1, whiteSpace: "nowrap" }}>{av.name}</span>
+                          {selectedAvatar === av.id && <span style={{ fontSize: 11, color: av.accent }}>✓</span>}
                         </button>
                       ))}
+                      {/* My photo option */}
+                      <button className="wlc-drop-opt" onClick={() => fileInputRef.current?.click()}
+                        style={{ background: selectedAvatar === "custom" ? "rgba(255,255,255,0.08)" : "transparent", color: "#CBD5E1" }}
+                      >
+                        <div style={{ width: 30, height: 16, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
+                          border: "1.5px dashed rgba(255,255,255,0.3)", borderRadius: 4 }}>
+                          <Camera size={10} strokeWidth={1.5} />
+                        </div>
+                        {selectedAvatar === "custom" && customAvatarSrc ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={customAvatarSrc} alt="" style={{ width: 22, height: 22, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
+                        ) : (
+                          <div style={{ width: 22, height: 22, borderRadius: "50%", border: "1.5px dashed rgba(255,255,255,0.3)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                            <Camera size={10} strokeWidth={1.5} color="rgba(255,255,255,0.4)" />
+                          </div>
+                        )}
+                        <span style={{ flex: 1, whiteSpace: "nowrap" }}>My photo</span>
+                        {selectedAvatar === "custom" && <span style={{ fontSize: 11, color: "#22C55E" }}>✓</span>}
+                      </button>
+                      {/* Theme dots — only shown when custom photo is selected */}
+                      {showThemePicker && selectedAvatar === "custom" && (
+                        <div style={{ padding: "8px 10px 4px", borderTop: "1px solid rgba(255,255,255,0.08)", marginTop: 4 }}>
+                          <div style={{ fontFamily: F_BODY, fontSize: 10, color: "rgba(203,213,225,0.45)", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 6 }}>Pick theme</div>
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                            {CUSTOM_THEME_DOTS.map(td => (
+                              <button key={td.theme} onClick={() => handleThemeSelect(td.theme)} title={td.theme.replace(/-/g, " ")}
+                                style={{ width: 20, height: 20, borderRadius: "50%", background: td.color, padding: 0, border: selectedTheme === td.theme ? "2px solid #fff" : "2px solid transparent",
+                                  boxShadow: selectedTheme === td.theme ? "0 0 0 2px rgba(255,255,255,0.35)" : "none", cursor: "pointer", transition: "all 0.15s" }} />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      <input ref={fileInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleCustomPhoto} />
                     </div>
                   )}
                 </div>
+
               </div>
             </div>
 
-            {/* ── Hero text — uses t.tagline so language change is instant ── */}
+            {/* ── Hero text ── */}
             <div style={{ textAlign: "center", marginTop: 28, position: "relative", zIndex: 1 }}>
               <p
                 className="wlc-headline"
@@ -366,10 +433,10 @@ export default function WelcomePage() {
               >
                 {t.tagline}
               </p>
-              <p style={{ fontFamily: F_BODY, fontSize: 16, color: "#CBD5E1", margin: "0 0 4px" }}>
+              <p style={{ fontFamily: F_BODY, fontSize: 16, color: "#ffffff", margin: "0 0 4px" }}>
                 {t.subtitle1}
               </p>
-              <p style={{ fontFamily: F_BODY, fontSize: 16, color: "#CBD5E1", margin: 0 }}>
+              <p style={{ fontFamily: F_BODY, fontSize: 16, color: "#ffffff", margin: 0 }}>
                 {t.subtitle2}
               </p>
             </div>
@@ -384,31 +451,21 @@ export default function WelcomePage() {
               position: "relative",
               zIndex: 1,
             }}>
-              {/* LEFT — avatar col */}
+              {/* LEFT — selected avatar (updates when companion is changed via dropdown) */}
               <div>
-                {!avatarError ? (
+                {selectedAvatar === "custom" && customAvatarSrc ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src="/avatars/nova.png"
-                    alt={companionName}
-                    width={80}
-                    height={80}
-                    style={{
-                      width: 80, height: 80,
-                      borderRadius: "50%",
-                      objectFit: "cover",
-                      filter: "drop-shadow(0 4px 16px rgba(34,197,94,0.55))",
-                      display: "block",
-                    }}
+                  <img src={customAvatarSrc} alt={companionName} width={80} height={80}
+                    style={{ width: 80, height: 80, borderRadius: "50%", objectFit: "cover", filter: "drop-shadow(0 4px 16px rgba(34,197,94,0.55))", display: "block" }} />
+                ) : !avatarError ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={`/avatars/${selectedAvatar}.png`} alt={companionName}
+                    width={80} height={80}
+                    style={{ width: 80, height: 80, borderRadius: "50%", objectFit: "cover", filter: "drop-shadow(0 4px 16px rgba(34,197,94,0.55))", display: "block" }}
                     onError={() => setAvatarError(true)}
                   />
                 ) : (
-                  <div style={{
-                    width: 80, height: 80, borderRadius: "50%",
-                    background: "linear-gradient(135deg, #22C55E, #14B8A6)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    filter: "drop-shadow(0 4px 16px rgba(34,197,94,0.55))",
-                  }}>
+                  <div style={{ width: 80, height: 80, borderRadius: "50%", background: "linear-gradient(135deg, #22C55E, #14B8A6)", display: "flex", alignItems: "center", justifyContent: "center", filter: "drop-shadow(0 4px 16px rgba(34,197,94,0.55))" }}>
                     <Bot size={32} color="white" strokeWidth={1.8} />
                   </div>
                 )}
@@ -417,14 +474,15 @@ export default function WelcomePage() {
               {/* RIGHT — content col */}
               <div>
                 <div style={{ fontFamily: F_HEADING, fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 4 }}>
-                  Meet Nova
+                  {t.meetCompanion.replace("{{name}}", companionName)}
                 </div>
-                <div style={{ fontFamily: F_BODY, fontSize: 14, color: "#94A3B8", lineHeight: 1.5 }}>
+                <div style={{ fontFamily: F_BODY, fontSize: 14, color: "#ffffff", lineHeight: 1.5 }}>
                   {t.companionSubtitle}
                 </div>
 
                 {/* Features card */}
                 <div style={{
+                  background: "color-mix(in srgb, var(--bg) 55%, transparent)",
                   border: "1px solid rgba(255,255,255,0.10)",
                   borderRadius: 12,
                   padding: 16,
@@ -436,7 +494,7 @@ export default function WelcomePage() {
                   {[t.feature1, t.feature2, t.feature3, t.feature4].map((feature, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
                       <CheckCircle2 size={16} color="#22C55E" strokeWidth={2} style={{ flexShrink: 0, marginTop: 1 }} />
-                      <span style={{ fontFamily: F_BODY, fontSize: 14, color: "#CBD5E1", lineHeight: 1.45 }}>
+                      <span style={{ fontFamily: F_BODY, fontSize: 14, color: "#ffffff", lineHeight: 1.45 }}>
                         {feature}
                       </span>
                     </div>
@@ -445,14 +503,15 @@ export default function WelcomePage() {
 
                 {/* Before we begin card */}
                 <div style={{
+                  background: "color-mix(in srgb, var(--bg) 55%, transparent)",
                   border: "1px solid rgba(255,255,255,0.10)",
                   borderRadius: 12,
                   padding: 16,
                   marginTop: 12,
                 }}>
                   <div style={{ marginBottom: 12 }}>
-                    <span style={{ fontFamily: F_BODY, fontSize: 16, fontWeight: 600, color: "#CBD5E1" }}>
-                      Before we begin
+                    <span style={{ fontFamily: F_BODY, fontSize: 16, fontWeight: 600, color: "#ffffff" }}>
+                      {t.beforeWeBegin}
                     </span>
                   </div>
 
@@ -466,7 +525,7 @@ export default function WelcomePage() {
                       )}
                     </div>
                     <input type="checkbox" checked={check1} onChange={e => setCheck1(e.target.checked)} style={{ display: "none" }} />
-                    <span style={{ fontFamily: F_BODY, fontSize: 15, color: "#F8FAFC", lineHeight: 1.5 }}>
+                    <span style={{ fontFamily: F_BODY, fontSize: 15, color: "#ffffff", lineHeight: 1.5 }}>
                       {t.check1}
                     </span>
                   </label>
@@ -481,7 +540,7 @@ export default function WelcomePage() {
                       )}
                     </div>
                     <input type="checkbox" checked={check2} onChange={e => setCheck2(e.target.checked)} style={{ display: "none" }} />
-                    <span style={{ fontFamily: F_BODY, fontSize: 15, color: "#F8FAFC", lineHeight: 1.5 }}>
+                    <span style={{ fontFamily: F_BODY, fontSize: 15, color: "#ffffff", lineHeight: 1.5 }}>
                       {t.check2}
                     </span>
                   </label>
@@ -502,8 +561,8 @@ export default function WelcomePage() {
 
             {/* ── Footer ── */}
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "center", gap: 6, marginTop: 16, position: "relative", zIndex: 1 }}>
-              <Lock size={11} color="#94A3B8" strokeWidth={2} style={{ flexShrink: 0, marginTop: 2 }} />
-              <span style={{ fontFamily: F_BODY, fontSize: 12, color: "#94A3B8", lineHeight: 1.5, textAlign: "center" }}>
+              <Lock size={11} color="#ffffff" strokeWidth={2} style={{ flexShrink: 0, marginTop: 2 }} />
+              <span style={{ fontFamily: F_BODY, fontSize: 12, color: "#ffffff", lineHeight: 1.5, textAlign: "center" }}>
                 {t.disclaimer}
               </span>
             </div>

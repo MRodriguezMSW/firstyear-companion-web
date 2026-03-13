@@ -1,10 +1,47 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Camera } from "lucide-react";
 import { getS2 } from "../translations";
 import styles from "../styles/Onboarding.module.css";
 import CrisisButton from "../../components/CrisisButton";
+
+const AVATARS = [
+  { id: "nova",  name: "Nova",  theme: "calm-sea" },
+  { id: "luna",  name: "Luna",  theme: "periwinkle" },
+  { id: "sage",  name: "Sage",  theme: "quiet-grove" },
+  { id: "ember", name: "Ember", theme: "hot-sunset" },
+  { id: "rio",   name: "Rio",   theme: "deep-teal" },
+  { id: "kai",   name: "Kai",   theme: "ocean-deep" },
+  { id: "wren",  name: "Wren",  theme: "linen-moss" },
+  { id: "lea",   name: "Lea",   theme: "rose-dusk" },
+  { id: "milo",  name: "Milo",  theme: "harvest" },
+  { id: "aria",  name: "Aria",  theme: "blue-violet" },
+  { id: "zeke",  name: "Zeke",  theme: "meadow-mist" },
+  { id: "ivy",   name: "Ivy",   theme: "garden-fresh" },
+  { id: "rex",   name: "Rex",   theme: "teal-earth" },
+  { id: "mia",   name: "Mia",   theme: "warm-clay" },
+  { id: "finn",  name: "Finn",  theme: "charcoal-sky" },
+];
+
+const THEME_DOTS = [
+  { theme: "calm-sea",     color: "#88BDF2" },
+  { theme: "periwinkle",   color: "#CCCCFF" },
+  { theme: "quiet-grove",  color: "#BAC095" },
+  { theme: "hot-sunset",   color: "#FD3DB5" },
+  { theme: "deep-teal",    color: "#4F7C82" },
+  { theme: "ocean-deep",   color: "#0047AB" },
+  { theme: "linen-moss",   color: "#DBD1ED" },
+  { theme: "rose-dusk",    color: "#DCA1A1" },
+  { theme: "harvest",      color: "#FFCE1B" },
+  { theme: "blue-violet",  color: "#A4A5F5" },
+  { theme: "meadow-mist",  color: "#68BA7F" },
+  { theme: "garden-fresh", color: "#93C572" },
+  { theme: "teal-earth",   color: "#81D8D0" },
+  { theme: "warm-clay",    color: "#E68057" },
+  { theme: "charcoal-sky", color: "#CBCBCB" },
+];
 
 export default function CheckInPage() {
   const router = useRouter();
@@ -18,14 +55,33 @@ export default function CheckInPage() {
   const [skipFlag, setSkipFlag] = useState(false);
   const [modal, setModal] = useState<"provider" | "meds" | null>(null);
   const [companionName, setCompanionName] = useState("Nova");
-  const [customCompanionName, setCustomCompanionName] = useState("");
 
-  const COMPANION_NAMES = ["Nova", "Luna", "Sage", "Mia", "Lea", "Aria", "Ember", "Wren", "Ivy", "Rio"];
-  const isCustom = companionName === "__custom__";
+  // Avatar picker state
+  const [selectedAvatar, setSelectedAvatar] = useState("nova");
+  const [customAvatarSrc, setCustomAvatarSrc] = useState("");
+  const [showThemePicker, setShowThemePicker] = useState(false);
+  const [selectedTheme, setSelectedTheme] = useState("calm-sea");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
 
   useEffect(() => {
     const saved = localStorage.getItem("companion_language") ?? "en-US";
     setLang(saved);
+
+    const savedAvatarId = localStorage.getItem("companion_avatar_id") || "nova";
+    setSelectedAvatar(savedAvatarId);
+    if (savedAvatarId === "custom") {
+      setShowThemePicker(true);
+      const savedCustom = localStorage.getItem("companion_custom_avatar");
+      if (savedCustom) setCustomAvatarSrc(savedCustom);
+    }
+
+    const savedTheme = localStorage.getItem("companion_theme") || "calm-sea";
+    setSelectedTheme(savedTheme);
+    document.documentElement.setAttribute("data-theme", savedTheme);
+
+    const savedCompanionName = localStorage.getItem("companion_name");
+    if (savedCompanionName) setCompanionName(savedCompanionName);
   }, []);
 
   const t = getS2(lang);
@@ -43,18 +99,47 @@ export default function CheckInPage() {
     if (opt === t.yesno[1]) setModal("meds");
   };
 
+  const handleAvatarSelect = (av: typeof AVATARS[0]) => {
+    setSelectedAvatar(av.id);
+    setSelectedTheme(av.theme);
+    setCompanionName(av.name);
+    setShowThemePicker(false);
+    localStorage.setItem("companion_avatar_id", av.id);
+    localStorage.setItem("companion_name", av.name);
+    localStorage.setItem("companion_theme", av.theme);
+    document.documentElement.setAttribute("data-theme", av.theme);
+  };
+
+  const handleCustomPhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const src = ev.target?.result as string;
+      setCustomAvatarSrc(src);
+      setSelectedAvatar("custom");
+      setShowThemePicker(true);
+      localStorage.setItem("companion_avatar_id", "custom");
+      localStorage.setItem("companion_custom_avatar", src);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleThemeSelect = (themeId: string) => {
+    setSelectedTheme(themeId);
+    localStorage.setItem("companion_theme", themeId);
+    document.documentElement.setAttribute("data-theme", themeId);
+  };
+
   const saveAndGo = () => {
-    if (name.trim())  localStorage.setItem("user_name", name.trim());
-    const finalCompanionName = isCustom
-      ? (customCompanionName.trim() || "Nova")
-      : companionName;
-    localStorage.setItem("companion_name", finalCompanionName);
-    if (journey)      localStorage.setItem("companion_journey", journey);
-    if (provider)     localStorage.setItem("companion_provider", provider);
-    if (medication)   localStorage.setItem("companion_medication", medication);
-    if (pronouns)     localStorage.setItem("companion_pronouns", pronouns);
+    if (name.trim()) localStorage.setItem("user_name", name.trim());
+    localStorage.setItem("companion_name", companionName || "Nova");
+    if (journey)    localStorage.setItem("companion_journey", journey);
+    if (provider)   localStorage.setItem("companion_provider", provider);
+    if (medication) localStorage.setItem("companion_medication", medication);
+    if (pronouns)   localStorage.setItem("companion_pronouns", pronouns);
     localStorage.setItem("companion_moods", JSON.stringify(moods));
-    if (skipFlag)     localStorage.setItem("firstyear_skip_checkin", "true");
+    if (skipFlag)   localStorage.setItem("firstyear_skip_checkin", "true");
     localStorage.setItem("onboarding_complete", "true");
     router.push("/chat");
   };
@@ -126,7 +211,7 @@ export default function CheckInPage() {
         }
       `}</style>
 
-      {/* Page wrapper — fixed, centered, no scroll */}
+      {/* Page wrapper */}
       <div style={{
         position: "fixed",
         top: 0, left: 0, right: 0, bottom: 0,
@@ -172,6 +257,7 @@ export default function CheckInPage() {
             justifyContent: "space-between",
             gap: 12,
             boxSizing: "border-box",
+            overflowY: "auto",
           }}
         >
 
@@ -183,6 +269,148 @@ export default function CheckInPage() {
             <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "var(--subtext)", margin: 0, lineHeight: 1.4 }}>
               {t.sub}
             </p>
+          </div>
+
+          {/* ── Avatar picker ── */}
+          <div>
+            <label style={lbl}>CHOOSE YOUR COMPANION</label>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(68px, 1fr))",
+              gap: 10,
+            }}>
+              {AVATARS.map(av => (
+                <button
+                  key={av.id}
+                  onClick={() => handleAvatarSelect(av)}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    padding: 0,
+                    cursor: "pointer",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 4,
+                  }}
+                >
+                  <div style={{
+                    width: 56, height: 56,
+                    borderRadius: "50%",
+                    border: selectedAvatar === av.id
+                      ? "2.5px solid #22C55E"
+                      : "2px solid rgba(255,255,255,0.15)",
+                    boxShadow: selectedAvatar === av.id
+                      ? "0 0 0 3px rgba(34,197,94,0.25)"
+                      : "none",
+                    overflow: "hidden",
+                    transition: "all 0.15s",
+                    flexShrink: 0,
+                  }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={`/avatars/${av.id}.png`}
+                      alt={av.name}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                  </div>
+                  <span style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: 11,
+                    color: selectedAvatar === av.id ? "#22C55E" : "var(--subtext)",
+                    fontWeight: selectedAvatar === av.id ? 600 : 400,
+                  }}>
+                    {av.name}
+                  </span>
+                </button>
+              ))}
+
+              {/* My photo option */}
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  padding: 0,
+                  cursor: "pointer",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 4,
+                }}
+              >
+                <div style={{
+                  width: 56, height: 56,
+                  borderRadius: "50%",
+                  border: selectedAvatar === "custom"
+                    ? "2.5px solid #22C55E"
+                    : "2px dashed rgba(255,255,255,0.3)",
+                  boxShadow: selectedAvatar === "custom"
+                    ? "0 0 0 3px rgba(34,197,94,0.25)"
+                    : "none",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  overflow: "hidden",
+                  transition: "all 0.15s",
+                  background: "rgba(255,255,255,0.04)",
+                  flexShrink: 0,
+                }}>
+                  {customAvatarSrc && selectedAvatar === "custom" ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={customAvatarSrc} alt="My photo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  ) : (
+                    <Camera size={20} color="rgba(255,255,255,0.4)" strokeWidth={1.5} />
+                  )}
+                </div>
+                <span style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: 11,
+                  color: selectedAvatar === "custom" ? "#22C55E" : "var(--subtext)",
+                  fontWeight: selectedAvatar === "custom" ? 600 : 400,
+                }}>
+                  My photo
+                </span>
+              </button>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                style={{ display: "none" }}
+                onChange={handleCustomPhoto}
+              />
+            </div>
+
+            {/* Theme dot picker — only shown for custom photo */}
+            {showThemePicker && (
+              <div style={{ marginTop: 12 }}>
+                <span style={{ ...lbl, marginBottom: 8 }}>PICK YOUR THEME</span>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  {THEME_DOTS.map(td => (
+                    <button
+                      key={td.theme}
+                      onClick={() => handleThemeSelect(td.theme)}
+                      title={td.theme.replace(/-/g, " ")}
+                      style={{
+                        width: 24, height: 24,
+                        borderRadius: "50%",
+                        background: td.color,
+                        border: selectedTheme === td.theme
+                          ? "2.5px solid #fff"
+                          : "2px solid transparent",
+                        boxShadow: selectedTheme === td.theme
+                          ? "0 0 0 2px rgba(255,255,255,0.4)"
+                          : "none",
+                        cursor: "pointer",
+                        padding: 0,
+                        transition: "all 0.15s",
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Name */}
@@ -205,39 +433,6 @@ export default function CheckInPage() {
                 outline: "none",
               }}
             />
-          </div>
-
-          {/* Companion Name */}
-          <div>
-            <label style={lbl}>WHAT WOULD YOU LIKE TO CALL YOUR COMPANION?</label>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {COMPANION_NAMES.map(opt => (
-                <button key={opt} style={pill(companionName === opt)} onClick={() => setCompanionName(opt)}>{opt}</button>
-              ))}
-              <button style={pill(isCustom)} onClick={() => setCompanionName("__custom__")}>Let me name my own</button>
-            </div>
-            {isCustom && (
-              <input
-                type="text"
-                value={customCompanionName}
-                onChange={e => setCustomCompanionName(e.target.value)}
-                placeholder="Give your companion a name"
-                style={{
-                  marginTop: 8,
-                  width: "100%",
-                  boxSizing: "border-box",
-                  height: 36,
-                  background: "rgba(255,255,255,0.1)",
-                  border: "1px solid rgba(255,255,255,0.2)",
-                  borderRadius: 8,
-                  padding: "0 12px",
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: 13,
-                  color: "var(--text)",
-                  outline: "none",
-                }}
-              />
-            )}
           </div>
 
           {/* Journey */}
@@ -290,7 +485,7 @@ export default function CheckInPage() {
             </div>
           </div>
 
-          {/* Bottom row — inside card, no marginTop auto */}
+          {/* Bottom row */}
           <div className="checkin-bottom-row" style={{
             display: "flex",
             alignItems: "center",

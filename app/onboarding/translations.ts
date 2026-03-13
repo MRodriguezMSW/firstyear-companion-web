@@ -43,6 +43,8 @@ export type S1 = {
   page_label: string;
   page_sub: string;
   disclaimer: string;
+  meetCompanion: string;
+  beforeWeBegin: string;
 };
 
 // ── Screen 2 type ─────────────────────────────────────────────────────────────
@@ -106,6 +108,8 @@ const S1_EN: S1 = {
   page_label: "Page 1 of 3",
   page_sub: "Language + welcome",
   disclaimer: "Beta version. This tool is still evolving and is not a clinical service. If you are in crisis, call 988 or emergency services.",
+  meetCompanion: "Meet {{name}}",
+  beforeWeBegin: "Before we begin",
 };
 
 const S1_ES: S1 = {
@@ -139,6 +143,8 @@ const S1_ES: S1 = {
   page_label: "Página 1 de 3",
   page_sub: "Idioma + bienvenida",
   disclaimer: "Versión beta. Esta herramienta aún está evolucionando y no es un servicio clínico. Si estás en crisis, llama al 988 o a los servicios de emergencia.",
+  meetCompanion: "Conoce a {{name}}",
+  beforeWeBegin: "Antes de comenzar",
 };
 
 const S1_FR: S1 = {
@@ -172,6 +178,8 @@ const S1_FR: S1 = {
   page_label: "Page 1 sur 3",
   page_sub: "Langue + bienvenue",
   disclaimer: "Version bêta. Cet outil est en cours d'évolution et n'est pas un service clinique. Si vous êtes en crise, appelez le 3114 ou les services d'urgence.",
+  meetCompanion: "Rencontrez {{name}}",
+  beforeWeBegin: "Avant de commencer",
 };
 
 const S1_PT: S1 = {
@@ -205,6 +213,8 @@ const S1_PT: S1 = {
   page_label: "Página 1 de 3",
   page_sub: "Idioma + boas-vindas",
   disclaimer: "Versão beta. Esta ferramenta ainda está evoluindo e não é um serviço clínico. Se você estiver em crise, ligue para 188 ou para os serviços de emergência.",
+  meetCompanion: "Conheça {{name}}",
+  beforeWeBegin: "Antes de começar",
 };
 
 const S1_HT: S1 = {
@@ -238,6 +248,8 @@ const S1_HT: S1 = {
   page_label: "Paj 1 sou 3",
   page_sub: "Lang + Byenveni",
   disclaimer: "Vèsyon bèta. Zouti sa a ap evolye toujou e se pa yon sèvis klinik. Si ou nan kriz, rele 988 oswa sèvis ijans.",
+  meetCompanion: "Rankontre {{name}}",
+  beforeWeBegin: "Anvan nou kòmanse",
 };
 
 const S1_ZH: S1 = {
@@ -271,6 +283,8 @@ const S1_ZH: S1 = {
   page_label: "第1页，共3页",
   page_sub: "语言 + 欢迎",
   disclaimer: "测试版本。此工具仍在持续改进中，不是临床服务。如果您处于危机中，请拨打988或紧急服务。",
+  meetCompanion: "认识{{name}}",
+  beforeWeBegin: "在我们开始之前",
 };
 
 export const S1_STRINGS: Record<LangCode6, S1> = {
