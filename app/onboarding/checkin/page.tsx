@@ -207,6 +207,10 @@ export default function CheckInPage() {
           margin: 16px 0;
         }
 
+        .ci-left-panel, .ci-left-panel * { color: #ffffff !important; }
+        .ci-right-panel, .ci-right-panel * { color: #ffffff !important; }
+        .ci-two-panel, .ci-two-panel * { color: #ffffff !important; }
+
         @media (max-width: 700px) {
           .ci-two-panel { flex-direction: column !important; }
           .ci-left-panel { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.10) !important; padding-bottom: 24px !important; }
@@ -445,7 +449,7 @@ export default function CheckInPage() {
             </div>
 
             {/* ═══ RIGHT PANEL ═══ */}
-            <div style={{ flex: 1, padding: 32, display: "flex", flexDirection: "column", gap: 22, overflowY: "auto" }}>
+            <div className="ci-right-panel" style={{ flex: 1, padding: 32, display: "flex", flexDirection: "column", gap: 22, overflowY: "auto" }}>
 
               {/* What should I call you? */}
               <div>
