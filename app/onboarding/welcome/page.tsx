@@ -96,6 +96,9 @@ export default function WelcomePage() {
     setSelectedTheme(savedTheme);
     document.documentElement.setAttribute("data-theme", savedTheme);
     setCompanionName(localStorage.getItem("companion_name") || "Nova");
+    const consentDone = localStorage.getItem("consent_completed") === "true";
+    setCheck1(consentDone);
+    setCheck2(consentDone);
   }, []);
 
   useEffect(() => {
@@ -150,6 +153,7 @@ export default function WelcomePage() {
 
   const handleContinue = () => {
     if (!canContinue) return;
+    localStorage.setItem("consent_completed", "true");
     router.push("/onboarding/checkin");
   };
 
