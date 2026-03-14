@@ -178,7 +178,7 @@ export default function CheckInPage() {
     fontFamily: F_BODY,
     fontSize: 11,
     fontWeight: 600,
-    color: "rgba(255,255,255,0.45)",
+    color: "#ffffff",
     letterSpacing: "0.09em",
     textTransform: "uppercase",
     marginBottom: 8,
@@ -333,7 +333,7 @@ export default function CheckInPage() {
           {/* ── Back button ── */}
           <div style={{ position: "relative", zIndex: 1, padding: "20px 28px 0" }}>
             <button onClick={() => router.push("/onboarding/welcome")}
-              style={{ display: "flex", alignItems: "center", gap: 6, background: "transparent", border: "none", color: "#ffffff", cursor: "pointer", fontSize: 14, opacity: 0.75, padding: 0, fontFamily: F_BODY }}>
+              style={{ display: "flex", alignItems: "center", gap: 6, background: "transparent", border: "none", color: "#ffffff", cursor: "pointer", fontSize: 14, padding: 0, fontFamily: F_BODY }}>
               <ArrowLeft size={16} strokeWidth={2} />
               Back
             </button>
@@ -383,7 +383,7 @@ export default function CheckInPage() {
               <div style={{ fontFamily: F_HEADING, fontSize: 17, fontWeight: 700, color: "#ffffff", marginBottom: 4, textAlign: "center" }}>
                 {companionName}
               </div>
-              <div style={{ fontFamily: F_BODY, fontSize: 13, color: "rgba(255,255,255,0.6)", textAlign: "center", lineHeight: 1.5, marginBottom: 16 }}>
+              <div style={{ fontFamily: F_BODY, fontSize: 13, color: "#ffffff", textAlign: "center", lineHeight: 1.5, marginBottom: 16 }}>
                 Hi! Let&apos;s start with a few questions.
               </div>
 
@@ -394,7 +394,7 @@ export default function CheckInPage() {
                 <div style={{
                   fontFamily: F_BODY,
                   fontSize: 15,
-                  color: "#8ecfb0",
+                  color: "#ffffff",
                   textAlign: "center",
                   lineHeight: 1.7,
                   minHeight: 72,
@@ -436,7 +436,7 @@ export default function CheckInPage() {
               <div style={{
                 fontFamily: F_BODY,
                 fontSize: 11,
-                color: "rgba(255,255,255,0.38)",
+                color: "#ffffff",
                 textAlign: "center",
                 lineHeight: 1.5,
               }}>
@@ -555,7 +555,7 @@ export default function CheckInPage() {
                     style={{
                       background: "none", border: "none", cursor: "pointer",
                       fontFamily: F_BODY, fontSize: 13,
-                      color: "rgba(255,255,255,0.40)",
+                      color: "#ffffff",
                     }}
                   >
                     · Skip for now ·
@@ -566,7 +566,7 @@ export default function CheckInPage() {
                 <div style={{
                   textAlign: "center", marginTop: 10,
                   fontFamily: F_BODY, fontSize: 11,
-                  color: "rgba(255,255,255,0.28)", lineHeight: 1.5,
+                  color: "#ffffff", lineHeight: 1.5,
                 }}>
                   Your conversation is private and confidential. {companionName} is not a medical professional but can guide you to help.
                 </div>
