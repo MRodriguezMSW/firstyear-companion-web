@@ -316,6 +316,7 @@ export default function CheckInPage() {
         <div style={{
           position: "relative",
           zIndex: 1,
+          color: "#ffffff",
           width: "92%",
           maxWidth: 900,
           background: "transparent",

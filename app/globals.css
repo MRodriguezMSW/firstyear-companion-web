@@ -36,6 +36,16 @@ input, textarea, select {
   font-size: 16px !important;
 }
 
+/* ── Check-in page: force white text ── */
+.ci-left-panel,
+.ci-left-panel *,
+.ci-right-panel,
+.ci-right-panel *,
+.ci-two-panel,
+.ci-two-panel * {
+  color: #ffffff !important;
+}
+
 /* ── Theme CSS variables (21 themes) ── */
 :root,
 [data-theme="calm-sea"]      { --bg:#384959; --text:#FFFFFF; --subtext:#BDDDFC; --accent:#88BDF2; }
