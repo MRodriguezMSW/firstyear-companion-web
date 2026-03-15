@@ -166,7 +166,7 @@ export default function CheckInPage() {
     padding: "7px 14px",
     fontFamily: F_BODY,
     fontSize: 13,
-    color: active ? "var(--accent)" : "#ffffff",
+    color: "#ffffff",
     cursor: "pointer",
     whiteSpace: "nowrap" as const,
     transition: "all 0.15s",
@@ -428,7 +428,7 @@ export default function CheckInPage() {
                       width: i === msgIdx ? 16 : 5,
                       height: 5,
                       borderRadius: 3,
-                      background: i === msgIdx ? "var(--accent)" : "rgba(255,255,255,0.2)",
+                      background: i === msgIdx ? "#ffffff" : "rgba(255,255,255,0.35)",
                       transition: "all 0.4s ease",
                     }} />
                   ))}
